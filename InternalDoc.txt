@@ -1,0 +1,54 @@
+﻿-There needs to be logic to handle whether an individual
+is a guest or a registered user. If they are a registered
+user they can have messages queued for them if they
+are not online, but if they are a guest the sender
+needs to get a notification that the person was a guest and is
+now offline and that the
+message will not be delivered. 
+It needs to be clear that guests
+will not have message queueing service due to their
+ephemeral nature.
+
+-Need to create the javascript function to handle the event
+when a guest has logged off and the response needs to 
+be sent to the sender.
+
+-The saved messages need to have a flag that designates
+whether the messages was sent to/ came from a guest.
+Will need to rework the tables.
+
+-Need to create a friends list -cannot add guests
+nor can guests have a friends list.
+
+-Need to add a groups function. A guest CAN join a room
+but they cannot create a room.
+
+-Look into third-party pushing?
+
+-Add rCaptcha
+
+-Add online presence indicator (heartbeat mechanism => ByeByteGo)
+
+-Enums => Sent, Delivered, Queued, Read
+	-Received versus Read? What would the "Read" event be?
+
+-Do you show an aside of the on-going conversations?
+
+-Maybe just have a chat list for now. No reason for a friend.
+	a. Highlight the chat if there are messages queued?
+	b. Just make an event when the queue receives a new
+	   item for the said receiver. 
+
+-So guests can have an on-going chat list? Or just one chat at a time?
+
+-Okay, so how does this all LOOK on the page?
+
+-Maybe have a reservation mechanism for the guest name? 24 Hours?
+
+-So if you can have a registered user select a former guest name, what
+do you do with any chats that the former name owner had  participated in?
+
+-Add end-to-end encryption
+	-If it is sent/stored encrypted, how would that work for
+	chatlogs or for queueing? Chat logs => onConnected chatlog load.
+	

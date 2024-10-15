@@ -1,0 +1,57 @@
+﻿@using WindTalkerMessenger.Models.DataLayer
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@model WindTalkerMessenger.Models.ViewModels.ChatOptionsViewModel
+
+
+@if(!SignInManager.IsSignedIn(User))
+{
+    <p>It appears you are not logged in or you are not registered.</p>
+    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Login</a>
+
+    <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
+        <span id="guestError"></span>
+        <input type="text" placeholder="Pick Guest Name" name="guestName" id="guestName" />
+        <button type="submit" class="btn btn-primary" id="guestSend" name="guestSend">Start Chatting</button>
+    </form>
+    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Register</a>
+}
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+    $("#guestOption").click(function () {
+        console.log("Works");
+        $("#guestName").toggleClass("recShow");
+    })
+</script>
+
+<script>
+    $("#guestSend").click(function(event) {
+        var guestName = $("#guestName").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CheckGuestName", "Messaging")',
+            dataType: "json",
+            data: { GuestName: guestName },
+            success: function (response) {
+                var resp = JSON.parse(response);
+                if (resp == true) {
+                    sessionStorage.setItem("GuestName", guestName);
+                    $("#guest_form").submit();
+                    console.log("Worked");
+                }
+                else{
+                    event.preventDefault();
+
+                    $("#guestError").text("That username is taken.");
+                    console.log("Failed");
+                }
+            }
+        })
+    })
+</script>
