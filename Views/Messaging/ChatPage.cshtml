@@ -87,10 +87,7 @@
 
 <body>
 	<h2 id="userHeading"></h2>
-	<!-- Main container -->
-
 	<div class="container">
-		<!-- msg-header section starts -->
 		<div class="msg-header">
 			<div class="container1">
 				@*<img src="user1.png" class="msgimg" />*@
@@ -98,14 +95,10 @@
 				</div>
 			</div>
 		</div>
-		<!-- msg-header section ends -->
-		<!-- Chat inbox  -->
 		<div class="chat-page">
 			<div class="msg-inbox">
 				<div class="chats">
-					<!-- Message container -->
 					<div class="msg-page" id="incmessage">
-						<!-- Incoming messages -->
 						<div id="maindiv">
 							<div id="leftinnerdiv"> </div>
 							<div id="rightinnerdiv"></div>
@@ -118,7 +111,6 @@
 						</div>
 					</div>
 				</div>
-				<!-- msg-bottom section -->
 				<div class="msg-bottom">
 					<div class="input-group">
 						<input type="text"
@@ -131,8 +123,6 @@
 					</div>
 				</div>
 				<div>
-
-					@*<button id="sendButton">Send</button>*@
 				</div>
 			</div>
 		</div>
@@ -171,13 +161,10 @@
 		if (!username) {
 			username = $("#username").val();
 		}
-
 		var message = $("#message").val();
-		//<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
 
 		if (username && message) {
-			//var chatTarget = $("<div />").text(username).html();
-			//$("#chatList").append("<li><a class='btn btn-primary' asp-controller='Home' asp-action='Index' id=" + chatTarget+ ">" + chatTarget + "</a></li>");
+			
 			connection.invoke("SendMessage", username, message).catch(function (err) {
 				var encodedUser = $("<div />").text(username).html();
 				var encodedMsg = $("<div />").text(message).html();

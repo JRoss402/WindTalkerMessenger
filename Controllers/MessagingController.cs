@@ -24,19 +24,15 @@ namespace WindTalkerMessenger.Controllers
 		{
 
 			bool isTaken = _contextService.CheckGuestName(guestName);
-			//ViewData["GuestNameTaken"] = isTaken;
 
 			if (isTaken == true)
 			{
 				ViewData["GuestMessage"] = "That Username is taken. Please choose a new one";
 				bool json = true;
-				//return View("ChatOptions");
 				return Json(json);
 			}
 			else
 			{
-				//bool json = false;
-				//return Json(json);
 				return View("ChatPage");
 			}
 		}

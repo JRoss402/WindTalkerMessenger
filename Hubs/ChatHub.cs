@@ -17,6 +17,7 @@ namespace WindTalkerMessenger.Hubs
          * help with diagnosing any issues as well as recovering queued messages in the event
          * that the receiver is not online to receive them in real-time
          */
+
         enum Status
         {
             //Message passed through SendMessage method
@@ -38,7 +39,6 @@ namespace WindTalkerMessenger.Hubs
 
         public async Task SendMessage(string receiverUser, string message)
         {
-            //Incoming Message
 
             string senderConnId = Context.ConnectionId;
             string receiverConnId = _onlineUsersLists.onlineUsers[receiverUser].ToString();
@@ -102,7 +102,6 @@ namespace WindTalkerMessenger.Hubs
             string connectionId = Context.ConnectionId.ToString();
 
 			//_services.GuestHashRemovalAsync(connectionId);
-
 
 			string name = Context.User.Identity.Name;
             _onlineUsersLists.onlineUsers.Remove(name);
