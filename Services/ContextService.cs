@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.InteropServices;
+using System.Security.Claims;
 using WindTalkerMessenger.Models.DataLayer;
 using WindTalkerMessenger.Models.DomainModels;
 
@@ -10,15 +10,22 @@ namespace WindTalkerMessenger.Services
     public class ContextService : IContextService
     {
         private readonly ApplicationDbContext _context;
-        private readonly OnlineUsersLists _onlineUsersLists;
         private readonly ICacheService _cacheService;
+        private readonly OnlineUsersLists _onlineUsersLists;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _http;
 
-        public ContextService(ApplicationDbContext context,OnlineUsersLists onlineUsersLists,
-                              ICacheService cacheService)
+        public ContextService(ApplicationDbContext context, 
+                              OnlineUsersLists onlineUsersLists,
+                              ICacheService cacheService, 
+                              UserManager<ApplicationUser> userManager,
+                              IHttpContextAccessor http)
         {
             _context = context;
-            _onlineUsersLists = onlineUsersLists;
             _cacheService = cacheService;
+            _onlineUsersLists = onlineUsersLists;
+            _userManager = userManager;
+            _http = http;
         }
 
         enum Status
@@ -31,20 +38,20 @@ namespace WindTalkerMessenger.Services
             Queued,
         }
 
-        public bool CheckGuestName(string guestName)
+        public async Task<bool> UserNameCheck(string userName)
         {
-            bool isTaken;
+            ApplicationUser user = new ApplicationUser();
+            bool contains = true;
 
-            if (!_onlineUsersLists.anonUsers.Contains(guestName))
+            //var userNames = await _userManager.Users.Select(x => x.UserUserName).ToListAsync();
+            var userNames = _onlineUsersLists.onlineUsers;
+
+            if (!userNames.Contains(userName))
             {
-                isTaken = false;
-            }
-            else
-            {
-                isTaken = true;
+                contains = false;
             }
 
-            return isTaken;
+            return contains;
         }
 
         public async Task<List<ChatMessage>> GrabAllChats()
@@ -54,6 +61,14 @@ namespace WindTalkerMessenger.Services
             return chats;
         }
 
+        public string GradIdentityUserName()
+        {
+            string  identityEmail = _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            
+            string identityUserName = _userManager.Users.FirstOrDefault(x => x.UserUserName == identityEmail).ToString();
+
+            return identityUserName;
+        }
         public async Task GuestHashRemovalAsync(string connectionId)
         {
             
@@ -75,29 +90,6 @@ namespace WindTalkerMessenger.Services
                 await _context.SaveChangesAsync();
             }
         }
-
-       /* public async Task AddMetaData(MsgMetaData meta)
-        {
-            MsgMetaData metaData = new MsgMetaData();
-
-            metaData.Message = meta.Message;
-            metaData.MsgSender = meta.MsgSender;
-            metaData.MsgReceiver = meta.MsgReceiver;
-            metaData.ChatStatusID = meta.ChatStatusID;
-            metaData.TimeStamp = meta.TimeStamp;
-            metaData.MsgStatus = meta.MsgStatus;
-            try
-            {
-                await _context.MsgMetaData.AddAsync(metaData);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }*/
-
-
 
         public async Task<List<ChatMessage>> GrabNewChats()
         {
@@ -129,7 +121,7 @@ namespace WindTalkerMessenger.Services
             _context.SaveChanges();
         }
 
-        public void CreateChatObject(MessageQueue queue)
+        public ChatMessage CreateChatObject(MessageQueue queue)
         {
             ChatMessage chat = new ChatMessage();
 
@@ -141,10 +133,10 @@ namespace WindTalkerMessenger.Services
             chat.MessageUID = queue.MessageUID;
             chat.isLoaded = queue.isLoaded;
 
-            AddChatObject(chat);
+            return chat;
 
         }
-        public ChatMessage CreateChatObject(string message, string receiverUser, string senderUser, string ChatUID, Enum status )
+        public void CreateChatObject(string message, string receiverUser, string senderUser, string ChatUID, Enum status )
         {
             ChatMessage chat = new ChatMessage();
             chat.MessageDate = DateTime.Now;
@@ -155,23 +147,8 @@ namespace WindTalkerMessenger.Services
             chat.MessageUID = ChatUID;
             chat.isLoaded = true;
             AddChatObject(chat);
-
-            return chat;
         }
 
-        /*public MsgMetaData CreateMetaObject(string message, string senderEmail, string receiverEmail, string statusId)
-        {
-            MsgMetaData meta = new MsgMetaData();
-
-            meta.MsgStatus = Status.Sent.ToString();
-            meta.Message = message;
-            meta.MsgSender = senderEmail;
-            meta.MsgReceiver = receiverEmail;
-            meta.ChatStatusID = statusId;
-            meta.TimeStamp = DateTime.Now;
-
-            return meta;
-        }*/
 
         public MessageQueue CreateQueueObject(string message, string senderEmail, string receiverEmail, string msgUID, Enum status)
         {
@@ -203,7 +180,7 @@ namespace WindTalkerMessenger.Services
             return queue;
         }
 
-    }
+	}
 }
 
 

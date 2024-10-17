@@ -54,17 +54,10 @@ namespace WindTalkerMessenger.Hubs
             }
             var ChatUID = Guid.NewGuid().ToString();
             ChatMessage msg = new ChatMessage();
-            //MsgMetaData meta = new MsgMetaData();
-            
-            //meta = _services.CreateMetaObject(message, userEmail, user, ChatUID);
-            
-            //msg = _services.CreateChatObject(message, receiverUser, senderUser, ChatUID, Status.Sent);
-            //await _services.AddDbMessage(msg,senderUser);
-            //await _services.AddMetaData(meta);
+            _services.CreateChatObject(message, receiverUser, senderUser, ChatUID, Status.Sent);
 
             if (_onlineUsersLists.onlineUsers.Contains(receiverUser))
             {
-                //await Clients.User(receiverUser).SendAsync("ReceiveMessage", senderUser, message);
                 Clients.Client(receiverConnId).SendAsync("ReceiveMessage", senderUser, message);
             }
             else
@@ -76,21 +69,24 @@ namespace WindTalkerMessenger.Hubs
         public override async Task<Task> OnConnectedAsync()
         {
             string name;
-            string guestName = _contextAccessor.HttpContext.Session.GetString("guestName");
+            //string guestName = _contextAccessor.HttpContext.Session.GetString("guestName");
+            //string identityUserName = _services.GradIdentityUserName();
+
             string connid = Context.ConnectionId.ToString();
 
             if (Context.User.Identity.Name != null)
             {
-                 name = Context.User.Identity.Name;
+                 name = _services.GradIdentityUserName();
+
             }
             else
             {
-                name = guestName;
+                name = _contextAccessor.HttpContext.Session.GetString("guestName");
+
                 _onlineUsersLists.anonUsers.Add(name, connid);
             }
 
             _onlineUsersLists.onlineUsers.Add(name, connid);
-            //await Groups.AddToGroupAsync(Context.User.Identity.Name, name);
 
             return base.OnConnectedAsync();
         }
@@ -100,8 +96,6 @@ namespace WindTalkerMessenger.Hubs
             await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
 
             string connectionId = Context.ConnectionId.ToString();
-
-			//_services.GuestHashRemovalAsync(connectionId);
 
 			string name = Context.User.Identity.Name;
             _onlineUsersLists.onlineUsers.Remove(name);

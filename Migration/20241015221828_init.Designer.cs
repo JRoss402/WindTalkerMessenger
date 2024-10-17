@@ -12,14 +12,14 @@ using WindTalkerMessenger.Models.DataLayer;
 namespace WindTalkerMessenger.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241012203632_init")]
+    [Migration("20241015221828_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.24")
+                .HasAnnotation("ProductVersion", "6.0.35")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -161,44 +161,6 @@ namespace WindTalkerMessenger.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("WindTalkerMessenger.Models.ChatMessage", b =>
-                {
-                    b.Property<int?>("ChatMessageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("ChatMessageId"), 1L, 1);
-
-                    b.Property<DateTime>("MessageDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MessageStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MessageUID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MsgReceiverEmail")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("MsgSenderEmail")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isLoaded")
-                        .HasColumnType("bit");
-
-                    b.HasKey("ChatMessageId");
-
-                    b.HasIndex("MsgReceiverEmail");
-
-                    b.HasIndex("MsgSenderEmail");
-
-                    b.ToTable("Chats");
-                });
-
             modelBuilder.Entity("WindTalkerMessenger.Models.DataLayer.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -271,13 +233,51 @@ namespace WindTalkerMessenger.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("WindTalkerMessenger.Models.MessageQueue", b =>
+            modelBuilder.Entity("WindTalkerMessenger.Models.DomainModels.ChatMessage", b =>
                 {
-                    b.Property<int?>("MessageQueueId")
+                    b.Property<int>("ChatMessageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("MessageQueueId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChatMessageId"), 1L, 1);
+
+                    b.Property<DateTime>("MessageDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MessageStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MessageUID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MsgReceiverEmail")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MsgSenderEmail")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("isLoaded")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ChatMessageId");
+
+                    b.HasIndex("MsgReceiverEmail");
+
+                    b.HasIndex("MsgSenderEmail");
+
+                    b.ToTable("Chats");
+                });
+
+            modelBuilder.Entity("WindTalkerMessenger.Models.DomainModels.MessageQueue", b =>
+                {
+                    b.Property<int>("MessageQueueId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageQueueId"), 1L, 1);
 
                     b.Property<DateTime>("MessageDate")
                         .HasColumnType("datetime2");
@@ -360,7 +360,7 @@ namespace WindTalkerMessenger.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WindTalkerMessenger.Models.ChatMessage", b =>
+            modelBuilder.Entity("WindTalkerMessenger.Models.DomainModels.ChatMessage", b =>
                 {
                     b.HasOne("WindTalkerMessenger.Models.DataLayer.ApplicationUser", "IdentityReceiver")
                         .WithMany()
@@ -370,14 +370,14 @@ namespace WindTalkerMessenger.Data.Migrations
                     b.HasOne("WindTalkerMessenger.Models.DataLayer.ApplicationUser", "IdentitySender")
                         .WithMany()
                         .HasForeignKey("MsgSenderEmail")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("IdentityReceiver");
 
                     b.Navigation("IdentitySender");
                 });
 
-            modelBuilder.Entity("WindTalkerMessenger.Models.MessageQueue", b =>
+            modelBuilder.Entity("WindTalkerMessenger.Models.DomainModels.MessageQueue", b =>
                 {
                     b.HasOne("WindTalkerMessenger.Models.DataLayer.ApplicationUser", "IdentityReceiver")
                         .WithMany()
@@ -387,7 +387,7 @@ namespace WindTalkerMessenger.Data.Migrations
                     b.HasOne("WindTalkerMessenger.Models.DataLayer.ApplicationUser", "IdentitySender")
                         .WithMany()
                         .HasForeignKey("MsgSenderEmail")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("IdentityReceiver");
 

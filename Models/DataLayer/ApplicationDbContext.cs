@@ -22,7 +22,7 @@ namespace WindTalkerMessenger.Models.DataLayer
                 .HasOne(b => b.IdentitySender)
                 .WithMany() 
                 .HasForeignKey(b => b.MsgSenderEmail)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<ChatMessage>()
                 .HasOne(b => b.IdentityReceiver)
@@ -41,7 +41,7 @@ namespace WindTalkerMessenger.Models.DataLayer
                 .HasOne(b => b.IdentityReceiver)
                 .WithMany() 
                 .HasForeignKey(b => b.MsgReceiverEmail)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
             
 
 

@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using WindTalkerMessenger.Models.DataLayer;
+using WindTalkerMessenger.Services;
 
 namespace WindTalkerMessenger.Areas.Identity.Pages.Account
 {
@@ -98,6 +99,13 @@ namespace WindTalkerMessenger.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            //===================ApplicationUser================//
+            [Required]
+            [Display(Name = "Username")]
+            public string UserUserName { get; set; }
+
+            //===================ApplicationUser================//
         }
 
 
@@ -113,8 +121,9 @@ namespace WindTalkerMessenger.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-
+                //var user = CreateUser();
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, UserUserName = Input.UserUserName,  };
+                
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);

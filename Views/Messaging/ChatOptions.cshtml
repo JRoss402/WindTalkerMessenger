@@ -10,14 +10,14 @@
 {
     <p>It appears you are not logged in or you are not registered.</p>
     <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Login</a>
-
+    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Register</a>
+}
     <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
         <span id="guestError"></span>
         <input type="text" placeholder="Pick Guest Name" name="guestName" id="guestName" />
         <button type="submit" class="btn btn-primary" id="guestSend" name="guestSend">Start Chatting</button>
     </form>
-    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Register</a>
-}
+
 
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -53,5 +53,6 @@
                 }
             }
         })
+
     })
 </script>

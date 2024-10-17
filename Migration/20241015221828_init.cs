@@ -48,7 +48,8 @@ namespace WindTalkerMessenger.Data.Migrations
                         name: "FK_Chats_AspNetUsers_MsgSenderEmail",
                         column: x => x.MsgSenderEmail,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,7 +78,8 @@ namespace WindTalkerMessenger.Data.Migrations
                         name: "FK_Queues_AspNetUsers_MsgSenderEmail",
                         column: x => x.MsgSenderEmail,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
