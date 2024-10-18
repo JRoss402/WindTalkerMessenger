@@ -1,26 +1,27 @@
-﻿using WindTalkerMessenger.Models.DataLayer;
-using WindTalkerMessenger.Models.DomainModels;
+﻿using WindTalkerMessenger.Models.DomainModels;
 
 namespace WindTalkerMessenger.Services
 {
     public interface IContextService
     {
-        Task AddDbMessage(ChatMessage Chat, string guestName);
-        Task<List<ChatMessage>> GrabAllChats();
-        Task<List<ChatMessage>> CheckMsgQueue();
-        Task<List<ChatMessage>> GrabNewChats();
-        public string GradIdentityUserName();
+        Task CreateNewMessage(Message Chat, string userName);
 
-        Task GuestHashRemovalAsync(string connectionId);
-        //Task<List<ApplicationUser>> GrabAllUserNames();
-        Task<bool> UserNameCheck(string userName);
+        //Can the object creation methods all be void?
+        void CreateMessageObject(string message, string receiverUser, string senderUser, string ChatUID, Enum statuses);
+        Message CreateMessageObject(MessageQueue queue);
+        MessageQueue CreateQueuedMessageObject(Message message);
+        MessageQueue CreateQueuedMessageObject(string message, string senderEmail, string receiverEmail, string ChatUID, Enum statuses);
+
+        Task<List<Message>> GetReceivedMessages();
+        Task<List<Message>> SendQueuedMessages();
+
+        void IsRowRemovable(Message message);
+        void DissociateUserMessages(string identityUserEmail);
+        void InsertMessage(Message message);
 
 
-        public void CreateChatObject(string message, string receiverUser, string senderUser, string ChatUID, Enum status);
 
-		//ChatMessage CreateChatObject(string message, string receiverUser, string senderUser, string ChatUID, Enum status);
-        //void CreateChatObject(MessageQueue queue);
-        MessageQueue CreateQueueObject(string message, string senderEmail, string receiverEmail, string ChatUID, Enum status);
+
 
 
     }

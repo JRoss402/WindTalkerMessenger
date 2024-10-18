@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+﻿using Microsoft.EntityFrameworkCore;
 using WindTalkerMessenger.Models.DataLayer;
 using WindTalkerMessenger.Models.DomainModels;
 
@@ -10,77 +7,69 @@ namespace WindTalkerMessenger.Services
     public class ContextService : IContextService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICacheService _cacheService;
         private readonly OnlineUsersLists _onlineUsersLists;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IHttpContextAccessor _http;
+        private const string DELETED = "User Account Deleted";
 
         public ContextService(ApplicationDbContext context, 
-                              OnlineUsersLists onlineUsersLists,
-                              ICacheService cacheService, 
-                              UserManager<ApplicationUser> userManager,
-                              IHttpContextAccessor http)
+                              OnlineUsersLists onlineUsersLists)
         {
             _context = context;
-            _cacheService = cacheService;
             _onlineUsersLists = onlineUsersLists;
-            _userManager = userManager;
-            _http = http;
         }
 
-        enum Status
+        public void DissociateUserMessages(string identityUserEmail) 
         {
-            //Message passed through SendMessage method
-            Sent,
-            //Message was received in real-time
-            Received,
-            //The message was placed in a message que
-            Queued,
-        }
+            var userMessages =  _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
+                                                          e.MessageReceiverEmail == identityUserEmail).ToList();
 
-        public async Task<bool> UserNameCheck(string userName)
-        {
-            ApplicationUser user = new ApplicationUser();
-            bool contains = true;
-
-            //var userNames = await _userManager.Users.Select(x => x.UserUserName).ToListAsync();
-            var userNames = _onlineUsersLists.onlineUsers;
-
-            if (!userNames.Contains(userName))
+            foreach(var userMessage in userMessages)
             {
-                contains = false;
-            }
+                if(userMessage.MessageSenderEmail == identityUserEmail)
+                {
+                    userMessage.MessageSenderEmail = DELETED;
+                }
+                else if(userMessage.MessageReceiverEmail == identityUserEmail)
+                {
+                    userMessage.MessageReceiverEmail = DELETED;
+                }
 
-            return contains;
+                IsRowRemovable(userMessage);
+
+                _context.Chats.Update(userMessage);
+            }
+            _context.SaveChanges();
+              
         }
 
-        public async Task<List<ChatMessage>> GrabAllChats()
+        public void IsRowRemovable(Message message)
+        {
+            if(message.MessageSenderEmail == DELETED &&
+               message.MessageReceiverEmail == DELETED)
+            {
+                _context.Chats.Remove(message);
+            }
+        }
+
+        enum Statuses
+        {
+            Sent, Received, Queued,
+        }
+
+        public async Task<List<Message>> GetReceivedMessages()
         {
             var chats = await _context.Chats.AsNoTracking().ToListAsync();
 
             return chats;
         }
 
-        public string GradIdentityUserName()
+        public async Task CreateNewMessage(Message msg, string guestName)
         {
-            string  identityEmail = _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-            
-            string identityUserName = _userManager.Users.FirstOrDefault(x => x.UserUserName == identityEmail).ToString();
-
-            return identityUserName;
-        }
-        public async Task GuestHashRemovalAsync(string connectionId)
-        {
-            
-        }
-        public async Task AddDbMessage(ChatMessage msg, string guestName)
-        {
-            if(!_onlineUsersLists.onlineUsers.Contains(msg.MsgReceiverEmail) ||
+            if(!_onlineUsersLists.onlineUsers.Contains(msg.MessageReceiverEmail) ||
                !_onlineUsersLists.onlineUsers.Contains(guestName))
             {
                 MessageQueue queue = new MessageQueue();
 
-                queue = CreateQueueObject(msg);
+                queue = CreateQueuedMessageObject(msg);
                 await _context.Queues.AddAsync(queue);
                 await _context.SaveChangesAsync();
             }
@@ -91,22 +80,16 @@ namespace WindTalkerMessenger.Services
             }
         }
 
-        public async Task<List<ChatMessage>> GrabNewChats()
+        public async Task<List<Message>> SendQueuedMessages()
         {
-            var readList = _cacheService.CacheChats().Result.Where(e => e.isLoaded == false).ToList();
+            //The new chats objects are being created, but why is this returning a list?
 
-            return readList;
-        }
-
-        
-        public async Task<List<ChatMessage>> CheckMsgQueue()
-        {
             var queues = _context.Queues;
             if (queues != null)
             {
                 foreach (MessageQueue queue in queues)
                 {
-                     CreateChatObject(queue);
+                    CreateMessageObject(queue);
 
                     _context.Queues.Remove(queue);
                     _context.SaveChanges();
@@ -115,67 +98,66 @@ namespace WindTalkerMessenger.Services
             return null;
         }
 
-        public void AddChatObject(ChatMessage chat)
+        public void InsertMessage(Message chat)
         {
             _context.Chats.Add(chat);
             _context.SaveChanges();
         }
 
-        public ChatMessage CreateChatObject(MessageQueue queue)
+        public Message CreateMessageObject(MessageQueue queue)
         {
-            ChatMessage chat = new ChatMessage();
+            Message chat = new Message();
 
             chat.MessageDate = DateTime.Now;
             chat.UserMessage = queue.UserMessage;
             chat.MessageStatus = queue.MessageStatus;
-            chat.MsgSenderEmail = queue.MsgSenderEmail;
-            chat.MsgReceiverEmail = queue.MsgReceiverEmail;
+            chat.MessageSenderEmail = queue.MessageSenderEmail;
+            chat.MessageReceiverEmail = queue.MessageReceiverEmail;
             chat.MessageUID = queue.MessageUID;
-            chat.isLoaded = queue.isLoaded;
+            chat.IsReceived = queue.IsReceived;
 
             return chat;
-
         }
-        public void CreateChatObject(string message, string receiverUser, string senderUser, string ChatUID, Enum status )
+        public void CreateMessageObject(string message, string receiverUser, string senderUser, string ChatUID, Enum status )
         {
-            ChatMessage chat = new ChatMessage();
+            Message chat = new Message();
             chat.MessageDate = DateTime.Now;
             chat.UserMessage = message;
             chat.MessageStatus = status.ToString();
-            chat.MsgSenderEmail = senderUser;
-            chat.MsgReceiverEmail = receiverUser;
+            chat.MessageSenderEmail = senderUser;
+            chat.MessageReceiverEmail = receiverUser;
             chat.MessageUID = ChatUID;
-            chat.isLoaded = true;
-            AddChatObject(chat);
+            chat.IsReceived = true;
+            InsertMessage(chat);
         }
 
 
-        public MessageQueue CreateQueueObject(string message, string senderEmail, string receiverEmail, string msgUID, Enum status)
+        public MessageQueue CreateQueuedMessageObject(string message, string senderEmail, string receiverEmail, string msgUID, Enum status)
         {
             MessageQueue queue = new MessageQueue();
 
             queue.MessageDate = DateTime.Now;
             queue.UserMessage = message;
             queue.MessageStatus = status.ToString();
-            queue.MsgSenderEmail = senderEmail;
-            queue.MsgReceiverEmail = receiverEmail;
+            queue.MessageSenderEmail = senderEmail;
+            queue.MessageReceiverEmail = receiverEmail;
             queue.MessageUID = msgUID;
-            queue.isLoaded = queue.isLoaded = false;
+            queue.IsReceived = queue.IsReceived = false;
 
             return queue;
         }
 
-        public MessageQueue CreateQueueObject(ChatMessage msg)
+        public MessageQueue CreateQueuedMessageObject(Message msg)
         {
             MessageQueue queue = new MessageQueue();
 
             queue.MessageDate = DateTime.Now;
             queue.UserMessage = msg.UserMessage;
             queue.MessageStatus = msg.MessageStatus;
-            queue.MsgSenderEmail = msg.MsgSenderEmail;
-            queue.MsgReceiverEmail = msg.MsgReceiverEmail;
+            queue.MessageSenderEmail = msg.MessageSenderEmail;
+            queue.MessageReceiverEmail = msg.MessageReceiverEmail;
             queue.MessageUID = msg.MessageUID;
-            queue.isLoaded = msg.isLoaded;
+            queue.IsReceived = msg.IsReceived;
 
             return queue;
         }

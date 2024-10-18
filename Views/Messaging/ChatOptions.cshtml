@@ -30,12 +30,11 @@
 </script>
 
 <script>
-    $("#guestSend").click(function(event) {
+    $("#guestSend").click(function (event) {
         var guestName = $("#guestName").val();
-
         $.ajax({
             type: "POST",
-            url: '@Url.Action("CheckGuestName", "Messaging")',
+            url: '@Url.Action("CheckGuestName", "API")',
             dataType: "json",
             data: { GuestName: guestName },
             success: function (response) {
@@ -53,6 +52,5 @@
                 }
             }
         })
-
-    })
+    });
 </script>
