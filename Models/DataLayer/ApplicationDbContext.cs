@@ -13,36 +13,27 @@ namespace WindTalkerMessenger.Models.DataLayer
         public DbSet<Message> Chats { get; set; }
         public DbSet<MessageQueue> Queues { get; set; }
         //public DbSet<Groups> Groups { get; set; }
+        public DbSet<Guest> Guests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-           /* builder.Entity<Message>();
-                 .HasOne(b => b.IdentitySender)
-                 .WithMany() 
-                 .HasForeignKey(b => b.MessageSenderEmail)
-                 .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Message>()
+                .Property(x => x.MessageReceiverEmail)
+                .HasDefaultValue("Guest");
 
-            builder.Entity<Message>();
-                .HasOne(b => b.IdentityReceiver)
-                .WithMany() 
-                .HasForeignKey(b => b.MessageReceiverEmail)
-                .OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<Message>()
+                .Property(x => x.MessageSenderEmail)
+                .HasDefaultValue("Guest");
 
             builder.Entity<MessageQueue>()
-                .HasOne(b => b.IdentitySender)
-                .WithMany() 
-                .HasForeignKey(b => b.MsgSenderEmail)
-                .OnDelete(DeleteBehavior.SetNull);
-
+                .Property(x => x.MessageReceiverEmail)
+                .HasDefaultValue("Guest");
 
             builder.Entity<MessageQueue>()
-                .HasOne(b => b.IdentityReceiver)
-                .WithMany() 
-                .HasForeignKey(b => b.MsgReceiverEmail)
-                .OnDelete(DeleteBehavior.SetNull);*/
-            
+                .Property(x => x.MessageSenderEmail)
+                .HasDefaultValue("Guest");        
         }
     }
 }

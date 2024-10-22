@@ -8,22 +8,22 @@ namespace WindTalkerMessenger.Services
 
         public Hashtable anonUsers = new Hashtable();
 
-        public void OnlineUsersAdd(string userName,string connectionId)
+        public async Task OnlineUsersAdd(string userName,string connectionId)
         {
             onlineUsers.Add(userName, connectionId);
         }
 
-        public void OnlineUsersRemove(string userName)
+        public async Task OnlineUsersRemove(string userName)
         {
             onlineUsers.Remove(userName);
         }
 
-        public void AnonUsersAdd(string userName, string connectionId)
+        public async Task AnonUsersAdd(string userName, string connectionId)
         {
             anonUsers.Add(userName, connectionId);
         }
 
-        public void AnonUsersRemove(string userName)
+        public async Task AnonUsersRemove(string userName)
         {
             anonUsers.Remove(userName);
         }

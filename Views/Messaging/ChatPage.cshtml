@@ -100,7 +100,7 @@
 				<div class="chats">
 					<div class="msg-page" id="incmessage">
 						<div id="maindiv">
-							<div id="leftinnerdiv"> </div>
+							<div id="leftinnerdiv"></div>
 							<div id="rightinnerdiv"></div>
 							<div id="chatsAside">
 								<input type="text" id="username" placeholder="Username" />
@@ -131,28 +131,16 @@
 </html>
 
 <script>
+
 	var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
 	connection.on("ReceiveMessage", function (user, message) {
 		var encodedUser = $("<div />").text(user).html();
 		var encodedMsg = $("<div />").text(message).html();
 		console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
 		$("#leftinnerdiv").append("<p><strong>" + encodedUser + "</strong>: " + encodedMsg + "</p>")
 
-	});
-	connection.on("MessageQueued", function (user) {
-		var encodedUser = $("<div />").text(user).html();
-
-		console.log(encodedUser, " is offline.Your message has been queued until they return.");
-
-		$("#leftinnerdiv").append("<p><strong> User: " + encodedUser + " is offline. Message is queued.</strong></p>")
-	});
-	connection.on("ServerDisconnect", function (user) {
-		var encodedUser = $("<div />").text(user).html();
-
-		console.log("User: ", encodedUser, " disconnected.The server timed out");
-
-		$("#leftinnerdiv").append("<p><strong>Server Response Timed Out. You have been disconnected.</strong></p>")
-	});
+	})
 
 	$("#sendButton").click(function () {
 		var username
@@ -184,10 +172,4 @@
 	}).catch(function (err) {
 		console.error(err.toString());
 	});
-</script>
-
-<script>
-	function GetUserName() {
-		var storedName = sessionStorage.getItem("GuestName");
-	}
 </script>

@@ -16,12 +16,12 @@ namespace WindTalkerMessenger.Services
             _context = context;
         }
 
-        public async Task<List<ChatMessage>> CacheChats()
+        public async Task<List<Message>> CacheChats()
         {
             var cacheKey = "chats";
 
 
-            if (!_cache.TryGetValue(cacheKey, out List<ChatMessage> expenses))
+            if (!_cache.TryGetValue(cacheKey, out List<Message> messages))
             {
                 var chats = await _context.Chats.ToListAsync();
                 var cacheOptions = new MemoryCacheEntryOptions()
@@ -31,7 +31,7 @@ namespace WindTalkerMessenger.Services
                 _cache.Set(cacheKey, chats, cacheOptions);
             }
 
-            return expenses;
+            return messages;
         }
     }
 }

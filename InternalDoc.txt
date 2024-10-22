@@ -52,3 +52,16 @@ do you do with any chats that the former name owner had  participated in?
 	-If it is sent/stored encrypted, how would that work for
 	chatlogs or for queueing? Chat logs => onConnected chatlog load.
 	
+
+-Add the logic that determines if a user is signed in, and if they are
+send them straight to the chat page and use the username that they created.
+
+
+-Fix the Javascript validation and the validationcontroller
+	=> Javscript prevents until correct value =>Correct sent back
+	to controller.
+	=> NO JAVASCRIPT => controller prevents until correct answer
+	comes back. The styling needs to be the same with the validation span.
+
+-Convert ajax to fetch
+

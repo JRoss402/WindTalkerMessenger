@@ -4,21 +4,24 @@ namespace WindTalkerMessenger.Services
 {
     public interface IContextService
     {
-        Task CreateNewMessage(Message Chat, string userName);
+        //Task CreateNewMessage(Message Chat, string userName);
 
         //Can the object creation methods all be void?
-        void CreateMessageObject(string message, string receiverUser, string senderUser, string ChatUID, Enum statuses);
+        void CreateMessageObject(string message, string senderEmail, string messageFamilyUID,
+                                 Enum status, string senderChatName, string receiverChatName);
         Message CreateMessageObject(MessageQueue queue);
         MessageQueue CreateQueuedMessageObject(Message message);
-        MessageQueue CreateQueuedMessageObject(string message, string senderEmail, string receiverEmail, string ChatUID, Enum statuses);
+        void CreateQueuedMessageObject(string message, string senderEmail, string messageFamilyUID,
+                                               Enum status, string senderChatName, string receiverChatName);
 
         Task<List<Message>> GetReceivedMessages();
         Task<List<Message>> SendQueuedMessages();
 
         void IsRowRemovable(Message message);
-        void DissociateUserMessages(string identityUserEmail);
+        void DisassociateUserMessages(string identityUserEmail);
         void InsertMessage(Message message);
 
+        void AddNewGuest(string userName, string connectionId);
 
 
 

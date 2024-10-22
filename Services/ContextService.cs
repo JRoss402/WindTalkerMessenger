@@ -9,6 +9,7 @@ namespace WindTalkerMessenger.Services
         private readonly ApplicationDbContext _context;
         private readonly OnlineUsersLists _onlineUsersLists;
         private const string DELETED = "User Account Deleted";
+        private enum Statuses { Sent, Received, Queued }
 
         public ContextService(ApplicationDbContext context, 
                               OnlineUsersLists onlineUsersLists)
@@ -17,7 +18,18 @@ namespace WindTalkerMessenger.Services
             _onlineUsersLists = onlineUsersLists;
         }
 
-        public void DissociateUserMessages(string identityUserEmail) 
+        public void AddNewGuest(string userName, 
+                                string connectionId)
+        {
+            Guest guest = new Guest();
+            guest.GuestName = userName;
+            guest.GuestConnectionId = connectionId;
+
+            _context.Add(guest);
+            _context.SaveChanges();
+        }
+
+        public void DisassociateUserMessages(string identityUserEmail) 
         {
             var userMessages =  _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
                                                           e.MessageReceiverEmail == identityUserEmail).ToList();
@@ -40,6 +52,10 @@ namespace WindTalkerMessenger.Services
             _context.SaveChanges();
               
         }
+        public void RowBackFill()
+        {
+            
+        }
 
         public void IsRowRemovable(Message message)
         {
@@ -50,34 +66,12 @@ namespace WindTalkerMessenger.Services
             }
         }
 
-        enum Statuses
-        {
-            Sent, Received, Queued,
-        }
 
         public async Task<List<Message>> GetReceivedMessages()
         {
             var chats = await _context.Chats.AsNoTracking().ToListAsync();
 
             return chats;
-        }
-
-        public async Task CreateNewMessage(Message msg, string guestName)
-        {
-            if(!_onlineUsersLists.onlineUsers.Contains(msg.MessageReceiverEmail) ||
-               !_onlineUsersLists.onlineUsers.Contains(guestName))
-            {
-                MessageQueue queue = new MessageQueue();
-
-                queue = CreateQueuedMessageObject(msg);
-                await _context.Queues.AddAsync(queue);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                await _context.Chats.AddAsync(msg);
-                await _context.SaveChangesAsync();
-            }
         }
 
         public async Task<List<Message>> SendQueuedMessages()
@@ -104,62 +98,89 @@ namespace WindTalkerMessenger.Services
             _context.SaveChanges();
         }
 
+        public void InsertQueuedMessage(MessageQueue queuedMessage)
+        {
+            _context.Queues.Add(queuedMessage);
+            _context.SaveChanges();
+        }
+
         public Message CreateMessageObject(MessageQueue queue)
         {
-            Message chat = new Message();
+            var newMessage = new MessageBuilder()
+                                .WithMessageStatus(queue.MessageStatus)
+                                .WithMessage(queue.UserMessage)
+                                .WithMessageFamilyUID(queue.MessageFamilyUID)
+                                .WithMessageDate(DateTime.Now)
+                                .WithIsReceived(queue.IsReceived)
+                                .WithSenderEmail(queue.MessageSenderEmail)
+                                .WithSenderChatName(queue.SenderChatName)
+                                .WithReceiverEmail(queue.MessageReceiverEmail)
+                                .WithReceiverChatName(queue.ReceiverChatName)
+                                .Build();
 
-            chat.MessageDate = DateTime.Now;
-            chat.UserMessage = queue.UserMessage;
-            chat.MessageStatus = queue.MessageStatus;
-            chat.MessageSenderEmail = queue.MessageSenderEmail;
-            chat.MessageReceiverEmail = queue.MessageReceiverEmail;
-            chat.MessageUID = queue.MessageUID;
-            chat.IsReceived = queue.IsReceived;
-
-            return chat;
+            return newMessage;
         }
-        public void CreateMessageObject(string message, string receiverUser, string senderUser, string ChatUID, Enum status )
+        public void CreateMessageObject(string message, 
+                                        string senderEmail, 
+                                        string messageFamilyUID,
+                                        Enum status, 
+                                        string senderChatName, 
+                                        string receiverChatName)
         {
-            Message chat = new Message();
-            chat.MessageDate = DateTime.Now;
-            chat.UserMessage = message;
-            chat.MessageStatus = status.ToString();
-            chat.MessageSenderEmail = senderUser;
-            chat.MessageReceiverEmail = receiverUser;
-            chat.MessageUID = ChatUID;
-            chat.IsReceived = true;
-            InsertMessage(chat);
+            var newMessage = new MessageBuilder()
+                                .WithMessageStatus(status.ToString())
+                                .WithMessage(message)
+                                .WithMessageFamilyUID(messageFamilyUID)
+                                .WithMessageDate(DateTime.Now)
+                                .WithIsReceived(true)
+                                .WithSenderEmail(senderEmail)
+                                .WithSenderChatName(senderChatName)
+                                .WithReceiverEmail(receiverChatName)
+                                .WithReceiverChatName(receiverChatName)
+                                .Build();
+
+            InsertMessage(newMessage);
+
         }
 
-
-        public MessageQueue CreateQueuedMessageObject(string message, string senderEmail, string receiverEmail, string msgUID, Enum status)
+        public void CreateQueuedMessageObject(string message, 
+                                              string senderEmail, 
+                                              string messageFamilyUID, 
+                                              Enum status, 
+                                              string senderChatName, 
+                                              string receiverChatName)
         {
-            MessageQueue queue = new MessageQueue();
 
-            queue.MessageDate = DateTime.Now;
-            queue.UserMessage = message;
-            queue.MessageStatus = status.ToString();
-            queue.MessageSenderEmail = senderEmail;
-            queue.MessageReceiverEmail = receiverEmail;
-            queue.MessageUID = msgUID;
-            queue.IsReceived = queue.IsReceived = false;
+            var queuedMessage = new MessageQueueBuilder()
+                    .WithMessageStatus(status.ToString())
+                    .WithMessage(message)
+                    .WithMessageFamilyUID(messageFamilyUID)
+                    .WithMessageDate(DateTime.Now)
+                    .WithIsReceived(true)
+                    .WithSenderEmail(senderEmail)
+                    .WithSenderChatName(senderChatName)
+                    .WithReceiverEmail(receiverChatName)
+                    .WithReceiverChatName(receiverChatName)
+                    .Build();
 
-            return queue;
+            InsertQueuedMessage(queuedMessage);
         }
 
         public MessageQueue CreateQueuedMessageObject(Message msg)
         {
-            MessageQueue queue = new MessageQueue();
+            var queuedMessage = new MessageQueueBuilder()
+                    .WithMessageStatus(msg.MessageStatus)
+                    .WithMessage(msg.UserMessage)
+                    .WithMessageFamilyUID(msg.MessageFamilyUID)
+                    .WithMessageDate(DateTime.Now)
+                    .WithIsReceived(msg.IsReceived)
+                    .WithSenderEmail(msg.MessageSenderEmail)
+                    .WithSenderChatName(msg.SenderChatName)
+                    .WithReceiverEmail(msg.ReceiverChatName)
+                    .WithReceiverChatName(msg.ReceiverChatName)
+                    .Build();
 
-            queue.MessageDate = DateTime.Now;
-            queue.UserMessage = msg.UserMessage;
-            queue.MessageStatus = msg.MessageStatus;
-            queue.MessageSenderEmail = msg.MessageSenderEmail;
-            queue.MessageReceiverEmail = msg.MessageReceiverEmail;
-            queue.MessageUID = msg.MessageUID;
-            queue.IsReceived = msg.IsReceived;
-
-            return queue;
+            return queuedMessage;
         }
 
 	}

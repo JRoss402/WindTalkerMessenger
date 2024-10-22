@@ -6,7 +6,7 @@ namespace WindTalkerMessenger.Services
 {
     public interface ICacheService
     {
-        Task<List<ChatMessage>> CacheChats();
+        Task<List<Message>> CacheChats();
 
     }
 }

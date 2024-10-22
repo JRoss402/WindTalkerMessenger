@@ -31,7 +31,6 @@ namespace WindTalkerMessenger.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
@@ -103,7 +102,7 @@ namespace WindTalkerMessenger.Areas.Identity.Pages.Account
             //===================ApplicationUser================//
             [Required]
             [Display(Name = "Username")]
-            public string UserUserName { get; set; }
+            public string ChatName { get; set; }
 
             //===================ApplicationUser================//
         }
@@ -121,8 +120,7 @@ namespace WindTalkerMessenger.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                //var user = CreateUser();
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, UserUserName = Input.UserUserName,  };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, ChatName = Input.ChatName,  };
                 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -131,7 +129,6 @@ namespace WindTalkerMessenger.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

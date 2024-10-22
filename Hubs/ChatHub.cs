@@ -1,6 +1,6 @@
 ﻿using WindTalkerMessenger.Services;
 using Microsoft.AspNetCore.SignalR;
-using WindTalkerMessenger.Models.DomainModels;
+using NuGet.Protocol;
 
 namespace WindTalkerMessenger.Hubs
 {
@@ -11,7 +11,7 @@ namespace WindTalkerMessenger.Hubs
         private readonly OnlineUsersLists _onlineUsersLists;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUserNameService _userNameService;
-        private const string userNameKey = "userName";
+        private const string chatNameKey = "chatName";
 
         /* The transmission states. These will update during the entire process. The status can 
          * help with diagnosing any issues as well as recovering queued messages in the event
@@ -34,27 +34,36 @@ namespace WindTalkerMessenger.Hubs
             _userNameService = userNameService;
         }
 
-        public async Task SendMessage(string receiverUserName, string message)
+        public async Task SendMessage(string receiverChatName, string message)
         {
             string senderConnectionId = Context.ConnectionId;
-            string senderUserName = Context.User.Identity.Name;
-            string receiverConnectionId = _onlineUsersLists.onlineUsers[receiverUserName].ToString();
 
-            if(senderUserName == null)
+            //What if it is a guest-to-guest chat?
+            string senderIdentityEmail = Context.User.Identity.Name;
+            //Need to rename this method => GetIdentityChatName()
+            string senderChatName = _userNameService.GetIdentityChatName(senderConnectionId);
+
+            string receiverConnectionId = _onlineUsersLists.onlineUsers[receiverChatName].ToString();
+            string messageFamilyUID = Guid.NewGuid().ToString();
+
+            if (senderChatName == null)
             {
-                senderUserName = _contextAccessor.HttpContext.Session.GetString(userNameKey);
+                senderChatName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
             }
 
-            var messageUID = Guid.NewGuid().ToString();
-            _contextServices.CreateMessageObject(message, receiverUserName, senderUserName, messageUID, Status.Sent);
-
-            if (_onlineUsersLists.onlineUsers.Contains(receiverUserName))
+            if (_onlineUsersLists.onlineUsers.Contains(receiverChatName))
             {
-                Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderUserName, message);
+                _contextServices.CreateMessageObject(message, senderIdentityEmail, messageFamilyUID,
+                                                     Status.Sent, senderChatName, receiverChatName);
+
+                Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
             }
             else
             {
-                await Clients.Client(receiverConnectionId).SendAsync("MessageQueued", receiverUserName);
+                _contextServices.CreateQueuedMessageObject(message, senderIdentityEmail, messageFamilyUID,
+                                                           Status.Sent, senderChatName, receiverChatName);
+
+                await Clients.Client(receiverConnectionId).SendAsync("MessageQueued", receiverChatName);
             }
         }
 
@@ -62,23 +71,21 @@ namespace WindTalkerMessenger.Hubs
         {
             string userName;
             string identityUserName = Context.User.Identity.Name;
-            //string guestName = _contextAccessor.HttpContext.Session.GetString("guestName");
-            //string identityUserName = _services.GradIdentityUserName();
-
             string connectionId = Context.ConnectionId.ToString();
 
             if (identityUserName != null)
             {
-                userName = _userNameService.GetIdentityUserName();
+
+               userName = _userNameService.GetIdentityChatName(connectionId);
 
             }
             else
             {
-                userName = _contextAccessor.HttpContext.Session.GetString("guestName");
-
-                _onlineUsersLists.anonUsers.Add(userName, connectionId);
+                userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
+                _contextServices.AddNewGuest(userName, connectionId);
+                //_onlineUsersLists.onlineUsers.Add(userName,connectionId);
+                //_onlineUsersLists.anonUsers.Add(userName, connectionId);
             }
-
             _onlineUsersLists.onlineUsers.Add(userName, connectionId);
 
             return base.OnConnectedAsync();

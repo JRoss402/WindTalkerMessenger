@@ -1,45 +1,23 @@
-﻿using EnigmaMessengerV1.Controllers;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using WindTalkerMessenger.Models.ExtensionMethods;
 using WindTalkerMessenger.Services;
 
 namespace WindTalkerMessenger.Controllers
 {
 	public class MessagingController : Controller
 	{
-		private readonly ILogger<HomeController> _logger;
 		private readonly OnlineUsersLists _onlineUsersLists;
 		private readonly IHttpContextAccessor _httpAccessor;
-		private readonly IContextService _contextService;
-		public MessagingController(ILogger<HomeController> logger, OnlineUsersLists onlineUsersLists,
-					  IHttpContextAccessor httpAccessor, IContextService contextService)
-		{
-			_logger = logger;
+		public MessagingController(OnlineUsersLists onlineUsersLists,
+                                   IHttpContextAccessor httpAccessor)
+        {
 			_onlineUsersLists = onlineUsersLists;
 			_httpAccessor = httpAccessor;
-			_contextService = contextService;
 		}
 
-		[HttpPost]
-		public IActionResult CheckGuestName(string guestName)
+        public IActionResult Guest(string chatName)
 		{
-
-			bool isTaken = _contextService.CheckGuestName(guestName);
-
-			if (isTaken == true)
-			{
-				ViewData["GuestMessage"] = "That Username is taken. Please choose a new one";
-				bool json = true;
-				return Json(json);
-			}
-			else
-			{
-				return View("ChatPage");
-			}
-		}
-
-		public IActionResult Guest(string guestName)
-		{
-			_httpAccessor.HttpContext.Session.SetString("guestName", guestName);
+			_httpAccessor.HttpContext.Session.SetString("chatName", chatName);
 
 			return View("Views\\Messaging\\ChatPage.cshtml");
 		}

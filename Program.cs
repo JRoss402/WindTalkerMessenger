@@ -1,9 +1,7 @@
 using WindTalkerMessenger.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WindTalkerMessenger.Hubs;
 using WindTalkerMessenger.Models.DataLayer;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,15 +16,18 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddMemoryCache();
-builder.Services.AddSession(options =>
+builder.Services.AddSession();
+/*(options =>
 {
-    options.Cookie.HttpOnly = true;
+    options.Cookie.HttpOnly = false;
     options.Cookie.IsEssential = true;
-});
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});*/
 
 builder.Services.AddScoped<IContextService, ContextService>();
 builder.Services.AddSingleton<OnlineUsersLists>();
 builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddScoped<IUserNameService, UserNameService>();
 builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
 
@@ -45,7 +46,7 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();

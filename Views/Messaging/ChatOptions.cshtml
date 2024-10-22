@@ -14,7 +14,7 @@
 }
     <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
         <span id="guestError"></span>
-        <input type="text" placeholder="Pick Guest Name" name="guestName" id="guestName" />
+    <input type="text" placeholder="Pick Chat Name" name="chatName" id="chatName" />
         <button type="submit" class="btn btn-primary" id="guestSend" name="guestSend">Start Chatting</button>
     </form>
 
@@ -25,29 +25,29 @@
 <script>
     $("#guestOption").click(function () {
         console.log("Works");
-        $("#guestName").toggleClass("recShow");
+        $("#chatName").toggleClass("recShow");
     })
 </script>
 
 <script>
     $("#guestSend").click(function (event) {
-        var guestName = $("#guestName").val();
+        var chatName = $("#chatName").val();
         $.ajax({
             type: "POST",
-            url: '@Url.Action("CheckGuestName", "API")',
+            url: '@Url.Action("CheckChatName", "API")',
             dataType: "json",
-            data: { GuestName: guestName },
+            data: { ChatName: chatName },
             success: function (response) {
                 var resp = JSON.parse(response);
                 if (resp == true) {
-                    sessionStorage.setItem("GuestName", guestName);
+                    sessionStorage.setItem("ChatName", chatName);
                     $("#guest_form").submit();
                     console.log("Worked");
                 }
                 else{
                     event.preventDefault();
 
-                    $("#guestError").text("That username is taken.");
+                    $("#guestError").text("That chat name is taken.");
                     console.log("Failed");
                 }
             }
