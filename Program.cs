@@ -2,6 +2,8 @@ using WindTalkerMessenger.Services;
 using Microsoft.EntityFrameworkCore;
 using WindTalkerMessenger.Hubs;
 using WindTalkerMessenger.Models.DataLayer;
+using Microsoft.AspNetCore.Identity;
+using WindTalkerMessenger.Models.DomainModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,22 +13,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSession();
-/*(options =>
-{
-    options.Cookie.HttpOnly = false;
-    options.Cookie.IsEssential = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-});*/
-
 builder.Services.AddScoped<IContextService, ContextService>();
 builder.Services.AddSingleton<OnlineUsersLists>();
-builder.Services.AddScoped<ICacheService, CacheService>();
+//builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IUserNameService, UserNameService>();
 builder.Services.AddSignalR();
 builder.Services.AddHttpContextAccessor();
@@ -54,9 +50,17 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chatHub");
+
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using (var scope = scopeFactory.CreateScope())
+{
+    await ConfigureRoles.CreateAdminRole(scope.ServiceProvider);
+}
 app.Run();

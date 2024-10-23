@@ -7,12 +7,22 @@ namespace WindTalkerMessenger.Services
         //Task CreateNewMessage(Message Chat, string userName);
 
         //Can the object creation methods all be void?
-        void CreateMessageObject(string message, string senderEmail, string messageFamilyUID,
-                                 Enum status, string senderChatName, string receiverChatName);
+        void CreateMessageObject(string message, 
+                                 string senderEmail, 
+                                 string receiverEmail, 
+                                 string messageFamilyUID,
+                                 Enum status, 
+                                 string senderChatName, 
+                                 string receiverChatName);
         Message CreateMessageObject(MessageQueue queue);
         MessageQueue CreateQueuedMessageObject(Message message);
-        void CreateQueuedMessageObject(string message, string senderEmail, string messageFamilyUID,
-                                               Enum status, string senderChatName, string receiverChatName);
+        void CreateQueuedMessageObject(string message, 
+                                       string senderEmail, 
+                                       string receiverEmail, 
+                                       string messageFamilyUID,
+                                       Enum status, 
+                                       string senderChatName, 
+                                       string receiverChatName);
 
         Task<List<Message>> GetReceivedMessages();
         Task<List<Message>> SendQueuedMessages();

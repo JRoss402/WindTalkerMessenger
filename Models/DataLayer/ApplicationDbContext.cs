@@ -28,12 +28,12 @@ namespace WindTalkerMessenger.Models.DataLayer
                 .HasDefaultValue("Guest");
 
             builder.Entity<MessageQueue>()
-                .Property(x => x.MessageReceiverEmail)
-                .HasDefaultValue("Guest");
+                .Property(x => x.MessageReceiverEmail);
+                //.HasDefaultValue("Guest");
 
             builder.Entity<MessageQueue>()
-                .Property(x => x.MessageSenderEmail)
-                .HasDefaultValue("Guest");        
+                .Property(x => x.MessageSenderEmail);
+                //.HasDefaultValue("Guest");        
         }
     }
 }

@@ -36,32 +36,50 @@ namespace WindTalkerMessenger.Hubs
 
         public async Task SendMessage(string receiverChatName, string message)
         {
+            //Need to change logic to make messageFamily the same for a chat sequence.
+            /*
+                If receiverName = recName AND senderName = sendName AND count = 1
+                
+             
+             */
+
             string senderConnectionId = Context.ConnectionId;
-
-            //What if it is a guest-to-guest chat?
             string senderIdentityEmail = Context.User.Identity.Name;
-            //Need to rename this method => GetIdentityChatName()
-            string senderChatName = _userNameService.GetIdentityChatName(senderConnectionId);
-
+            string senderChatName = _userNameService.GetSenderChatName(senderConnectionId);
             string receiverConnectionId = _onlineUsersLists.onlineUsers[receiverChatName].ToString();
+            string receiverEmail = _userNameService.GetReceiverEmail(receiverChatName);
+            if(receiverEmail == "")
+            {
+                receiverEmail = null;
+            }
             string messageFamilyUID = Guid.NewGuid().ToString();
 
-            if (senderChatName == null)
+            /*if (senderChatName == null)
             {
                 senderChatName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
-            }
+            }*/
 
             if (_onlineUsersLists.onlineUsers.Contains(receiverChatName))
             {
-                _contextServices.CreateMessageObject(message, senderIdentityEmail, messageFamilyUID,
-                                                     Status.Sent, senderChatName, receiverChatName);
+                _contextServices.CreateMessageObject(message, 
+                                                     senderIdentityEmail,
+                                                     receiverEmail,
+                                                     messageFamilyUID,
+                                                     Status.Sent, 
+                                                     senderChatName, 
+                                                     receiverChatName);
 
                 Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
             }
             else
             {
-                _contextServices.CreateQueuedMessageObject(message, senderIdentityEmail, messageFamilyUID,
-                                                           Status.Sent, senderChatName, receiverChatName);
+                _contextServices.CreateQueuedMessageObject(message, 
+                                                           senderIdentityEmail,
+                                                           receiverEmail,
+                                                           messageFamilyUID,
+                                                           Status.Sent, 
+                                                           senderChatName, 
+                                                           receiverChatName);
 
                 await Clients.Client(receiverConnectionId).SendAsync("MessageQueued", receiverChatName);
             }
@@ -76,7 +94,7 @@ namespace WindTalkerMessenger.Hubs
             if (identityUserName != null)
             {
 
-               userName = _userNameService.GetIdentityChatName(connectionId);
+               userName = _userNameService.GetSenderChatName(connectionId);
 
             }
             else

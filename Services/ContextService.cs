@@ -76,7 +76,7 @@ namespace WindTalkerMessenger.Services
 
         public async Task<List<Message>> SendQueuedMessages()
         {
-            //The new chats objects are being created, but why is this returning a list?
+            //Fix the header or return
 
             var queues = _context.Queues;
             if (queues != null)
@@ -121,7 +121,8 @@ namespace WindTalkerMessenger.Services
             return newMessage;
         }
         public void CreateMessageObject(string message, 
-                                        string senderEmail, 
+                                        string senderEmail,
+                                        string receiverEmail,
                                         string messageFamilyUID,
                                         Enum status, 
                                         string senderChatName, 
@@ -135,7 +136,7 @@ namespace WindTalkerMessenger.Services
                                 .WithIsReceived(true)
                                 .WithSenderEmail(senderEmail)
                                 .WithSenderChatName(senderChatName)
-                                .WithReceiverEmail(receiverChatName)
+                                .WithReceiverEmail(receiverEmail)
                                 .WithReceiverChatName(receiverChatName)
                                 .Build();
 
@@ -144,7 +145,8 @@ namespace WindTalkerMessenger.Services
         }
 
         public void CreateQueuedMessageObject(string message, 
-                                              string senderEmail, 
+                                              string senderEmail,
+                                              string receiverEmail,
                                               string messageFamilyUID, 
                                               Enum status, 
                                               string senderChatName, 
@@ -159,7 +161,7 @@ namespace WindTalkerMessenger.Services
                     .WithIsReceived(true)
                     .WithSenderEmail(senderEmail)
                     .WithSenderChatName(senderChatName)
-                    .WithReceiverEmail(receiverChatName)
+                    .WithReceiverEmail(receiverEmail)
                     .WithReceiverChatName(receiverChatName)
                     .Build();
 
@@ -176,7 +178,7 @@ namespace WindTalkerMessenger.Services
                     .WithIsReceived(msg.IsReceived)
                     .WithSenderEmail(msg.MessageSenderEmail)
                     .WithSenderChatName(msg.SenderChatName)
-                    .WithReceiverEmail(msg.ReceiverChatName)
+                    .WithReceiverEmail(msg.MessageReceiverEmail)
                     .WithReceiverChatName(msg.ReceiverChatName)
                     .Build();
 

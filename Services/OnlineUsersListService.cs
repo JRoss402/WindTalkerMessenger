@@ -8,6 +8,7 @@ namespace WindTalkerMessenger.Services
 
         public Hashtable anonUsers = new Hashtable();
 
+        //Rename these functions and place the verb in front.
         public async Task OnlineUsersAdd(string userName,string connectionId)
         {
             onlineUsers.Add(userName, connectionId);

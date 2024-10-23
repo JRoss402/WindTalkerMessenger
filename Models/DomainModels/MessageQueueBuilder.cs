@@ -2,10 +2,7 @@
 {
     public class MessageQueueBuilder
     {
-
-
         private MessageQueue _messageQueue = new MessageQueue();
-
         public MessageQueueBuilder WithMessageStatus(string messageStatus)
         {
             _messageQueue.MessageStatus = messageStatus;
@@ -62,20 +59,8 @@
 
         public MessageQueue Build()
         {
-
             return _messageQueue;
         }
-        /*public int MessageId { get; set; }
-        public string? MessageStatus { get; set; }
-        public string? UserMessage { get; set; }
-        public string? MessageFamilyUID { get; set; }
-        public DateTime MessageDate { get; set; } = DateTime.Now;
-        public bool IsReceived { get; set; } = false;
-        public string? MessageSenderEmail { get; set; }
-        public string? MessageReceiverEmail { get; set; }
-        public string? SenderChatName { get; set; }
-        public string? ReceiverChatName { get; set; }
-    }*/
 
     }
 }

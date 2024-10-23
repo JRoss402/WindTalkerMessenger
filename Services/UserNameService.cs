@@ -27,7 +27,6 @@ namespace WindTalkerMessenger.Services
         public bool IsUserNameAvailable(string guestName)
         {
             bool isAvailable;
-
             if (!_onlineUsersLists.anonUsers.Contains(guestName))
             {
                 isAvailable = true;
@@ -36,32 +35,38 @@ namespace WindTalkerMessenger.Services
             {
                 isAvailable = false;
             }
-
             return isAvailable;
         }
-        
-        //Rename this method to be more concise regarding case of no identityemail
-        public string GetIdentityChatName(string senderConnectionId)
+        public string GetReceiverEmail(string username)
         {
             
+            var grab = _userManager.Users.FirstOrDefault(u => u.ChatName == username);
+            if (grab != null)
+            {
+                var receiverEmail = grab.Email;
+                return receiverEmail;
+            }
+            else
+            {
+                var receiverEmail = "";
+                return receiverEmail;
+            }
+        }
+        public string GetSenderChatName(string senderConnectionId)
+        {
             var identityEmail = _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
             var chatNameKey = "";
             var senderChatName = "";
             
             if (identityEmail == null)
             {
-                Guest guest = new Guest();
-                //Need to grab the key from the connectionID value
-                //senderChatName = (_onlineUsersLists.onlineUsers[chatNameKey] = senderConnectionId).ToString();
-                guest = (Guest)_context.Guests.Where(x => x.GuestConnectionId == senderConnectionId);
-
+                var grab = _context.Guests.FirstOrDefault(u => u.GuestConnectionId == senderConnectionId);
+                senderChatName = grab.GuestName;
             }
             else
             {
                 senderChatName = _userManager.Users.Where(e => e.Email == identityEmail).Select(x => x.ChatName).ToString();
             }
-
-            //return identityChatName;
             return senderChatName;
         }
     }
