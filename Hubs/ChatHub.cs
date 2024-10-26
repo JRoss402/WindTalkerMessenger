@@ -1,21 +1,22 @@
 ﻿using WindTalkerMessenger.Services;
 using Microsoft.AspNetCore.SignalR;
-using NuGet.Protocol;
 
 namespace WindTalkerMessenger.Hubs
 {
     public class ChatHub : Hub
     {
-
         private readonly IContextService _contextServices;
         private readonly OnlineUsersLists _onlineUsersLists;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUserNameService _userNameService;
         private const string chatNameKey = "chatName";
 
-        /* The transmission states. These will update during the entire process. The status can 
-         * help with diagnosing any issues as well as recovering queued messages in the event
-         * that the receiver is not online to receive them in real-time
+        /*
+         * 1 - Grab a list of the user's current when they connect
+         * 2 - Create a list of button with the chatnames via javascript
+         * 3 - When the user clicks the button => load the chats
+         * 4 - GetCurrentChats(string receiverChatName)
+         * 5 - 
          */
 
         enum Status
@@ -39,8 +40,6 @@ namespace WindTalkerMessenger.Hubs
             //Need to change logic to make messageFamily the same for a chat sequence.
             /*
                 If receiverName = recName AND senderName = sendName AND count = 1
-                
-             
              */
 
             string senderConnectionId = Context.ConnectionId;
@@ -69,7 +68,7 @@ namespace WindTalkerMessenger.Hubs
                                                      senderChatName, 
                                                      receiverChatName);
 
-                Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
+                await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
             }
             else
             {
@@ -91,16 +90,18 @@ namespace WindTalkerMessenger.Hubs
             string identityUserName = Context.User.Identity.Name;
             string connectionId = Context.ConnectionId.ToString();
 
+
             if (identityUserName != null)
             {
-
                userName = _userNameService.GetSenderChatName(connectionId);
-
             }
             else
             {
                 userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
                 _contextServices.AddNewGuest(userName, connectionId);
+                //var currentChatNames = _contextServices.GetChatFriends(userName);
+                //await Clients.Client(connectionId).SendAsync("ChatNamesList", currentChatNames);
+
                 //_onlineUsersLists.onlineUsers.Add(userName,connectionId);
                 //_onlineUsersLists.anonUsers.Add(userName, connectionId);
             }

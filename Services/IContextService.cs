@@ -1,4 +1,5 @@
-﻿using WindTalkerMessenger.Models.DomainModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using WindTalkerMessenger.Models.DomainModels;
 
 namespace WindTalkerMessenger.Services
 {
@@ -24,10 +25,13 @@ namespace WindTalkerMessenger.Services
                                        string senderChatName, 
                                        string receiverChatName);
 
-        Task<List<Message>> GetReceivedMessages();
-        Task<List<Message>> SendQueuedMessages();
 
-        void IsRowRemovable(Message message);
+		Task<List<Message>> SendQueuedMessages();
+        Task<List<string>> GetChatFriends(string chatName);
+
+
+
+		void IsRowRemovable(Message message);
         void DisassociateUserMessages(string identityUserEmail);
         void InsertMessage(Message message);
 

@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using WindTalkerMessenger.Models.DataLayer;
 using WindTalkerMessenger.Models.DomainModels;
 
@@ -22,17 +25,19 @@ namespace WindTalkerMessenger.Services
                                 string connectionId)
         {
             Guest guest = new Guest();
+            string guestuid = Guid.NewGuid().ToString();
             guest.GuestName = userName;
             guest.GuestConnectionId = connectionId;
+            guest.GuestUID = guestuid;
 
-            _context.Add(guest);
+            _context.Guests.Add(guest);
             _context.SaveChanges();
         }
 
-        public void DisassociateUserMessages(string identityUserEmail) 
+        public  async void DisassociateUserMessages(string identityUserEmail) 
         {
-            var userMessages =  _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
-                                                          e.MessageReceiverEmail == identityUserEmail).ToList();
+            var userMessages = await _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
+                                                          e.MessageReceiverEmail == identityUserEmail).ToListAsync();
 
             foreach(var userMessage in userMessages)
             {
@@ -52,10 +57,6 @@ namespace WindTalkerMessenger.Services
             _context.SaveChanges();
               
         }
-        public void RowBackFill()
-        {
-            
-        }
 
         public void IsRowRemovable(Message message)
         {
@@ -66,19 +67,36 @@ namespace WindTalkerMessenger.Services
             }
         }
 
-
-        public async Task<List<Message>> GetReceivedMessages()
+        public async Task<List<string>> GetChatFriends(string chatName)
         {
-            var chats = await _context.Chats.AsNoTracking().ToListAsync();
+            List<string> totalList = new List<string>();
 
+            var currentChatsList = await _context.Chats.Where(u => u.SenderChatName == chatName).ToListAsync();
+            foreach(Message user in currentChatsList)
+            {
+                if (!totalList.Contains(user.ReceiverChatName))
+                {
+                    totalList.Add(user.ReceiverChatName);
+                }
+            }
+
+            return totalList;
+        }
+
+
+        public async Task<List<Message>> GrabFriendChats(string chatName)
+        {
+            var chats = await _context.Chats.Where(u => u.ReceiverChatName == chatName ).ToListAsync();
             return chats;
         }
 
-        public async Task<List<Message>> SendQueuedMessages()
+
+
+		public async Task<List<Message>> SendQueuedMessages()
         {
             //Fix the header or return
 
-            var queues = _context.Queues;
+            var queues = await _context.Queues.ToListAsync();
             if (queues != null)
             {
                 foreach (MessageQueue queue in queues)
@@ -98,10 +116,10 @@ namespace WindTalkerMessenger.Services
             _context.SaveChanges();
         }
 
-        public void InsertQueuedMessage(MessageQueue queuedMessage)
+        public async void InsertQueuedMessage(MessageQueue queuedMessage)
         {
             _context.Queues.Add(queuedMessage);
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
         }
 
         public Message CreateMessageObject(MessageQueue queue)

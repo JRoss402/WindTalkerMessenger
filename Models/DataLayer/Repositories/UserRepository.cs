@@ -29,10 +29,6 @@ namespace WindTalkerMessenger.Models.DataLayer.Repositories
             _context.SaveChanges();
         }
 
-        public void RowBackFill()
-        {
-
-        }
 
         public void IsRowRemovable(Message message)
         {
@@ -41,6 +37,14 @@ namespace WindTalkerMessenger.Models.DataLayer.Repositories
             {
                 _context.Chats.Remove(message);
             }
+        }
+
+        public async Task<List<Message>> GrabMessages(string receiverName, string senderName)
+        {
+            var messageList = _context.Chats.Where(u => u.ReceiverChatName == receiverName && u.SenderChatName == senderName).ToList();
+
+            return messageList;
+
         }
 
         public async Task<List<Message>> GetReceivedMessages()

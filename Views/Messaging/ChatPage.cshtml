@@ -100,12 +100,15 @@
 				<div class="chats">
 					<div class="msg-page" id="incmessage">
 						<div id="maindiv">
-							<div id="leftinnerdiv"></div>
+							<!--<div id="leftinnerdiv"></div>-->
+							<ul id="leftinnerdiv">
+							</ul>
 							<div id="rightinnerdiv"></div>
 							<div id="chatsAside">
 								<input type="text" id="username" placeholder="Username" />
 								<ul id="chatList">
 									<li>Test Item</li>
+									<button id="getChats" name="getChats">Steve</button>
 								</ul>
 							</div>
 						</div>
@@ -128,8 +131,38 @@
 		</div>
 	</div>
 </body>
-</html>
 
+</html>
+<script>
+	$("#getChats").click(function (event) {
+		var chatName = $("#getChats").text();
+		$.ajax({
+			type: "POST",
+			data: {ChatName: chatName},
+			cache: false,
+			async: true,
+			url: '@Url.Action("GetReceivedMessages", "API")',
+			dataType: "json",
+			success: function (response) {
+				//var resp = JSON.parse(response);
+				//resp.forEach(getChats)
+				response.forEach(getChats);
+
+			}
+		})
+	});
+
+	function getChats(item, index, arr) {
+		console.log(item);
+		console.log(index);
+		console.log(arr);
+		let chatName = $("<div />").text(item.receiverChatName).html();
+		let message = $("<div />").text(item.userMessage).html();
+		let timeStamp = $("<div />").text(item.MessageDate).html();
+		$("#leftinnerdiv").append("<li>" + timeStamp + "<strong>" + chatName + "</strong>: " + message + "</li>");
+
+	}
+</script>
 <script>
 
 	var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
@@ -138,12 +171,30 @@
 		var encodedUser = $("<div />").text(user).html();
 		var encodedMsg = $("<div />").text(message).html();
 		console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
-		$("#leftinnerdiv").append("<p><strong>" + encodedUser + "</strong>: " + encodedMsg + "</p>")
+		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong>: " + encodedMsg + "</li>").after("#leftinnerdive");
 
-	})
+	});
+
+	connection.on("MessageQueued", function (user) {
+		var encodedUser = $("<div />").text(user).html();
+
+		console.log(encodedUser, " is offline.Your message has been queued until they return.");
+
+		$("#leftinnerdiv").append("<li><strong> User: " + encodedUser + " is offline. Message is queued.</strong></li>");
+	});
+
+	connection.on("ServerDisconnect", function (user) {
+		var encodedUser = $("<div />").text(user).html();
+
+		console.log("User: ", encodedUser, " disconnected.The server timed out");
+
+		$("#leftinnerdiv").append("<li><strong>Server Response Timed Out. You have been disconnected.</strong></li>");
+	});
+
+
 
 	$("#sendButton").click(function () {
-		var username
+		var username = "";
 
 		console.log("clicked");
 		if (!username) {
@@ -156,7 +207,7 @@
 			connection.invoke("SendMessage", username, message).catch(function (err) {
 				var encodedUser = $("<div />").text(username).html();
 				var encodedMsg = $("<div />").text(message).html();
-				$("#rightinnerdiv").append("<p><strong>" + encodedUser + "</strong>: " + encodedMsg + "</p>")
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong>: " + encodedMsg + "</li>");
 
 				return console.error(err.toString());
 			});
