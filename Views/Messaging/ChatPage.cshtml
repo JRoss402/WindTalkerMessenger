@@ -180,8 +180,17 @@
 
 		console.log(encodedUser, " is offline.Your message has been queued until they return.");
 
-		$("#leftinnerdiv").append("<li><strong> User: " + encodedUser + " is offline. Message is queued.</strong></li>");
+		$("#leftinnerdiv").append("<li><strong> User: " + encodedUser + " is offline. The message will be delivered when they return ...whenver that is.</strong></li>");
 	});
+
+	connection.on("GuestGone", function (user) {
+		var encodedUser = $("<div />").text(user).html();
+
+		console.log(encodedUser, " was a guest and have disconnected.");
+
+		$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected or they never existed. Sad either way.</li>");
+	});
+
 
 	connection.on("ServerDisconnect", function (user) {
 		var encodedUser = $("<div />").text(user).html();

@@ -45,18 +45,22 @@ namespace WindTalkerMessenger.Hubs
             string senderConnectionId = Context.ConnectionId;
             string senderIdentityEmail = Context.User.Identity.Name;
             string senderChatName = _userNameService.GetSenderChatName(senderConnectionId);
-            string receiverConnectionId = _onlineUsersLists.onlineUsers[receiverChatName].ToString();
+            string receiverConnectionId;
+
+            if(_onlineUsersLists.onlineUsers[receiverChatName] == null)
+            {
+                receiverConnectionId = "";
+            }
+            else
+            {
+                receiverConnectionId = _onlineUsersLists.onlineUsers[receiverChatName].ToString();
+			}
             string receiverEmail = _userNameService.GetReceiverEmail(receiverChatName);
             if(receiverEmail == "")
             {
                 receiverEmail = null;
             }
             string messageFamilyUID = Guid.NewGuid().ToString();
-
-            /*if (senderChatName == null)
-            {
-                senderChatName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
-            }*/
 
             if (_onlineUsersLists.onlineUsers.Contains(receiverChatName))
             {
@@ -72,16 +76,23 @@ namespace WindTalkerMessenger.Hubs
             }
             else
             {
-                _contextServices.CreateQueuedMessageObject(message, 
-                                                           senderIdentityEmail,
-                                                           receiverEmail,
-                                                           messageFamilyUID,
-                                                           Status.Sent, 
-                                                           senderChatName, 
-                                                           receiverChatName);
+                if (_contextServices.IsUserGuest(receiverChatName))
+                {
+					await Clients.Client(senderConnectionId).SendAsync("GuestGone", receiverChatName);
+				}
+				else
+                {
+					_contextServices.CreateQueuedMessageObject(message,
+					   senderIdentityEmail,
+					   receiverEmail,
+					   messageFamilyUID,
+					   Status.Queued,
+					   senderChatName,
+					   receiverChatName);
 
-                await Clients.Client(receiverConnectionId).SendAsync("MessageQueued", receiverChatName);
-            }
+					await Clients.Client(receiverConnectionId).SendAsync("MessageQueued", receiverChatName);
+				}
+			}
         }
 
         public override async Task<Task> OnConnectedAsync()

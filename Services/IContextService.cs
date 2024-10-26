@@ -29,6 +29,7 @@ namespace WindTalkerMessenger.Services
 		Task<List<Message>> SendQueuedMessages();
         Task<List<string>> GetChatFriends(string chatName);
 
+        bool IsUserGuest(string chatName);
 
 
 		void IsRowRemovable(Message message);

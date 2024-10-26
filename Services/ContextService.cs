@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -9,16 +10,25 @@ namespace WindTalkerMessenger.Services
 {
     public class ContextService : IContextService
     {
-        private readonly ApplicationDbContext _context;
+		enum Status
+		{
+			Sent, Received, Queued
+		}
+
+
+		private readonly ApplicationDbContext _context;
         private readonly OnlineUsersLists _onlineUsersLists;
+        private readonly UserManager<ApplicationUser> _userManager;
         private const string DELETED = "User Account Deleted";
         private enum Statuses { Sent, Received, Queued }
 
         public ContextService(ApplicationDbContext context, 
-                              OnlineUsersLists onlineUsersLists)
+                              OnlineUsersLists onlineUsersLists,
+                              UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _onlineUsersLists = onlineUsersLists;
+            _userManager = userManager;
         }
 
         public void AddNewGuest(string userName, 
@@ -90,7 +100,20 @@ namespace WindTalkerMessenger.Services
             return chats;
         }
 
+        public bool IsUserGuest(string chatName)
+        {
+            var guest = _userManager.Users.FirstOrDefault(u => u.ChatName == chatName);
 
+            if(guest == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
 
 		public async Task<List<Message>> SendQueuedMessages()
         {
@@ -101,6 +124,7 @@ namespace WindTalkerMessenger.Services
             {
                 foreach (MessageQueue queue in queues)
                 {
+                    queue.MessageStatus = Status.Sent.ToString();
                     CreateMessageObject(queue);
 
                     _context.Queues.Remove(queue);
@@ -116,10 +140,18 @@ namespace WindTalkerMessenger.Services
             _context.SaveChanges();
         }
 
-        public async void InsertQueuedMessage(MessageQueue queuedMessage)
-        {
-            _context.Queues.Add(queuedMessage);
-           await _context.SaveChangesAsync();
+        public void InsertQueuedMessage(MessageQueue queuedMessage)
+         {
+            try
+            {
+				_context.Queues.Add(queuedMessage);
+				_context.SaveChanges();
+			}
+			catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
         }
 
         public Message CreateMessageObject(MessageQueue queue)
