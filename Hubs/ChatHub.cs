@@ -73,8 +73,10 @@ namespace WindTalkerMessenger.Hubs
                                                      receiverChatName);
 
                 await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
-            }
-            else
+				//await Clients.Client(senderConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
+
+			}
+			else
             {
                 if (_contextServices.IsUserGuest(receiverChatName))
                 {
@@ -89,7 +91,6 @@ namespace WindTalkerMessenger.Hubs
 					   Status.Queued,
 					   senderChatName,
 					   receiverChatName);
-
 					await Clients.Client(receiverConnectionId).SendAsync("MessageQueued", receiverChatName);
 				}
 			}
@@ -105,16 +106,20 @@ namespace WindTalkerMessenger.Hubs
             if (identityUserName != null)
             {
                 
-			   userName =  _userNameService.GetSenderChatName(connectionId);
+			    userName =  _userNameService.GetSenderChatName(connectionId);
 				_onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
 				_contextServices.AddQueuedMessages(userName);
-                //await Clients.Users(connectionId).SendAsync("PrintQueuedMessages",queuedMessages)
+				_onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
+
+				//await Clients.Users(connectionId).SendAsync("PrintQueuedMessages",queuedMessages)
 			}
 			else
             {
                 userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
                 _contextServices.AddNewGuest(userName, connectionId);
+                _onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
             }
+            //move to if
             _onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
 
             return base.OnConnectedAsync();
@@ -128,6 +133,7 @@ namespace WindTalkerMessenger.Hubs
 			string userName = Context.User.Identity.Name;
             _onlineUsersLists.onlineUsers.TryRemove(userName, out _);
             _onlineUsersLists.anonUsers.TryRemove(userName, out _);
+
 
             await base.OnDisconnectedAsync(exception);
         }

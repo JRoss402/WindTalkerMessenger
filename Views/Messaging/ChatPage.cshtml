@@ -133,51 +133,19 @@
 </body>
 
 </html>
+
 <script>
-	$("#getChats").click(function (event) {
-		var chatName = $("#getChats").text();
-		$.ajax({
-			type: "POST",
-			data: {ChatName: chatName},
-			cache: false,
-			async: true,
-			url: '@Url.Action("GetReceivedMessages", "API")',
-			dataType: "json",
-			success: function (response) {
-				response.forEach(getChats);
-
-			}
-		})
-	});
-
-	function getChats(item, index, arr) {
-		console.log(item);
-		console.log(index);
-		console.log(arr);
-		let chatName = $("<div />").text(item.receiverChatName).html();
-		let message = $("<div />").text(item.userMessage).html();
-		let timeStamp = $("<div />").text(item.MessageDate).html();
-		$("#leftinnerdiv").append("<li>" + timeStamp + "<strong>" + chatName + "</strong>: " + message + "</li>");
-
-	}
-</script>
-<script>
-
 	var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
-
 	connection.on("ReceiveMessage", function (user, message) {
 		var encodedUser = $("<div />").text(user).html();
 		var encodedMsg = $("<div />").text(message).html();
 		console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
-		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong>: " + encodedMsg + "</li>").after("#leftinnerdive");
-
+		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong>: " + encodedMsg + "</li>");
 	});
 
 	connection.on("MessageQueued", function (user) {
 		var encodedUser = $("<div />").text(user).html();
-
 		console.log(encodedUser, " is offline.Your message has been queued until they return.");
-
 		$("#leftinnerdiv").append("<li><strong> User: " + encodedUser + " is offline. The message will be delivered when they return ...whenver that is.</strong></li>");
 	});
 
@@ -220,15 +188,13 @@
 		var message = $("#message").val();
 
 		if (username && message) {
-			
-			connection.invoke("SendMessage", username, message).catch(function (err) {
-				var encodedUser = $("<div />").text(username).html();
-				var encodedMsg = $("<div />").text(message).html();
-				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong>: " + encodedMsg + "</li>");
+			var encodedMsg = $("<div />").text(message).html();
+			$("#leftinnerdiv").append("<li><strong>You</strong>: " + encodedMsg + "</li>");
 
+			connection.invoke("SendMessage", username, message)
+				.catch(function (err) {
 				return console.error(err.toString());
-			});
-
+				});
 			$("#message").val("").focus();
 		} else if (!username) {
 			alert("Please enter your username!");
@@ -236,11 +202,10 @@
 	});
 
 	connection.start().then(function () {
-		//console.log("Connected!");
+		console.log("Connected!");
 		//connection.invoke("GetQueuedMessages").catch(function (err) {
 			//return console.error(err.toString());
-		});
-	}).catch(function (err) {
+		}).catch(function (err) {
 		console.error(err.toString());
 	});
 
