@@ -48,7 +48,25 @@ namespace WindTalkerMessenger.Services
 			_context.SaveChanges();
 		}
 
-		public async void DisassociateUserMessages(string identityUserEmail)
+		public async void DisassociateGuestUserMessages(string guestChatName)
+		{
+			var chats = _context.Chats.Where(u => u.SenderChatName == guestChatName ||
+									  u.ReceiverChatName == guestChatName).ToList();
+						  
+			foreach(Message chat in chats)
+			{
+				if(chat.SenderChatName == guestChatName)
+				{
+					chat.SenderChatName = "Guest Disconnected";
+				}else if(chat.ReceiverChatName == guestChatName)
+				{
+					chat.ReceiverChatName = "Guest Disconnected";
+				}
+				 _context.SaveChangesAsync();
+			}
+		}
+
+		public async void DisassociateIdentityUserMessages(string identityUserEmail)
 		{
 			var userMessages = await _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
 														  e.MessageReceiverEmail == identityUserEmail).ToListAsync();

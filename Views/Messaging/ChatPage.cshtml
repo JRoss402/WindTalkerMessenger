@@ -211,3 +211,30 @@
 
 	
 </script>
+
+<script>
+	$("#getChats").click(function (event) {
+		var chatName = $("#getChats").text();
+		$.ajax({
+			type: "POST",
+			data: { ChatName: chatName },
+			cache: false,
+			async: true,
+			url: '@Url.Action("GetReceivedMessages", "API")',
+			dataType: "json",
+			success: function (response) {
+				response.forEach(getChats);
+			}
+		})
+	});
+
+	function getChats(item, index, arr) {
+		console.log(item);
+		console.log(index);
+		console.log(arr);
+		let chatName = $("<div />").text(item.receiverChatName).html();
+		let message = $("<div />").text(item.userMessage).html();
+		let timeStamp = $("<div />").text(item.MessageDate).html();
+		$("#leftinnerdiv").append("<li>" + timeStamp + "<strong>" + chatName + "</strong>: " + message + "</li>");
+	}
+</script>

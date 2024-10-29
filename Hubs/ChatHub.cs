@@ -131,9 +131,15 @@ namespace WindTalkerMessenger.Hubs
 
             string connectionId = Context.ConnectionId.ToString();
 			string userName = Context.User.Identity.Name;
+            if(userName == null)
+            {
+				userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
+			}
+            string disconnectedUser; 
             _onlineUsersLists.onlineUsers.TryRemove(userName, out _);
             _onlineUsersLists.anonUsers.TryRemove(userName, out _);
 
+            _contextServices.DisassociateGuestUserMessages(userName);
 
             await base.OnDisconnectedAsync(exception);
         }

@@ -33,10 +33,12 @@ namespace WindTalkerMessenger.Services
 
 
 		void IsRowRemovable(Message message);
-        void DisassociateUserMessages(string identityUserEmail);
+        void DisassociateIdentityUserMessages(string identityUserEmail);
         void InsertMessage(Message message);
+        void DisassociateGuestUserMessages(string guestChatName);
 
-        void AddNewGuest(string userName, string connectionId);
+
+		void AddNewGuest(string userName, string connectionId);
 
 
 
