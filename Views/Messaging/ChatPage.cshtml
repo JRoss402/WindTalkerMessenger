@@ -144,8 +144,6 @@
 			url: '@Url.Action("GetReceivedMessages", "API")',
 			dataType: "json",
 			success: function (response) {
-				//var resp = JSON.parse(response);
-				//resp.forEach(getChats)
 				response.forEach(getChats);
 
 			}
@@ -191,7 +189,19 @@
 		$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected or they never existed. Sad either way.</li>");
 	});
 
+	connection.on("PrintQueuedMessages", function (messages) {
+		messages.forEach(printMsgs)
+		//var encodedUser = $("<div />").text(user).html();
+        //var encodedMsg = $("<div />").text(message).html();
 
+		function printMsgs(item, index, arr) {
+			let chatName = $("<div />").text(item.receiverChatName).html();
+			let message = $("<div />").text(item.userMessage).html();
+			//let timeStamp = $("<div />").text(item.MessageDate).html();
+			$("#leftinnerdiv").append("<li>" + timeStamp + "<strong>" + chatName + "</strong>: " + message + "</li>");
+		}
+		$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected or they never existed. Sad either way.</li>");
+	});
 	connection.on("ServerDisconnect", function (user) {
 		var encodedUser = $("<div />").text(user).html();
 
@@ -199,8 +209,6 @@
 
 		$("#leftinnerdiv").append("<li><strong>Server Response Timed Out. You have been disconnected.</strong></li>");
 	});
-
-
 
 	$("#sendButton").click(function () {
 		var username = "";
@@ -228,8 +236,13 @@
 	});
 
 	connection.start().then(function () {
-		console.log("Connected!");
+		//console.log("Connected!");
+		//connection.invoke("GetQueuedMessages").catch(function (err) {
+			//return console.error(err.toString());
+		});
 	}).catch(function (err) {
 		console.error(err.toString());
 	});
+
+	
 </script>

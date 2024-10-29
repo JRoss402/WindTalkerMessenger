@@ -17,3 +17,6 @@ body {
   margin-bottom: 60px;
 }
 
+#leftinnerdiv {
+    list-style: none;
+}

@@ -24,7 +24,7 @@ namespace WindTalkerMessenger.Controllers
 
         public bool CheckChatName(string chatName)
         {
-            var isTaken = _onlineUsersLists.onlineUsers.Contains(chatName);
+            var isTaken = _onlineUsersLists.onlineUsers.ContainsKey(chatName);
             //bool json = true;
 
             if (isTaken == false)
