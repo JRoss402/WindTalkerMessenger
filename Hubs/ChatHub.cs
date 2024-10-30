@@ -37,6 +37,8 @@ namespace WindTalkerMessenger.Hubs
 
         public async Task SendMessage(string receiverChatName, string message)
         {
+            //Move most of the logic here to another class for object info gather methods
+
             //Need to change logic to make messageFamily the same for a chat sequence.
             /*
                 If receiverName = recName AND senderName = sendName AND count = 1
@@ -47,20 +49,26 @@ namespace WindTalkerMessenger.Hubs
             string senderChatName = _userNameService.GetSenderChatName(senderConnectionId);
             string receiverConnectionId;
 
-            if(_onlineUsersLists.onlineUsers[receiverChatName] == null)
+            /* Key => Chatname - Value => ConnectionId*/
+
+            //may not need part of this if-else
+            if (!_onlineUsersLists.onlineUsers.TryGetValue(receiverChatName, out _))
             {
                 receiverConnectionId = "";
             }
             else
             {
-                receiverConnectionId = _onlineUsersLists.onlineUsers[receiverChatName].ToString();
+			    _onlineUsersLists.onlineUsers.TryGetValue(receiverChatName, out receiverConnectionId).ToString();
 			}
-            string receiverEmail = _userNameService.GetReceiverEmail(receiverChatName);
+			string receiverEmail = _userNameService.GetReceiverEmail(receiverChatName);
+          
+
             if(receiverEmail == "")
             {
                 receiverEmail = null;
             }
             string messageFamilyUID = Guid.NewGuid().ToString();
+
 
             if (_onlineUsersLists.onlineUsers.ContainsKey(receiverChatName))
             {
@@ -73,7 +81,6 @@ namespace WindTalkerMessenger.Hubs
                                                      receiverChatName);
 
                 await Clients.Client(receiverConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
-				//await Clients.Client(senderConnectionId).SendAsync("ReceiveMessage", senderChatName, message);
 
 			}
 			else
@@ -85,13 +92,14 @@ namespace WindTalkerMessenger.Hubs
 				else
                 {
 					_contextServices.CreateQueuedMessageObject(message,
-					   senderIdentityEmail,
-					   receiverEmail,
-					   messageFamilyUID,
-					   Status.Queued,
-					   senderChatName,
-					   receiverChatName);
-					await Clients.Client(receiverConnectionId).SendAsync("MessageQueued", receiverChatName);
+					                                           senderIdentityEmail,
+					                                           receiverEmail,
+					                                           messageFamilyUID,
+					                                           Status.Queued,
+					                                           senderChatName,
+					                                           receiverChatName);
+
+					await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName);
 				}
 			}
         }
@@ -101,17 +109,16 @@ namespace WindTalkerMessenger.Hubs
             string userName;
             string identityUserName = Context.User.Identity.Name;
             string connectionId = Context.ConnectionId.ToString();
-
+            
 
             if (identityUserName != null)
             {
-                
 			    userName =  _userNameService.GetSenderChatName(connectionId);
 				_onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
-				_contextServices.AddQueuedMessages(userName);
+				var newMessages = await _contextServices.AddQueuedMessages(userName);
 				_onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
-
-				//await Clients.Users(connectionId).SendAsync("PrintQueuedMessages",queuedMessages)
+				_onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
+                await Clients.Users(connectionId).SendAsync("PrintQueuedMessages", newMessages);
 			}
 			else
             {
@@ -120,7 +127,6 @@ namespace WindTalkerMessenger.Hubs
                 _onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
             }
             //move to if
-            _onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
 
             return base.OnConnectedAsync();
         }

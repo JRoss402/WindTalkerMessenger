@@ -48,7 +48,7 @@ namespace WindTalkerMessenger.Services
 			_context.SaveChanges();
 		}
 
-		public async void DisassociateGuestUserMessages(string guestChatName)
+		public void DisassociateGuestUserMessages(string guestChatName)
 		{
 			var chats = _context.Chats.Where(u => u.SenderChatName == guestChatName ||
 									  u.ReceiverChatName == guestChatName).ToList();
@@ -66,10 +66,10 @@ namespace WindTalkerMessenger.Services
 			}
 		}
 
-		public async void DisassociateIdentityUserMessages(string identityUserEmail)
+		public void DisassociateIdentityUserMessages(string identityUserEmail)
 		{
-			var userMessages = await _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
-														  e.MessageReceiverEmail == identityUserEmail).ToListAsync();
+			var userMessages = _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
+														  e.MessageReceiverEmail == identityUserEmail).ToList();
 
 			foreach (var userMessage in userMessages)
 			{
@@ -137,18 +137,22 @@ namespace WindTalkerMessenger.Services
 
 		}
 
-		public void AddQueuedMessages(string username)
+		//needs to return a list
+		public async Task<List<Message>> AddQueuedMessages(string username)
 		{
 			List<Message> messages = new List<Message>();
-			var queues = _context.Queues.Where(u => u.SenderChatName == username).ToList();
+			var queues = await _context.Queues.Where(u => u.ReceiverChatName == username).ToListAsync();
 			foreach (MessageQueue queue in queues)
 			{
 				queue.MessageStatus = Status.Sent.ToString();
 				var newMsg = CreateMessageObject(queue);
 				messages.Add(newMsg);
+				await _context.Chats.AddAsync(newMsg);
 				_context.Queues.Remove(queue);
-				_context.SaveChanges();
+				await _context.SaveChangesAsync();
 			}
+
+			return messages;
 		}
 
 		public void InsertMessage(Message chat)

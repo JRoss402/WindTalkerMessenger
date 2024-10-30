@@ -108,7 +108,7 @@
 								<input type="text" id="username" placeholder="Username" />
 								<ul id="chatList">
 									<li>Test Item</li>
-									<button id="getChats" name="getChats">Steve</button>
+									<button id="getChats" name="getChats">myname</button>
 								</ul>
 							</div>
 						</div>
@@ -146,7 +146,8 @@
 	connection.on("MessageQueued", function (user) {
 		var encodedUser = $("<div />").text(user).html();
 		console.log(encodedUser, " is offline.Your message has been queued until they return.");
-		$("#leftinnerdiv").append("<li><strong> User: " + encodedUser + " is offline. The message will be delivered when they return ...whenver that is.</strong></li>");
+		
+		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> is offline. The message will be delivered when they return ...whenever that will be.</li>");
 	});
 
 	connection.on("GuestGone", function (user) {
@@ -163,10 +164,10 @@
         //var encodedMsg = $("<div />").text(message).html();
 
 		function printMsgs(item, index, arr) {
-			let chatName = $("<div />").text(item.receiverChatName).html();
+			let chatName = $("<div />").text(item.senderChatName).html();
 			let message = $("<div />").text(item.userMessage).html();
 			//let timeStamp = $("<div />").text(item.MessageDate).html();
-			$("#leftinnerdiv").append("<li>" + timeStamp + "<strong>" + chatName + "</strong>: " + message + "</li>");
+			$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
 		}
 		$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected or they never existed. Sad either way.</li>");
 	});
@@ -232,9 +233,9 @@
 		console.log(item);
 		console.log(index);
 		console.log(arr);
-		let chatName = $("<div />").text(item.receiverChatName).html();
+		let chatName = $("<div />").text(item.senderChatName).html();
 		let message = $("<div />").text(item.userMessage).html();
 		let timeStamp = $("<div />").text(item.MessageDate).html();
-		$("#leftinnerdiv").append("<li>" + timeStamp + "<strong>" + chatName + "</strong>: " + message + "</li>");
+		$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
 	}
 </script>

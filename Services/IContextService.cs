@@ -26,8 +26,9 @@ namespace WindTalkerMessenger.Services
                                        string receiverChatName);
 
 
-		void AddQueuedMessages(string username);
-        Task<List<string>> GetChatFriends(string chatName);
+        Task<List<Message>> AddQueuedMessages(string username);
+
+		Task<List<string>> GetChatFriends(string chatName);
 
         bool IsUserGuest(string chatName);
 
