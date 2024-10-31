@@ -24,10 +24,16 @@ namespace WindTalkerMessenger.Services
             _context = context;
         }
 
+        public bool IsUserAuthenticated()
+        {
+            var auth = _http.HttpContext.User.Identity.IsAuthenticated;
+            return auth;
+        }
+
         public bool IsUserNameAvailable(string guestName)
         {
             bool isAvailable;
-            if (!_onlineUsersLists.anonUsers.Contains(guestName))
+            if (!_onlineUsersLists.anonUsers.ContainsKey(guestName))
             {
                 isAvailable = true;
             }
@@ -54,7 +60,7 @@ namespace WindTalkerMessenger.Services
         }
         public string GetSenderChatName(string senderConnectionId)
         {
-            var identityEmail = _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            var identityEmail =  _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
             var chatNameKey = "";
             var senderChatName = "";
             
@@ -65,7 +71,8 @@ namespace WindTalkerMessenger.Services
             }
             else
             {
-                senderChatName = _userManager.Users.Where(e => e.Email == identityEmail).Select(x => x.ChatName).ToString();
+               var grab = _userManager.Users.FirstOrDefault(e => e.Email == identityEmail);
+                senderChatName = grab.ChatName;
             }
             return senderChatName;
         }

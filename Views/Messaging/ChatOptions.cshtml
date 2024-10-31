@@ -6,18 +6,26 @@
 @model WindTalkerMessenger.Models.ViewModels.ChatOptionsViewModel
 
 
-@if(!SignInManager.IsSignedIn(User))
+@if (!SignInManager.IsSignedIn(User))
 {
     <p>It appears you are not logged in or you are not registered.</p>
-    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Login to start!</a>
     <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Register</a>
-}
+    <p>Or you can pick a guest name and then click "Start Chatting".</p>
     <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
         <span id="guestError"></span>
-    <input type="text" placeholder="Pick Chat Name" name="chatName" id="chatName" />
+        <input type="text" placeholder="Pick Chat Name" name="chatName" id="chatName" />
         <button type="submit" class="btn btn-primary" id="guestSend" name="guestSend">Start Chatting</button>
     </form>
-
+}
+else
+{
+    <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
+        <span id="guestError"></span>
+        <input type="text" placeholder="Pick Chat Name" name="chatName" id="chatName" />
+        <button type="submit" class="btn btn-primary" id="guestSend" name="guestSend">Start Chatting</button>
+    </form>
+}
 
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>

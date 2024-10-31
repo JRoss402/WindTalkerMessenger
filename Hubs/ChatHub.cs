@@ -11,14 +11,6 @@ namespace WindTalkerMessenger.Hubs
         private readonly IUserNameService _userNameService;
         private const string chatNameKey = "chatName";
 
-        /*
-         * 1 - Grab a list of the user's current when they connect
-         * 2 - Create a list of button with the chatnames via javascript
-         * 3 - When the user clicks the button => load the chats
-         * 4 - GetCurrentChats(string receiverChatName)
-         * 5 - 
-         */
-
         enum Status
         {
             Sent, Received, Queued
@@ -38,12 +30,6 @@ namespace WindTalkerMessenger.Hubs
         public async Task SendMessage(string receiverChatName, string message)
         {
             //Move most of the logic here to another class for object info gather methods
-
-            //Need to change logic to make messageFamily the same for a chat sequence.
-            /*
-                If receiverName = recName AND senderName = sendName AND count = 1
-             */
-
             string senderConnectionId = Context.ConnectionId;
             string senderIdentityEmail = Context.User.Identity.Name;
             string senderChatName = _userNameService.GetSenderChatName(senderConnectionId);

@@ -24,8 +24,8 @@ namespace WindTalkerMessenger.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MessageStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MessageFamilyUID = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MessageDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MessageFamilyUID = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsReceived = table.Column<bool>(type: "bit", nullable: false),
                     MessageSenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: true, defaultValue: "Guest"),
                     MessageReceiverEmail = table.Column<string>(type: "nvarchar(max)", nullable: true, defaultValue: "Guest"),
@@ -43,8 +43,9 @@ namespace WindTalkerMessenger.Data.Migrations
                 {
                     GuestId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GuestName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    GuestConnectionId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    GuestName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GuestConnectionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GuestUID = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -62,8 +63,8 @@ namespace WindTalkerMessenger.Data.Migrations
                     UserMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MessageDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsReceived = table.Column<bool>(type: "bit", nullable: false),
-                    MessageSenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: true, defaultValue: "Guest"),
-                    MessageReceiverEmail = table.Column<string>(type: "nvarchar(max)", nullable: true, defaultValue: "Guest"),
+                    MessageSenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MessageReceiverEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SenderChatName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReceiverChatName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },

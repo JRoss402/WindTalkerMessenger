@@ -1,22 +1,27 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
+using System.Security.Policy;
 
 namespace WindTalkerMessenger.Services
 {
     public class OnlineUsersLists
     {
-        public Hashtable onlineUsers = new Hashtable();
+        public ConcurrentDictionary<string,string> onlineUsers = new ConcurrentDictionary<string,string>();
 
-        public Hashtable anonUsers = new Hashtable();
+        public ConcurrentDictionary<string,string> anonUsers = new ConcurrentDictionary<string, string>();
+
+        public ConcurrentDictionary<string,string> authenticatedUsers = new ConcurrentDictionary<string,string>();
+
 
         //Rename these functions and place the verb in front.
-        public async Task OnlineUsersAdd(string userName,string connectionId)
+       /* public async Task OnlineUsersAdd(string userName,string connectionId)
         {
-            onlineUsers.Add(userName, connectionId);
+            onlineUsers.TryAdd(userName, connectionId);
         }
 
-        public async Task OnlineUsersRemove(string userName)
+        public async Task OnlineUsersRemove(string userName,string connectionId)
         {
-            onlineUsers.Remove(userName);
+            onlineUsers.TryRemove(KeyValuePair<userName,connectionId);
         }
 
         public async Task AnonUsersAdd(string userName, string connectionId)
@@ -27,7 +32,7 @@ namespace WindTalkerMessenger.Services
         public async Task AnonUsersRemove(string userName)
         {
             anonUsers.Remove(userName);
-        }
+        }*/
 
     }
 }

@@ -237,11 +237,12 @@ namespace WindTalkerMessenger.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GuestId"), 1L, 1);
 
                     b.Property<string>("GuestConnectionId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GuestName")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GuestUID")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("GuestId");
@@ -311,14 +312,10 @@ namespace WindTalkerMessenger.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MessageReceiverEmail")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("Guest");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MessageSenderEmail")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("Guest");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MessageStatus")
                         .HasColumnType("nvarchar(max)");

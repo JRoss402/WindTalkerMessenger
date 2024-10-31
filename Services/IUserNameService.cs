@@ -5,5 +5,8 @@
         bool IsUserNameAvailable(string guestName);
         string GetSenderChatName(string senderConnectionId);
         string GetReceiverEmail(string receiverConnectionId);
-    }
+        bool IsUserAuthenticated();
+
+
+	}
 }

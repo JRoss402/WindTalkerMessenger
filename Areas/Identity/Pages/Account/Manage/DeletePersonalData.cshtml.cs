@@ -94,7 +94,7 @@ namespace WindTalkerMessenger.Areas.Identity.Pages.Account.Manage
             }
 
             var result = await _userManager.DeleteAsync(user);
-            _contextService.DisassociateUserMessages(userEmail);
+            _contextService.DisassociateIdentityUserMessages(userEmail);
 
             var userId = await _userManager.GetUserIdAsync(user);
 

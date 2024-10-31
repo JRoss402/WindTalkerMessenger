@@ -43,7 +43,7 @@
 
 		#chatList {
 			list-style-type: none;
-			padding-left:0px;
+			padding-left: 0px;
 		}
 
 		#leftinnerdiv {
@@ -54,7 +54,7 @@
 
 		button {
 			border-radius: 5px;
-			width:100%;
+			width: 100%;
 		}
 
 		#rightinnerdiv {
@@ -96,36 +96,25 @@
 			</div>
 		</div>
 		<div class="chat-page">
-			<div class="msg-inbox">
-				<div class="chats">
-					<div class="msg-page" id="incmessage">
-						<div id="maindiv">
-							<!--<div id="leftinnerdiv"></div>-->
-							<ul id="leftinnerdiv">
-							</ul>
-							<div id="rightinnerdiv"></div>
-							<div id="chatsAside">
-								<input type="text" id="username" placeholder="Username" />
-								<ul id="chatList">
-									<li>Test Item</li>
-									<button id="getChats" name="getChats">myname</button>
-								</ul>
-							</div>
-						</div>
-					</div>
+			<div id="maindiv">
+				<ul id="leftinnerdiv">
+				</ul>
+				<div id="chatsAside">
+					<input type="text" id="username" placeholder="Username" />
+					<ul id="chatList">
+						<!--<button id="getChats" name="getChats">myname</button>-->
+					</ul>
 				</div>
-				<div class="msg-bottom">
-					<div class="input-group">
-						<input type="text"
-							   id="message"
-							   class="form-control"
-							   placeholder="Write message..." />
-						<span class="input-group-text send-icon" id="sendButton">
-							<i class="bi bi-send"></i>
-						</span>
-					</div>
-				</div>
-				<div>
+			</div>
+			<div class="msg-bottom">
+				<div class="input-group">
+					<input type="text"
+						   id="message"
+						   class="form-control"
+						   placeholder="Write message..." />
+					<span class="input-group-text send-icon" id="sendButton">
+						<i class="bi bi-send"></i>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -146,7 +135,7 @@
 	connection.on("MessageQueued", function (user) {
 		var encodedUser = $("<div />").text(user).html();
 		console.log(encodedUser, " is offline.Your message has been queued until they return.");
-		
+
 		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> is offline. The message will be delivered when they return ...whenever that will be.</li>");
 	});
 
@@ -160,9 +149,6 @@
 
 	connection.on("PrintQueuedMessages", function (messages) {
 		messages.forEach(printMsgs)
-		//var encodedUser = $("<div />").text(user).html();
-        //var encodedMsg = $("<div />").text(message).html();
-
 		function printMsgs(item, index, arr) {
 			let chatName = $("<div />").text(item.senderChatName).html();
 			let message = $("<div />").text(item.userMessage).html();
@@ -173,7 +159,6 @@
 	});
 	connection.on("ServerDisconnect", function (user) {
 		var encodedUser = $("<div />").text(user).html();
-
 		console.log("User: ", encodedUser, " disconnected.The server timed out");
 
 		$("#leftinnerdiv").append("<li><strong>Server Response Timed Out. You have been disconnected.</strong></li>");
@@ -194,7 +179,7 @@
 
 			connection.invoke("SendMessage", username, message)
 				.catch(function (err) {
-				return console.error(err.toString());
+					return console.error(err.toString());
 				});
 			$("#message").val("").focus();
 		} else if (!username) {
@@ -204,18 +189,38 @@
 
 	connection.start().then(function () {
 		console.log("Connected!");
-		//connection.invoke("GetQueuedMessages").catch(function (err) {
-			//return console.error(err.toString());
-		}).catch(function (err) {
+		$.ajax({
+			type: "POST",
+			//data: { ChatName: chatName },
+			//cache: false,
+			//async: true,
+			url: '@Url.Action("GetUserChatList", "API")',
+			dataType: "json",
+			success: function (response) {
+				console.log("Send Worked")
+				response.forEach(getUserChats);
+			}
+		})
+	}).catch(function (err) {
 		console.error(err.toString());
 	});
 
-	
+	//https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+	//https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
+
+
+	function getUserChats(item, index, arr) {
+		console.log("Link supposed to be added.");
+		let name = item;
+		$("#chatList").append('<button class="btn btn-primary" onclick="GetMessages(event)" name-arg="'+name+'">' + name + "</button>");
+	}
 </script>
 
 <script>
-	$("#getChats").click(function (event) {
-		var chatName = $("#getChats").text();
+	function GetMessages(event){
+		$("#leftinnerdiv").empty();
+		var target = $(event.target);
+		var chatName = target.attr("name-arg");
 		$.ajax({
 			type: "POST",
 			data: { ChatName: chatName },
@@ -227,12 +232,9 @@
 				response.forEach(getChats);
 			}
 		})
-	});
-
+	};
+	
 	function getChats(item, index, arr) {
-		console.log(item);
-		console.log(index);
-		console.log(arr);
 		let chatName = $("<div />").text(item.senderChatName).html();
 		let message = $("<div />").text(item.userMessage).html();
 		let timeStamp = $("<div />").text(item.MessageDate).html();

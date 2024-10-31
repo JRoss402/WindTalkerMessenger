@@ -5,9 +5,6 @@ namespace WindTalkerMessenger.Services
 {
     public interface IContextService
     {
-        //Task CreateNewMessage(Message Chat, string userName);
-
-        //Can the object creation methods all be void?
         void CreateMessageObject(string message, 
                                  string senderEmail, 
                                  string receiverEmail, 
