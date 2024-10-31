@@ -1,31 +1,4 @@
-﻿@*
-    <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>Real-Time Chat with SignalR</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.13/signalr.min.js"></script>
-</head>
-<body>
-    <div id="chatContainer">
-    <div>
-        <input type="text" id="username" placeholder="Enter your username" />
-        <input type="text" id="message" placeholder="Enter your message" />
-        <button id="sendButton">Send</button>
-    </div>
-    <div id="chatBox"></div>
-    </div>
-</body>
-</html>
-
-*@
-
-@{
-
-}
-
-<html>
+﻿<html>
 <head>
 	<!-- Import this CDN to use icons -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" />
@@ -48,8 +21,9 @@
 
 		#leftinnerdiv {
 			float: left;
-			height: 500px;
-			width: 32%;
+			height: 495px;
+			width: 75%;
+			overflow-y: auto;
 		}
 
 		button {
@@ -66,7 +40,7 @@
 		#chatsAside {
 			border-left: 2px solid black;
 			float: right;
-			height: 500px;
+			height: 495px;
 			width: 25%;
 			justify-content: flex-start;
 			display: flex;
@@ -120,7 +94,6 @@
 		</div>
 	</div>
 </body>
-
 </html>
 
 <script>
@@ -152,7 +125,6 @@
 		function printMsgs(item, index, arr) {
 			let chatName = $("<div />").text(item.senderChatName).html();
 			let message = $("<div />").text(item.userMessage).html();
-			//let timeStamp = $("<div />").text(item.MessageDate).html();
 			$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
 		}
 		$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected or they never existed. Sad either way.</li>");
@@ -172,11 +144,9 @@
 			username = $("#username").val();
 		}
 		var message = $("#message").val();
-
 		if (username && message) {
 			var encodedMsg = $("<div />").text(message).html();
 			$("#leftinnerdiv").append("<li><strong>You</strong>: " + encodedMsg + "</li>");
-
 			connection.invoke("SendMessage", username, message)
 				.catch(function (err) {
 					return console.error(err.toString());
@@ -197,7 +167,6 @@
 			url: '@Url.Action("GetUserChatList", "API")',
 			dataType: "json",
 			success: function (response) {
-				console.log("Send Worked")
 				response.forEach(getUserChats);
 			}
 		})
@@ -207,20 +176,22 @@
 
 	//https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
 	//https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
+	//https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function
 
 
 	function getUserChats(item, index, arr) {
-		console.log("Link supposed to be added.");
 		let name = item;
 		$("#chatList").append('<button class="btn btn-primary" onclick="GetMessages(event)" name-arg="'+name+'">' + name + "</button>");
 	}
 </script>
 
 <script>
-	function GetMessages(event){
+	function GetMessages(event) {
 		$("#leftinnerdiv").empty();
 		var target = $(event.target);
 		var chatName = target.attr("name-arg");
+		$("#username").val(chatName);
+
 		$.ajax({
 			type: "POST",
 			data: { ChatName: chatName },
@@ -238,6 +209,11 @@
 		let chatName = $("<div />").text(item.senderChatName).html();
 		let message = $("<div />").text(item.userMessage).html();
 		let timeStamp = $("<div />").text(item.MessageDate).html();
-		$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
+		let sessionChatName = sessionStorage.getItem('ChatName');
+		if (chatName == sessionChatName) {
+			$("#leftinnerdiv").append("<li><strong>You</strong>: " + message + "</li>");
+		} else {
+			$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
+		}
 	}
 </script>

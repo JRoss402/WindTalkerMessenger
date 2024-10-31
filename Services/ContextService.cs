@@ -58,11 +58,16 @@ namespace WindTalkerMessenger.Services
 				if(chat.SenderChatName == guestChatName)
 				{
 					chat.SenderChatName = "Guest Disconnected";
+					chat.UserMessage = "Guest Disconnected";
+					//IsRowRemovable(chat);
+					
 				}else if(chat.ReceiverChatName == guestChatName)
 				{
 					chat.ReceiverChatName = "Guest Disconnected";
+					//IsRowRemovable(chat);
+
 				}
-				 _context.SaveChangesAsync();
+				_context.SaveChangesAsync();
 			}
 		}
 
@@ -76,10 +81,13 @@ namespace WindTalkerMessenger.Services
 				if (userMessage.MessageSenderEmail == identityUserEmail)
 				{
 					userMessage.MessageSenderEmail = DELETED;
+					userMessage.SenderChatName = DELETED;
+					userMessage.UserMessage = DELETED;
 				}
 				else if (userMessage.MessageReceiverEmail == identityUserEmail)
 				{
 					userMessage.MessageReceiverEmail = DELETED;
+					userMessage.ReceiverChatName = DELETED;
 				}
 
 				IsRowRemovable(userMessage);

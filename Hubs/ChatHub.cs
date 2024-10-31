@@ -119,19 +119,17 @@ namespace WindTalkerMessenger.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
-
-            string connectionId = Context.ConnectionId.ToString();
-			string userName = Context.User.Identity.Name;
+			//await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
+			string connectionId = Context.ConnectionId.ToString();
+            string userName = Context.User.Identity.Name;
+            //string userName = _userNameService.GetSenderChatName(connectionId);
             if(userName == null)
             {
 				userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
+				_contextServices.DisassociateGuestUserMessages(userName);
+				_onlineUsersLists.anonUsers.TryRemove(userName, out _);
 			}
-            string disconnectedUser; 
             _onlineUsersLists.onlineUsers.TryRemove(userName, out _);
-            _onlineUsersLists.anonUsers.TryRemove(userName, out _);
-
-            _contextServices.DisassociateGuestUserMessages(userName);
 
             await base.OnDisconnectedAsync(exception);
         }
