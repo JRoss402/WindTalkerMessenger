@@ -1,28 +1,31 @@
-﻿@using WindTalkerMessenger.Models.DataLayer
+﻿@using System.Security.Claims
+@using WindTalkerMessenger.Models.DataLayer
 @using Microsoft.AspNetCore.Identity
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+@*https://stackoverflow.com/questions/35781423/how-should-i-access-my-applicationuser-properties-from-asp-net-core-views*@
+
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+            <a class="nav-link text-success" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Welcome Agent @User.Claims.FirstOrDefault( x=> x.Type == "ChatName")?.Value</a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+            <button  type="submit" class="nav-link btn btn-link text-success">Logout</button>
         </form>
     </li>
 }
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a id="tech" class="nav-link text-success" asp-area="Identity" asp-page="/Account/Register">Register</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            <a class="nav-link text-success" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </li>
 }
 </ul>

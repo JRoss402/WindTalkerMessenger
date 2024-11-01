@@ -5,10 +5,11 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js" /></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.13/signalr.min.js" /></script>
 	<style>
+
 		#maindiv {
 			border: 3px solid black;
 			height: 500px;
-			width: 1200px;
+			width: auto;
 			margin: auto;
 			border-top-left-radius: 10px;
 			border-top-right-radius: 10px;
@@ -24,6 +25,13 @@
 			height: 495px;
 			width: 75%;
 			overflow-y: auto;
+			background-color: black;
+			opacity: 95%;
+			border-radius: 15px 0px 0px 15px;
+			color: #2E801B;
+			border-style: solid;
+			border-color: cyan;
+			border-width: 1px;
 		}
 
 		button {
@@ -44,7 +52,8 @@
 			width: 25%;
 			justify-content: flex-start;
 			display: flex;
-			flex-direction: column
+			flex-direction: column;
+			overflow-y:  auto;
 		}
 
 		#li {
@@ -56,7 +65,7 @@
 			height: 50px;
 			font-size: 20px;
 			margin-top: 20px;
-			margin-bottom: 20px;
+			margin-bottom: 50px;
 			text-align: center;
 			background-color: black;
 			opacity: 95%;
@@ -71,19 +80,10 @@
 			background-size: 100% 100%;
 		}
 		
-		#leftinnerdiv {
-			background-color: black;
-			opacity: 95%;
-			border-radius: 15px 0px 0px 15px;
-			color: #2E801B;
-			border-style: solid;
-			border-color: cyan;
-			border-width: 1px;
-		}
 		#chatsAside {
 			background-color: black;
 			border-radius: 0px 15px 15px 0px;
-			color: #2E801B;
+			color: #7ACC00;
 			border-style: solid;
 			border-color: cyan;
 			border-width: 1px;
@@ -108,7 +108,7 @@
 			text-align: center;
 			background-color: black;
 			opacity: 90%;
-			color: green;
+			color: #7ACC00;
 			border-color: green;
 			width:1150px;
 			border-right-color: black;
@@ -119,7 +119,7 @@
 			height: 50px;
 			width: 125px;
 			background-color: black;
-			color: green;
+			color: #7ACC00;
 			font-weight: bold;
 			border-left-color: black;
 			margin-left: 0px;
@@ -132,6 +132,20 @@
 			border-style: none;
 		}
 		
+		#nameButton{
+			background-color:black;
+			border-color: #7ACC00;
+			border-width: 1px;
+			height: 50px;
+			color: #7ACC00;
+			font-size: 20px;
+			font-weight: bold;
+		}
+		#nameButton:hover{
+			background-color: darkgreen;
+			opacity: 95%;
+		}
+
 	</style>
 </head>
 
@@ -173,6 +187,11 @@
 </body>
 </html>
 
+<script>
+	$("#username").click(function () {
+		$("#leftinnerdiv").empty();
+	})
+</script>
 <script>
 	//change these methods to async
 
@@ -263,7 +282,7 @@
 
 	function getUserChats(item, index, arr) {
 		let name = item;
-		$("#chatList").append('<button class="btn btn-primary" onclick="GetMessages(event)" name-arg="'+name+'">' + name + "</button>");
+		$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="'+name+'">' + name + "</button>");
 		
 	}
 </script>

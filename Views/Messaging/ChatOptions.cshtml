@@ -39,22 +39,22 @@ else
 
 <script>
     $("#guestSend").click(function (event) {
-        var chatName = $("#chatName").val();
+        const chatName = $("#chatName").val();
         $.ajax({
             type: "POST",
-            url: '@Url.Action("CheckChatName", "API")',
+            url: '@Url.Action("CheckChatName", "Home")',
             dataType: "json",
             data: { ChatName: chatName },
             success: function (response) {
-                var resp = JSON.parse(response);
-                if (resp == true) {
-                    sessionStorage.setItem("ChatName", chatName);
+                alert("OptionsPage Success");
+                //var resp = JSON.parse(response);
+                if (response != null) {
+                    alert("Session supposed to be set");
+                    localStorage.setItem("UserChatName", "chatName");
                     $("#guest_form").submit();
-                    console.log("Worked");
                 }
                 else{
                     event.preventDefault();
-
                     $("#guestError").text("That chat name is taken.");
                     console.log("Failed");
                 }

@@ -1,9 +1,55 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+	ViewData["Title"] = "Home Page";
 }
+<style>
+	body {
+		background-image: url('../banner.jpg');
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: 100% 100%;
+	}
 
-<div class="text-center">
-<h1>Welcome to the WindTalker Messenger!</h1>
-    <a type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Start Chatting</a>
+	#container {
+		width: 1350px;
+		height: 500px;
+		background-color: black;
+		margin: auto;
+		color: green;
+		opacity: 95%;
+		border-radius: 25px;
+		font-size: 20px;
+		font-weight: bold;
+	}
 
+	h2 {
+		margin-bottom: 70px;
+	}
+
+	#enterButton {
+		margin-top: 40px;
+		background-color: black;
+		border-color: #7ACC00;
+		border-width: 1px;
+		height: 50px;
+		color: #7ACC00;
+		font-size: 20px;
+		font-weight: bold;
+	}
+
+	#enterButton:hover {
+		background-color: darkgreen;
+		opacity: 95%;
+	}
+
+</style>
+
+<div id="container">
+	<div class="text-center">
+		<h1>Welcome to the Agent Correspondance Terminal</h1>
+		<h2>Powered by Wind Talker Technology Inc.</h2>
+		<p>We are happy to welcome you aboard. All transmissions have been secured.</p>
+		<p>If you forget or lose your credentials, contact your main headquarters IMMEDIATELY.</p>
+		<p>Guest passes are available if you cannot contact your headquarters at this time.</p>
+		<a id="enterButton" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter Secure Chat</a>
+	</div>
 </div>
