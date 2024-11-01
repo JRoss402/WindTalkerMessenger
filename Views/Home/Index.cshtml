@@ -1,6 +1,9 @@
 ﻿@{
 	ViewData["Title"] = "Home Page";
 }
+
+<!--The link below is the original source code for the blinking cursor-->
+<!--https://dev.to/phuocng/blinking-cursor-35f4-->
 <style>
 	body {
 		background-image: url('../banner.jpg');
@@ -41,6 +44,30 @@
 		opacity: 95%;
 	}
 
+	* {
+		box-sizing: border-box;
+	}
+
+	.cursor {
+		background-color: rgb(122 204 0);
+		width: 0.25rem;
+		height: 2rem;
+		display: inline-block;
+		animation: blink 1s infinite;
+		display: inline-block;
+		position: relative;
+		top: 7px;
+	}
+
+	@@keyframes blink {
+		from {
+			opacity: 1;
+		}
+
+		to {
+			opacity: 0;
+		}
+	}
 </style>
 
 <div id="container">
@@ -49,7 +76,7 @@
 		<h2>Powered by Wind Talker Technology Inc.</h2>
 		<p>We are happy to welcome you aboard. All transmissions have been secured.</p>
 		<p>If you forget or lose your credentials, contact your main headquarters IMMEDIATELY.</p>
-		<p>Guest passes are available if you cannot contact your headquarters at this time.</p>
+		<p>Guest passes are available if you cannot contact your headquarters at this time. <span class="cursor"></span></p>
 		<a id="enterButton" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter Secure Chat</a>
 	</div>
 </div>
