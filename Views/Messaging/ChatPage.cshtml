@@ -53,15 +53,93 @@
 		}
 
 		#username {
-			height: 25px;
-			margin-top: 10px;
+			height: 50px;
+			font-size: 20px;
+			margin-top: 20px;
+			margin-bottom: 20px;
+			text-align: center;
+			background-color: black;
+			opacity: 95%;
+			color: green;
+			border-color: green;
 		}
+
+		body {
+			background-image: url('../banner.jpg');
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+			background-size: 100% 100%;
+		}
+		
+		#leftinnerdiv {
+			background-color: black;
+			opacity: 95%;
+			border-radius: 15px 0px 0px 15px;
+			color: #2E801B;
+			border-style: solid;
+			border-color: cyan;
+			border-width: 1px;
+		}
+		#chatsAside {
+			background-color: black;
+			border-radius: 0px 15px 15px 0px;
+			color: #2E801B;
+			border-style: solid;
+			border-color: cyan;
+			border-width: 1px;
+			border-left-width: 0px;
+			opacity: 95%;
+		}
+		#userHeading {
+			color: #2E801B;
+			font-size: 60px;
+			font-weight: bold;
+			text-align: center;
+		}
+		.container {
+			margin-top: 50px;
+		}
+
+		#message {
+			height: 50px;
+			font-size: 20px;
+			margin-top: 10px;
+			margin-bottom: 20px;
+			text-align: center;
+			background-color: black;
+			opacity: 90%;
+			color: green;
+			border-color: green;
+			width:1150px;
+			border-right-color: black;
+		}
+
+		#sendButton {
+			margin-top: 10px;
+			height: 50px;
+			width: 125px;
+			background-color: black;
+			color: green;
+			font-weight: bold;
+			border-left-color: black;
+			margin-left: 0px;
+		}
+		#messageContainer {
+			display: inline-flex;
+		}
+
+		#maindiv {
+			border-style: none;
+		}
+		
 	</style>
 </head>
 
 <body>
-	<h2 id="userHeading"></h2>
+	<!--<p id="userHeading">Wind Talker</p>-->
 	<div class="container">
+		<div id="pictureheader">
+		</div>
 		<div class="msg-header">
 			<div class="container1">
 				@*<img src="user1.png" class="msgimg" />*@
@@ -69,7 +147,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="chat-page">
+		<div id="chat-page">
 			<div id="maindiv">
 				<ul id="leftinnerdiv">
 				</ul>
@@ -80,23 +158,27 @@
 					</ul>
 				</div>
 			</div>
-			<div class="msg-bottom">
+			<div class="msg-bottom" id="messageContainer">
 				<div class="input-group">
 					<input type="text"
 						   id="message"
 						   class="form-control"
 						   placeholder="Write message..." />
-					<span class="input-group-text send-icon" id="sendButton">
-						<i class="bi bi-send"></i>
-					</span>
 				</div>
+				<button id="sendButton">Transmit</button>
 			</div>
+
 		</div>
 	</div>
 </body>
 </html>
 
 <script>
+	//change these methods to async
+
+	//https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-8.0
+	//https://www.roundthecode.com/dotnet-tutorials/add-signalr-hub-aspnet-core-connect-using-javascript
+
 	var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 	connection.on("ReceiveMessage", function (user, message) {
 		var encodedUser = $("<div />").text(user).html();
@@ -109,7 +191,7 @@
 		var encodedUser = $("<div />").text(user).html();
 		console.log(encodedUser, " is offline.Your message has been queued until they return.");
 
-		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> is offline. The message will be delivered when they return ...whenever that will be.</li>");
+		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. They are currently on a mission-critical assignment and will return after completion.</li>");
 	});
 
 	connection.on("GuestGone", function (user) {
@@ -117,7 +199,7 @@
 
 		console.log(encodedUser, " was a guest and have disconnected.");
 
-		$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected or they never existed. Sad either way.</li>");
+		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone rogue and removed their fingerprint from this site.</li>");
 	});
 
 	connection.on("PrintQueuedMessages", function (messages) {
@@ -127,7 +209,7 @@
 			let message = $("<div />").text(item.userMessage).html();
 			$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
 		}
-		$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected or they never existed. Sad either way.</li>");
+		//$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected,they never existed and you're crazy or they deleted their account. Sad either way.</li>");
 	});
 	connection.on("ServerDisconnect", function (user) {
 		var encodedUser = $("<div />").text(user).html();
@@ -182,6 +264,7 @@
 	function getUserChats(item, index, arr) {
 		let name = item;
 		$("#chatList").append('<button class="btn btn-primary" onclick="GetMessages(event)" name-arg="'+name+'">' + name + "</button>");
+		
 	}
 </script>
 
