@@ -228,7 +228,6 @@
 			let message = $("<div />").text(item.userMessage).html();
 			$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
 		}
-		//$("#leftinnerdiv").append("<li>" + encodedUser + " was either a guest and disconnected,they never existed and you're crazy or they deleted their account. Sad either way.</li>");
 	});
 	connection.on("ServerDisconnect", function (user) {
 		var encodedUser = $("<div />").text(user).html();
@@ -260,21 +259,20 @@
 
 	connection.start().then(function () {
 		console.log("Connected!");
-		$.ajax({
-			type: "POST",
-			//data: { ChatName: chatName },
-			//cache: false,
-			//async: true,
-			url: '@Url.Action("GetUserChatList", "API")',
-			dataType: "json",
-			success: function (response) {
-				response.forEach(getUserChats);
+		const request = '../API/GetUserChatList'
+		fetch(request, {
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json; charset=utf-8',
+				'Content-Type': 'application/json;charset=UTF-8'
 			}
 		})
-	}).catch(function (err) {
-		console.error(err.toString());
+			.then(response => response.json())
+			.then(json => json.forEach(getUserChats))
+			.catch(error => caughtErrors(error))
 	});
 
+	
 	//https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
 	//https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
 	//https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function
@@ -294,28 +292,57 @@
 		var chatName = target.attr("name-arg");
 		$("#username").val(chatName);
 
-		$.ajax({
-			type: "POST",
-			data: { ChatName: chatName },
-			cache: false,
-			async: true,
-			url: '@Url.Action("GetReceivedMessages", "API")',
-			dataType: "json",
-			success: function (response) {
-				response.forEach(getChats);
+		const requestName = "../API/GetChatName";
+
+		fetch(requestName, {
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json; charset=utf-8',
+				'Content-Type': 'application/json;charset=UTF-8'
 			}
 		})
+			.then(response => response.json())
+			.then(json => storeChatName(json))
+
+
+		const storeChatName = (json) => {
+			console.log("Name is stored!!!!!!");
+			localStorage.setItem('UserChatName', json.toString());
+
+		}
+
+		const requestMessages = `../API/GetReceivedMessages/${chatName}`;
+
+		fetch(requestMessages, {
+			method: 'POST',
+			body: JSON.stringify({ ChatName: chatName }),
+			headers: {
+				'Accept': 'application/json; charset=utf-8',
+				'Content-Type': 'application/json;charset=UTF-8'
+			}
+		})
+			.then(response => response.json())
+			.then(response => response.forEach(getChats))
+			//.catch(error => caughtErrors(error))
 	};
+
+
 	
 	function getChats(item, index, arr) {
-		let chatName = $("<div />").text(item.senderChatName).html();
+		let chatPostName = $("<div />").text(item.senderChatName).html();
+		let sendName = item.senderChatName;
+		console.log("SendName: " + sendName)
 		let message = $("<div />").text(item.userMessage).html();
 		let timeStamp = $("<div />").text(item.MessageDate).html();
-		let sessionChatName = sessionStorage.getItem('ChatName');
-		if (chatName == sessionChatName) {
-			$("#leftinnerdiv").append("<li><strong>You</strong>: " + message + "</li>");
-		} else {
-			$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
+		let storedChatName = localStorage.getItem('UserChatName');
+		console.log("StoredChatName:" + storedChatName)
+		if (sendName !== storedChatName) {
+			$("#leftinnerdiv").append("<li><strong>" + chatPostName + "</strong>: " + message + "</li>");
+
 		}
-	}
+		else {
+			$("#leftinnerdiv").append("<li><strong>You</strong>: " + message + "</li>");
+
+		}
+	};
 </script>

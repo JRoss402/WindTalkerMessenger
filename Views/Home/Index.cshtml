@@ -1,4 +1,10 @@
-﻿@{
+﻿@using System.Security.Claims
+@using WindTalkerMessenger.Models.DataLayer
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
 	ViewData["Title"] = "Home Page";
 }
 
@@ -74,7 +80,12 @@
 	<div class="text-center">
 		<h1>Welcome to the Agent Correspondance Terminal</h1>
 		<h2>Powered by Wind Talker Technology Inc.</h2>
+		@if (SignInManager.IsSignedIn(User))
+		{
+			<p>Agent @User.Claims.FirstOrDefault(x => x.Type == "ChatName")?.Value, your credentials have been verified.</p>
+		}
 		<p>We are happy to welcome you aboard. All transmissions have been secured.</p>
+
 		<p>If you forget or lose your credentials, contact your main headquarters IMMEDIATELY.</p>
 		<p>Guest passes are available if you cannot contact your headquarters at this time. <span class="cursor"></span></p>
 		<a id="enterButton" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter Secure Chat</a>

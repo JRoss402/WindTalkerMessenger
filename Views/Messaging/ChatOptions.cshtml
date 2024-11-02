@@ -38,27 +38,41 @@ else
 </script>
 
 <script>
-    $("#guestSend").click(function (event) {
+    //https://stackoverflow.com/questions/57328836/post-fetch-net-core
+    $("#guestSend").click( (event) => {
+        event.preventDefault();
+        alert("guestClicked");
         const chatName = $("#chatName").val();
-        $.ajax({
-            type: "POST",
-            url: '@Url.Action("CheckChatName", "Home")',
-            dataType: "json",
-            data: { ChatName: chatName },
-            success: function (response) {
-                alert("OptionsPage Success");
-                //var resp = JSON.parse(response);
-                if (response != null) {
-                    alert("Session supposed to be set");
-                    localStorage.setItem("UserChatName", "chatName");
-                    $("#guest_form").submit();
-                }
-                else{
-                    event.preventDefault();
-                    $("#guestError").text("That chat name is taken.");
-                    console.log("Failed");
-                }
+        const request = '/CheckChatName';
+
+        fetch(request, {
+            method: 'POST',
+            body: JSON.stringify({ ChatName: chatName }),
+            headers: {
+                'Accept': 'application/json; charset=utf-8',
+                'Content-Type': 'application/json;charset=UTF-8'
             }
         })
+            .then(response => response.json())
+            .then(json => nameCheck(json.isTaken, chatName))
+            .catch(error => caughtErrors(error))
     });
+        
+    const nameCheck = (data,chatName) => {
+        localStorage.setItem("UserChatName", chatName.toString());
+        alert("In the function");
+        if (data === false) {
+            $("#guestError").text("That chat name is taken.");
+            console.log("Failed");
+        } else {
+            alert("Inside the else");
+            alert("Session supposed to be set");
+            localStorage.setItem("UserChatName", chatName.toString());
+            $("#guest_form").submit();
+        }
+    }
+
+    const caughtErrors = (error) => {
+        console.log(error.toString());
+    }
 </script>
