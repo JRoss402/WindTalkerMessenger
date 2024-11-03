@@ -23,7 +23,7 @@ namespace WindTalkerMessenger.Controllers
                              IContextService contextService,
                              ApplicationDbContext context,
                              IHttpContextAccessor http,
-                             UserManager<ApplicationUser> userManager) 
+                             UserManager<ApplicationUser> userManager)
         {
             _onlineUsersLists = onlineUsersLists;
             _contextService = contextService;
@@ -44,7 +44,8 @@ namespace WindTalkerMessenger.Controllers
             return true;
         }
 
-        //[Route ("API/{chatName}")]
+		[HttpPost]
+		[Route("API/GetReceivedMessages/{chatName}")]
 		public async Task<List<Message>> GetReceivedMessages(string chatName)
 		
         {
@@ -55,10 +56,32 @@ namespace WindTalkerMessenger.Controllers
                                        && u.ReceiverChatName == connectedUserChatName)
                                      || ( u.SenderChatName == connectedUserChatName 
                                        && u.ReceiverChatName == chatName))).ToListAsync();
+            
             return chats;
 		}
 
-        public async Task<HashSet<string>> GetUserChatList()
+
+        [HttpPost]
+        [Route("API/GetSenderQueues/{chatName}")]
+        public async Task<List<MessageQueue>> GetSenderQueues(string chatName)
+        {
+			var userInfo = await _userManager.GetUserAsync(User);
+			var connectedUserChatName = userInfo.ChatName;
+
+			var senderQueued = await _context.Queues.Where(u => u.SenderChatName == connectedUserChatName && u.ReceiverChatName == chatName).ToListAsync();
+
+            return senderQueued;
+        }
+
+		public async Task<JsonResult> GetChatName()
+        {
+			var userInfo = await _userManager.GetUserAsync(User);
+			var connectedUserChatName = userInfo.ChatName;
+
+            return Json(connectedUserChatName);
+		}
+
+		public async Task<HashSet<string>> GetUserChatList()
         {
 			var userInfo = await _userManager.GetUserAsync(User);
 			var connectedUserChatName = userInfo.ChatName;

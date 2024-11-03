@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WindTalkerMessenger.Services;
+using NuGet.Protocol;
 
 namespace EnigmaMessengerV1.Controllers
 {
@@ -37,16 +38,14 @@ namespace EnigmaMessengerV1.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-		public bool CheckChatName(string chatName)
+        [HttpPost]
+        [Route ("/{chatName}")]
+
+        public JsonResult CheckChatName(string chatName)
 		{
 			var isTaken = _onlineUsersLists.onlineUsers.ContainsKey(chatName);
 
-			if (isTaken == false)
-			{
-				return false; ;
-			}
-
-			return true;
+			return Json(isTaken);
 		}
 	}
 }

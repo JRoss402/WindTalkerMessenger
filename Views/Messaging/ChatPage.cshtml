@@ -193,6 +193,9 @@
 	})
 </script>
 <script>
+	//after transmit, if the name is not in the returned name array, create a new button with that name and begin the new chat
+	//if the chatname of a current chat is in the username box but their chat history isn't in the div, load the messages and then post the message
+	//will need to query the queued messages table and append the messages to the end of the messages list
 	//change these methods to async
 
 	//https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-8.0
@@ -238,13 +241,14 @@
 
 	$("#sendButton").click(function () {
 		var username = "";
-
-		console.log("clicked");
 		if (!username) {
 			username = $("#username").val();
 		}
 		var message = $("#message").val();
 		if (username && message) {
+			username = $("#username").val();
+			//jsonname = JSON.stringify(username);
+			//determineName(username);
 			var encodedMsg = $("<div />").text(message).html();
 			$("#leftinnerdiv").append("<li><strong>You</strong>: " + encodedMsg + "</li>");
 			connection.invoke("SendMessage", username, message)
@@ -256,10 +260,73 @@
 			alert("Please enter your username!");
 		}
 	});
+	
+	/*const determineName = (username) => {
+		const request = '../API/GetUserChatList'
+		fetch(request, {
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json; charset=utf-8',
+				'Content-Type': 'application/json;charset=UTF-8'
+			}
+		})
+			.then(response => response.json())
+			.then(data => checkName(data, username))
+			//.catch(error => caughtErrors(error))
+	}
 
+	const checkName = (data, username) => {
+		//let chatName = username;
+		console.log("Checking the chat name");
+		if (data.includes(username)) {
+
+			grabNameChats(username)
+		}
+	}
+
+
+	/*const grabNameChats = (chatName) => {
+		const requestMessages = `../API/GetReceivedMessages/${chatName}`;
+
+		console.log("AJAX ecking the chat name");
+
+		fetch(requestMessages, {
+		method: 'POST',
+		body: JSON.stringify({ ChatName: chatName }),
+		headers: {
+			'Accept': 'application/json; charset=utf-8',
+			'Content-Type': 'application/json;charset=UTF-8'
+		}
+	})
+		.then(response => response.json())
+		.then(response => response.forEach(getChats))
+				//.catch(error => caughtErrors(error))
+	}
+
+	/*function getChats(item, index, arr) {
+		console.log("Top of chats");
+		let chatPostName = $("<div />").text(item.senderChatName).html();
+		let sendName = item.senderChatName;
+		console.log("SendName: " + sendName)
+		let message = $("<div />").text(item.userMessage).html();
+		let timeStamp = $("<div />").text(item.MessageDate).html();
+		let storedChatName = localStorage.getItem('UserChatName');
+		console.log("StoredChatName:" + storedChatName)
+		console.log("Getting the chats");
+		if (sendName !== storedChatName) {
+			$("#leftinnerdiv").append("<li><strong>" + chatPostName + "</strong>: " + message + "</li>");
+
+		}
+		else {
+			$("#leftinnerdiv").append("<li><strong>You</strong>: " + message + "</li>");
+
+		}
+	};*/
+
+	//=================================
 	connection.start().then(function () {
 		console.log("Connected!");
-		const request = '../API/GetUserChatList'
+		const request = '../API/GetUserChatList';
 		fetch(request, {
 			method: 'POST',
 			headers: {
@@ -306,14 +373,46 @@
 
 
 		const storeChatName = (json) => {
-			console.log("Name is stored!!!!!!");
 			localStorage.setItem('UserChatName', json.toString());
 
 		}
 
-		const requestMessages = `../API/GetReceivedMessages/${chatName}`;
+		getQueues();
 
-		fetch(requestMessages, {
+		function getMessages() {
+			const requestMessages = `../API/GetReceivedMessages/${chatName}`;
+
+			fetch(requestMessages, {
+				method: 'POST',
+				body: JSON.stringify({ ChatName: chatName }),
+				headers: {
+					'Accept': 'application/json; charset=utf-8',
+					'Content-Type': 'application/json;charset=UTF-8'
+				}
+			})
+				.then(response => response.json())
+				.then(response => response.forEach(getChats))
+				//.catch(error => caughtErrors(error))
+				//.then(getMessages())
+		};
+		
+
+		function getQueues() {
+			const queuesRequest = `../API/GetSenderQueues/${chatName}`;
+			fetch(queuesRequest, {
+				method: 'POST',
+				body: JSON.stringify({ ChatName: chatName }),
+				headers: {
+					'Accept': 'application/json; charset=utf-8',
+					'Content-Type': 'application/json;charset=UTF-8'
+				}
+			})
+				.then(response => response.json())
+				.then(getMessages())
+				.then(response => response.forEach(getQueuedChats))
+		};
+		}
+		/*fetch(queuesRequest, {
 			method: 'POST',
 			body: JSON.stringify({ ChatName: chatName }),
 			headers: {
@@ -322,12 +421,25 @@
 			}
 		})
 			.then(response => response.json())
-			.then(response => response.forEach(getChats))
-			//.catch(error => caughtErrors(error))
+			.then(response => response.forEach(getQueuedChats))*/
+	
+
+	function getQueuedChats(item, index, arr) {
+		let chatPostName = $("<div />").text(item.senderChatName).html();
+		let sendName = item.senderChatName;
+		console.log("SendName: " + sendName)
+		let message = $("<div />").text(item.userMessage).html();
+		let timeStamp = $("<div />").text(item.MessageDate).html();
+		let storedChatName = localStorage.getItem('UserChatName');
+		console.log("StoredChatName:" + storedChatName)
+		if (sendName !== storedChatName) {
+			$("#leftinnerdiv").append("<li><strong>" + chatPostName + " (Message Queued) </strong>: " + message + "</li>");
+		}
+		else {
+			$("#leftinnerdiv").append("<li><strong>You (Message Queued)</strong>: " + message + "</li>");
+		}
 	};
 
-
-	
 	function getChats(item, index, arr) {
 		let chatPostName = $("<div />").text(item.senderChatName).html();
 		let sendName = item.senderChatName;
