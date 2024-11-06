@@ -85,7 +85,7 @@ namespace WindTalkerMessenger.Hubs
 					                                           senderChatName,
 					                                           receiverChatName);
 
-					await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName);
+					await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName,message);
 				}
 			}
         }

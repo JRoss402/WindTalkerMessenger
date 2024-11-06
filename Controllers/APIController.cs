@@ -93,7 +93,6 @@ namespace WindTalkerMessenger.Controllers
 
             foreach(var sender in senders)
             {
-                //sender.ToString();
                 userList.Add(sender.ReceiverChatName.ToString());
             }
             foreach(var receiver in receivers)
