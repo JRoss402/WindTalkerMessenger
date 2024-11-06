@@ -1,22 +1,287 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-image: url('../banner.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
 }
 
 #leftinnerdiv {
     list-style: none;
+}
+
+
+
+.personalDataPage {
+    position: relative;
+    z-index: 2;
+    margin-left:100px;
+}
+.navItems{
+    margin-right:20px
+}
+.navContainer {
+    width: 1350px;
+    height: 600px;
+    background-color: black;
+    margin: auto;
+    color: green;
+    opacity: 95%;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    padding-top:70px;
+    z-index:1;
+}
+
+.registerContainer {
+    width: 1350px;
+    height: 600px;
+    background-color: black;
+    margin: auto;
+    color: green;
+    opacity: 95%;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.username {
+    height: 50px;
+    font-size: 20px;
+    margin-top: 20px;
+    margin-bottom: 50px;
+    text-align: center;
+    background-color: black;
+    opacity: 95%;
+    color: green;
+    border-color: green;
+}
+
+.registerButton {
+    background-color: black;
+    border-color: #7ACC00;
+    border-width: 1px;
+    height: 50px;
+    color: green;
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px
+
+}
+
+    .registerButton:hover {
+        color: #7ACC00
+    }
+
+.registerFormGroups label {
+    width: 150px;
+    margin-right: 10px; 
+    color: green;
+    font-size: 20px;
+    text-align: center;
+    background-color: black;
+    opacity: 95%;
+    border-color: green;
+
+}
+
+.registerFormGroups {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 20px;
+    position:relative;
+    right:50px
+}
+
+    .registerFormGroups input {
+        height: 50px;
+        font-size: 20px;
+
+        text-align: center;
+        background-color: black;
+        opacity: 95%;
+        color: green;
+        border-color: green;
+    }
+
+.formlabel {
+    position: absolute;
+    right: 375px;
+    width: 300px;
+}
+
+#forgot {
+    margin-top: 40px;
+}
+
+#forgotLink {
+    text-decoration: none;
+    color: green;
+}
+
+    #forgotLink:hover {
+        color: #7ACC00;
+    }
+
+.mainLink {
+    text-decoration: none;
+    color: green;
+    margin: auto;
+    padding: 10px;
+    font-size: 25px;
+}
+
+#menuItems {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+#mainLink:hover {
+    text-decoration: none;
+    color: #7ACC00;
+}
+
+.container {
+    width: 1350px;
+    height: 600px;
+    background-color: black;
+    margin: auto;
+    color: green;
+    opacity: 95%;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    z-index:1;
+}
+.chatPageContainer {
+    width: 1350px;
+    height: 600px;
+    background-color: black;
+    margin: auto;
+    color: green;
+    opacity: 95%;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.sendButton {
+    margin-top: 10px;
+    height: 50px;
+    width: 125px;
+    background-color: black;
+    color: green;
+    font-weight: bold;
+    border-left-color: black;
+    margin-left: 0px;
+}
+
+.logoutButton {
+    text-decoration: none;
+    color: green;
+    font-size: 25px;
+    background-color: #212529;
+    border: none;
+}
+
+    #logoutButton:hover {
+        color: #7ACC00
+    }
+
+.sendButton:hover {
+    color: #7ACC00;
+}
+
+.cursor {
+    background-color: rgb(122 204 0);
+    width: 0.25rem;
+    height: 2rem;
+    display: inline-block;
+    animation: blink 1s infinite;
+    display: inline-block;
+    position: relative;
+    top: 7px;
+}
+
+@keyframes blink {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+* {
+    box-sizing: border-box;
+}
+
+#enterButton {
+    margin-top: 40px;
+    background-color: black;
+    border-color: #7ACC00;
+    border-width: 1px;
+    height: 50px;
+    color: #7ACC00;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+    #enterButton:hover {
+        background-color: darkgreen;
+        opacity: 95%;
+    }
+
+#textarea {
+    padding: 25px;
+
+}
+
+.aboutContainer {
+    width: 1350px;
+    height: auto;
+    background-color: black;
+    color: green;
+    opacity: 95%;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    position: relative;
+    right:20px;
+}
+
+.abouth2 {
+    margin-bottom: 20px;
+
 }

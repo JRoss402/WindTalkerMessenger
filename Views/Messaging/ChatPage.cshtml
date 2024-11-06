@@ -29,9 +29,9 @@
 			opacity: 95%;
 			border-radius: 15px 0px 0px 15px;
 			color: #2E801B;
-			border-style: solid;
-			border-color: cyan;
+			//border-style: solid;
 			border-width: 1px;
+			border-right-style:solid;
 		}
 
 		button {
@@ -41,20 +41,12 @@
 
 		#rightinnerdiv {
 			float: left;
-			height: 500px;
+			height: 520px;
 			width: 32%;
+			overflow-y: auto;
 		}
 
-		#chatsAside {
-			border-left: 2px solid black;
-			float: right;
-			height: 495px;
-			width: 25%;
-			justify-content: flex-start;
-			display: flex;
-			flex-direction: column;
-			overflow-y:  auto;
-		}
+
 
 		#li {
 			display: inline-block;
@@ -79,25 +71,29 @@
 			background-attachment: fixed;
 			background-size: 100% 100%;
 		}
-		
+
+
 		#chatsAside {
 			background-color: black;
 			border-radius: 0px 15px 15px 0px;
 			color: #7ACC00;
 			border-style: solid;
-			border-color: cyan;
 			border-width: 1px;
 			border-left-width: 0px;
 			opacity: 95%;
+			float: right;
+			height: 495px;
+			width: 25%;
+			justify-content: flex-start;
+			display: flex;
+			flex-direction: column;
+			overflow-y: auto;
 		}
 		#userHeading {
 			color: #2E801B;
 			font-size: 60px;
 			font-weight: bold;
 			text-align: center;
-		}
-		.container {
-			margin-top: 50px;
 		}
 
 		#message {
@@ -112,6 +108,11 @@
 			border-color: green;
 			width:1150px;
 			border-right-color: black;
+			width:1210px;
+		}
+
+		.messageLoad {
+			color: #7ACC00;
 		}
 
 		#sendButton {
@@ -126,6 +127,7 @@
 		}
 		#messageContainer {
 			display: inline-flex;
+
 		}
 
 		#maindiv {
@@ -134,7 +136,7 @@
 		
 		#nameButton{
 			background-color:black;
-			border-color: #7ACC00;
+			border-color: green;
 			border-width: 1px;
 			height: 50px;
 			color: #7ACC00;
@@ -146,27 +148,36 @@
 			opacity: 95%;
 		}
 
+		::-webkit-scrollbar {
+			width: 10px;
+		}
+
+		::-webkit-scrollbar-track {
+			background: black;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background: green;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+				background: #7ACC00;
+		}
+
 	</style>
 </head>
 
 <body>
 	<!--<p id="userHeading">Wind Talker</p>-->
-	<div class="container">
-		<div id="pictureheader">
-		</div>
-		<div class="msg-header">
-			<div class="container1">
-				@*<img src="user1.png" class="msgimg" />*@
-				<div class="active">
-				</div>
-			</div>
+	<div class="chatPageContainer">
+		<div>
 		</div>
 		<div id="chat-page">
 			<div id="maindiv">
 				<ul id="leftinnerdiv">
 				</ul>
 				<div id="chatsAside">
-					<input type="text" id="username" placeholder="Username" />
+					<input type="text" id="username" class="username" placeholder="Username" />
 					<ul id="chatList">
 						<!--<button id="getChats" name="getChats">myname</button>-->
 					</ul>
@@ -179,9 +190,8 @@
 						   class="form-control"
 						   placeholder="Write message..." />
 				</div>
-				<button id="sendButton">Transmit</button>
+				<button id="sendButton"class="sendButton">Transmit</button>
 			</div>
-
 		</div>
 	</div>
 </body>
@@ -206,7 +216,7 @@
 		var encodedUser = $("<div />").text(user).html();
 		var encodedMsg = $("<div />").text(message).html();
 		console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
-		$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong>: " + encodedMsg + "</li>");
+		$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span> < /li>");
 	});
 
 	connection.on("MessageQueued", function (user) {
@@ -247,10 +257,8 @@
 		var message = $("#message").val();
 		if (username && message) {
 			username = $("#username").val();
-			//jsonname = JSON.stringify(username);
-			//determineName(username);
 			var encodedMsg = $("<div />").text(message).html();
-			$("#leftinnerdiv").append("<li><strong>You</strong>: " + encodedMsg + "</li>");
+			$("#leftinnerdiv").append('<li><strong>You</strong>: <span class="messageLoad"> ' + encodedMsg + "</span></li>");
 			connection.invoke("SendMessage", username, message)
 				.catch(function (err) {
 					return console.error(err.toString());
@@ -260,68 +268,6 @@
 			alert("Please enter your username!");
 		}
 	});
-	
-	/*const determineName = (username) => {
-		const request = '../API/GetUserChatList'
-		fetch(request, {
-			method: 'POST',
-			headers: {
-				'Accept': 'application/json; charset=utf-8',
-				'Content-Type': 'application/json;charset=UTF-8'
-			}
-		})
-			.then(response => response.json())
-			.then(data => checkName(data, username))
-			//.catch(error => caughtErrors(error))
-	}
-
-	const checkName = (data, username) => {
-		//let chatName = username;
-		console.log("Checking the chat name");
-		if (data.includes(username)) {
-
-			grabNameChats(username)
-		}
-	}
-
-
-	/*const grabNameChats = (chatName) => {
-		const requestMessages = `../API/GetReceivedMessages/${chatName}`;
-
-		console.log("AJAX ecking the chat name");
-
-		fetch(requestMessages, {
-		method: 'POST',
-		body: JSON.stringify({ ChatName: chatName }),
-		headers: {
-			'Accept': 'application/json; charset=utf-8',
-			'Content-Type': 'application/json;charset=UTF-8'
-		}
-	})
-		.then(response => response.json())
-		.then(response => response.forEach(getChats))
-				//.catch(error => caughtErrors(error))
-	}
-
-	/*function getChats(item, index, arr) {
-		console.log("Top of chats");
-		let chatPostName = $("<div />").text(item.senderChatName).html();
-		let sendName = item.senderChatName;
-		console.log("SendName: " + sendName)
-		let message = $("<div />").text(item.userMessage).html();
-		let timeStamp = $("<div />").text(item.MessageDate).html();
-		let storedChatName = localStorage.getItem('UserChatName');
-		console.log("StoredChatName:" + storedChatName)
-		console.log("Getting the chats");
-		if (sendName !== storedChatName) {
-			$("#leftinnerdiv").append("<li><strong>" + chatPostName + "</strong>: " + message + "</li>");
-
-		}
-		else {
-			$("#leftinnerdiv").append("<li><strong>You</strong>: " + message + "</li>");
-
-		}
-	};*/
 
 	//=================================
 	connection.start().then(function () {
@@ -436,7 +382,7 @@
 			$("#leftinnerdiv").append("<li><strong>" + chatPostName + " (Message Queued) </strong>: " + message + "</li>");
 		}
 		else {
-			$("#leftinnerdiv").append("<li><strong>You (Message Queued)</strong>: " + message + "</li>");
+			$("#leftinnerdiv").append('<li><strong>You (Message Queued)</strong>:<span class="messageLoad">' + message + "</span></li>");
 		}
 	};
 
@@ -449,11 +395,11 @@
 		let storedChatName = localStorage.getItem('UserChatName');
 		console.log("StoredChatName:" + storedChatName)
 		if (sendName !== storedChatName) {
-			$("#leftinnerdiv").append("<li><strong>" + chatPostName + "</strong>: " + message + "</li>");
+			$("#leftinnerdiv").append('<li><strong>' + chatPostName + '</strong>: <span class="messageLoad">' + message + "</span></li>");
 
 		}
 		else {
-			$("#leftinnerdiv").append("<li><strong>You</strong>: " + message + "</li>");
+			$("#leftinnerdiv").append('<li><strong>You</strong>: <span class="messageLoad">' + message + "</span></li>");
 
 		}
 	};
