@@ -146,6 +146,7 @@
 			opacity: 95%;
 		}
 
+		//https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp
 		::-webkit-scrollbar {
 			width: 10px;
 		}
@@ -162,6 +163,7 @@
 				background: #7ACC00;
 		}
 
+
 	</style>
 </head>
 
@@ -172,8 +174,10 @@
 		</div>
 		<div id="chat-page">
 			<div id="maindiv">
+				<div id="reversal">
 				<ul id="leftinnerdiv">
 				</ul>
+				</div>
 				<div id="chatsAside">
 					<input type="text" id="username" class="username" placeholder="Username" />
 					<ul id="chatList">
@@ -194,23 +198,17 @@
 	</div>
 
 	<script>
-		$("#username").click(function () {
-			$("#leftinnerdiv").empty();
-		})
-	</script>
-
-	<script>
 		//https://vmar76.medium.com/using-async-await-when-chaining-fetch-requests-in-javascript-5b75a75ff8e0
-		async function GetMessages(event,name) {
+		async function GetMessages(event, name) {
+			$("#leftinnerdiv").empty();
 			if (name == null) {
-				$("#leftinnerdiv").empty();
 				var target = $(event.target);
 				var chatName = target.attr("name-arg");
 				$("#username").val(chatName);
-			}else{
+			} else {
 				var chatName = name;
 			}
-				
+
 
 			const requestName = "../API/GetChatName";
 
@@ -242,6 +240,7 @@
 				.then(response => response.forEach(getChats))
 
 
+
 			const queuesRequest = `../API/GetSenderQueues/${chatName}`;
 			await fetch(queuesRequest, {
 				method: 'POST',
@@ -251,8 +250,16 @@
 					'Content-Type': 'application/json;charset=UTF-8'
 				}
 			})
+				//https://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
 				.then(response => response.json())
 				.then(response => response.forEach(postQueuedChats))
+				.then(response => {
+					setTimeout(() => { scrollBottom(); }, 0);
+				})
+			function scrollBottom() {
+				const chatContainer = document.getElementById("leftinnerdiv");
+				chatContainer.scrollTop = chatContainer.scrollHeight;
+			}
 		}
 
 		function postQueuedChats(item, index, arr) {
@@ -296,11 +303,12 @@
 			$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span> < /li>");
 		});
 
-		//route the queued message here and add the (Queued Message) styling.
-		connection.on("MessageQueued", function (user, message) {
-			var encodedUser = $("<div />").text(user).html();
-			console.log(encodedUser, " is offline.Your message has been queued until they return.");
 
+		//add the (Queued Message) styling.
+		connection.on("MessageQueued", async function (receiver, message) {
+			var encodedUser = $("<div />").text(receiver).html();
+			console.log(encodedUser, " is offline.Your message has been queued until they return.");
+			let name = localStorage.getItem('UserChatName');
 			$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. They are currently on a mission-critical assignment and will return after completion.</li>");
 
 		});
@@ -328,13 +336,20 @@
 			$("#leftinnerdiv").append("<li><strong>Server Response Timed Out. You have been disconnected.</strong></li>");
 		});
 
-		$("#sendButton").click( async function () {
+		$("#sendButton").click(async function () {
+			let names = [];
+			let nameList = [];
 			var username = "";
 			if (!username) {
 				username = $("#username").val();
 			}
 			var message = $("#message").val();
 			if (username && message) {
+				namesList = await fetchChatNameList();
+				console.log(namesList);
+				if (namesList.includes(username) == false) {
+					$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + username + '">' + username + "</button>");
+				}
 				await GetMessages(event, username)
 				username = $("#username").val();
 				var encodedMsg = $("<div />").text(message).html();
@@ -347,7 +362,26 @@
 			} else if (!username) {
 				alert("Please enter your username!");
 			}
-		});
+		})
+		//https://stackoverflow.com/questions/45018338/javascript-fetch-api-how-to-save-output-to-variable-as-an-object-not-the-prom
+			
+		async function fetchChatNameList() {
+				const request = '../API/GetUserChatList';
+				const response = await fetch(request, {
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
+					}
+				})
+				return await response.json();
+
+			}
+			//})
+
+		//https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+		//https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
+		//https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function
 
 		//==============Connection Start===================//
 
