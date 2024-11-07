@@ -39,12 +39,11 @@ else
 
 <script>
     //https://stackoverflow.com/questions/57328836/post-fetch-net-core
-    $("#guestSend").click( (event) => {
+    $("#guestSend").click((event) => {
         event.preventDefault();
-        alert("guestClicked");
         const chatName = $("#chatName").val();
-        const request = '/CheckChatName';
-
+        const request = `/CheckChatName/${chatName}`;
+        alert("Clicked")
         fetch(request, {
             method: 'POST',
             body: JSON.stringify({ ChatName: chatName }),
@@ -54,19 +53,21 @@ else
             }
         })
             .then(response => response.json())
-            .then(json => nameCheck(json.isTaken, chatName))
+            .then(response => nameCheck(response, chatName))
             .catch(error => caughtErrors(error))
     });
         
-    const nameCheck = (data,chatName) => {
+    function nameCheck(response,chatName){
+        alert("Inside the namecheck fun")
+        console.log(response);
+        console.log(chatName);
         localStorage.setItem("UserChatName", chatName.toString());
-        alert("In the function");
-        if (data === false) {
+        if (response == true) {
+            alert("Inside response = true");
             $("#guestError").text("That chat name is taken.");
             console.log("Failed");
         } else {
-            alert("Inside the else");
-            alert("Session supposed to be set");
+            alert("Inside repsonse = false");
             localStorage.setItem("UserChatName", chatName.toString());
             $("#guest_form").submit();
         }

@@ -4,6 +4,7 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" />
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js" /></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.13/signalr.min.js" /></script>
+
 	<style>
 
 		#maindiv {
@@ -23,7 +24,7 @@
 		#leftinnerdiv {
 			float: left;
 			height: 495px;
-			width: 75%;
+			width: 50%;
 			overflow-y: auto;
 			background-color: black;
 			opacity: 95%;
@@ -31,7 +32,9 @@
 			color: #2E801B;
 			//border-style: solid;
 			border-width: 1px;
-			border-right-style:solid;
+			border-right-style: solid;
+			border-bottom-style: solid;
+
 		}
 
 		button {
@@ -41,9 +44,14 @@
 
 		#rightinnerdiv {
 			float: left;
-			height: 520px;
-			width: 32%;
+			height: 495px;
+			width: 25%;
 			overflow-y: auto;
+			border-right-style: solid;
+			border-bottom-style: solid;
+			border-width: 1px;
+			justify-content: center;
+			text-align: center;
 		}
 
 		#li {
@@ -73,7 +81,7 @@
 
 		#chatsAside {
 			background-color: black;
-			border-radius: 0px 15px 15px 0px;
+			border-radius: 0px 15px 0px 0px;
 			color: #7ACC00;
 			border-style: solid;
 			border-width: 1px;
@@ -86,7 +94,15 @@
 			display: flex;
 			flex-direction: column;
 			overflow-y: auto;
+			border-right-color: black;
+			text-align: center
 		}
+
+		#chatParagraph {
+			font-size:40px;
+			text-decoration: underline;
+		}
+
 		#userHeading {
 			color: #2E801B;
 			font-size: 60px;
@@ -104,9 +120,9 @@
 			opacity: 90%;
 			color: #7ACC00;
 			border-color: green;
-			width:1150px;
+			width: 1150px;
 			border-right-color: black;
-			width:1210px;
+			width: 1210px;
 		}
 
 		.messageLoad {
@@ -123,17 +139,36 @@
 			border-left-color: black;
 			margin-left: 0px;
 		}
+
 		#messageContainer {
 			display: inline-flex;
-
 		}
 
 		#maindiv {
 			border-style: none;
 		}
-		
-		#nameButton{
-			background-color:black;
+
+		#killswitch {
+			margin-top: 10px;
+			height: 50px;
+			width: 300px;
+			background-color: #7ACC00;
+			color: red;
+			font-weight: bold;
+			border-left-color: black;
+			margin-left: 0px;
+			font-size: 25px;
+		}
+
+		#warning {
+			color: red;
+		}
+
+		#deletePara{
+			margin-top:-40px;
+		}
+		#nameButton {
+			background-color: black;
 			border-color: green;
 			border-width: 1px;
 			height: 50px;
@@ -141,12 +176,14 @@
 			font-size: 20px;
 			font-weight: bold;
 		}
-		#nameButton:hover{
-			background-color: darkgreen;
-			opacity: 95%;
-		}
 
-		//https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp
+			#nameButton:hover {
+				background-color: darkgreen;
+				opacity: 95%;
+			}
+
+		/*https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp*/
+
 		::-webkit-scrollbar {
 			width: 10px;
 		}
@@ -159,10 +196,9 @@
 			background: green;
 		}
 
-		::-webkit-scrollbar-thumb:hover {
+			::-webkit-scrollbar-thumb:hover {
 				background: #7ACC00;
-		}
-
+			}
 
 	</style>
 </head>
@@ -175,13 +211,25 @@
 		<div id="chat-page">
 			<div id="maindiv">
 				<div id="reversal">
-				<ul id="leftinnerdiv">
-				</ul>
+					<ul id="leftinnerdiv">
+					</ul>
+					<div id="rightinnerdiv">
+						<p id="chatParagraph">Options</p>
+						<p>Enter a Username below to begin new chat.</p>
+						<input type="text"
+							   id="username"
+							   class="username"
+							   placeholder="Username" />
+						<p>To delete your PROFILE and CHAT HISTORY click the "Kill Switch" below.</p>
+						<p><span id="warning">WARNING:</span> THIS ACTION IS NOT REVERSABLE!</p>
+						<button id="killswitch">Kill Switch</button>
+					</div>
 				</div>
+
 				<div id="chatsAside">
-					<input type="text" id="username" class="username" placeholder="Username" />
+					<p id="chatParagraph">Chats</p>
+					<!--<input type="text" id="username" class="username" placeholder="Username" />-->
 					<ul id="chatList">
-						<!--<button id="getChats" name="getChats">myname</button>-->
 					</ul>
 				</div>
 			</div>
@@ -192,13 +240,13 @@
 						   class="form-control"
 						   placeholder="Write message..." />
 				</div>
-				<button id="sendButton"class="sendButton">Transmit</button>
+				<button id="sendButton" class="sendButton">Transmit</button>
 			</div>
 		</div>
 	</div>
 
 	<script>
-		//https://vmar76.medium.com/using-async-await-when-chaining-fetch-requests-in-javascript-5b75a75ff8e0
+		/*https://vmar76.medium.com/using-async-await-when-chaining-fetch-requests-in-javascript-5b75a75ff8e0*/
 		async function GetMessages(event, name) {
 			$("#leftinnerdiv").empty();
 			if (name == null) {
@@ -250,7 +298,7 @@
 					'Content-Type': 'application/json;charset=UTF-8'
 				}
 			})
-				//https://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up
+				/*https://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up*/
 				.then(response => response.json())
 				.then(response => response.forEach(postQueuedChats))
 				.then(response => {
@@ -269,10 +317,10 @@
 			let timeStamp = $("<div />").text(item.MessageDate).html();
 			let storedChatName = localStorage.getItem('UserChatName');
 			if (sendName !== storedChatName) {
-				$("#leftinnerdiv").append("<li><strong>" + chatPostName + " (Message Queued) </strong>: " + message + "</li>");
+				$("#leftinnerdiv").append("<li><strong>" + chatPostName + " (Sent) </strong>: " + message + "</li>");
 			}
 			else {
-				$("#leftinnerdiv").append('<li><strong>You (Message Queued)</strong>:<span class="messageLoad">' + message + "</span></li>");
+				$("#leftinnerdiv").append('<li><strong>You (Sent)</strong>:<span class="messageLoad">' + message + "</span></li>");
 			}
 		};
 
@@ -287,7 +335,7 @@
 
 			}
 			else {
-				$("#leftinnerdiv").append('<li><strong>You</strong>: <span class="messageLoad">' + message + "</span></li>");
+				$("#leftinnerdiv").append('<li><strong>You (Read)</strong>: <span class="messageLoad">' + message + "</span></li>");
 			}
 		};
 
@@ -309,7 +357,12 @@
 			var encodedUser = $("<div />").text(receiver).html();
 			console.log(encodedUser, " is offline.Your message has been queued until they return.");
 			let name = localStorage.getItem('UserChatName');
-			$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. They are currently on a mission-critical assignment and will return after completion.</li>");
+			const loginState = await GetLoginState(name)
+			if (loginState == true) {
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. They will review your message when they return.</li>");
+			} else {
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. Due to your guest credentials, your message cannot be delivered. Register or Login to have your message queued for their return.</li>");
+			}
 
 		});
 
@@ -345,12 +398,17 @@
 			}
 			var message = $("#message").val();
 			if (username && message) {
-				namesList = await fetchChatNameList();
-				console.log(namesList);
-				if (namesList.includes(username) == false) {
-					$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + username + '">' + username + "</button>");
+				const loginState = await GetLoginState();
+				console.log(loginState)
+				if (loginState == true) {
+					namesList = await fetchChatNameList();
+					//console.log(namesList);
+					if (namesList.includes(username) == false) {
+						$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + username + '">' + username + "</button>");
+					}
+					await GetMessages(event, username)
 				}
-				await GetMessages(event, username)
+
 				username = $("#username").val();
 				var encodedMsg = $("<div />").text(message).html();
 				$("#leftinnerdiv").append('<li><strong>You</strong>: <span class="messageLoad"> ' + encodedMsg + "</span></li>");
@@ -363,25 +421,40 @@
 				alert("Please enter your username!");
 			}
 		})
-		//https://stackoverflow.com/questions/45018338/javascript-fetch-api-how-to-save-output-to-variable-as-an-object-not-the-prom
-			
+		/*https://stackoverflow.com/questions/45018338/javascript-fetch-api-how-to-save-output-to-variable-as-an-object-not-the-prom*/
+
+		async function GetLoginState() {
+			let storedChatName = localStorage.getItem('UserChatName');
+			const request = `/GetLoginState/${storedChatName}`
+			const response = await fetch(request, {
+				method: 'POST',
+				headers: {
+					'Accept': 'application/json; charset=utf-8',
+					'Content-Type': 'application/json;charset=UTF-8'
+				}
+			});
+			const responseJson = await response.json();
+
+			return responseJson;
+		}
+
 		async function fetchChatNameList() {
-				const request = '../API/GetUserChatList';
-				const response = await fetch(request, {
-					method: 'POST',
-					headers: {
-						'Accept': 'application/json; charset=utf-8',
-						'Content-Type': 'application/json;charset=UTF-8'
-					}
-				})
-				return await response.json();
+			const request = '../API/GetUserChatList';
+			const response = await fetch(request, {
+				method: 'POST',
+				headers: {
+					'Accept': 'application/json; charset=utf-8',
+					'Content-Type': 'application/json;charset=UTF-8'
+				}
+			}).catch(error => caughtErrors(error))
+			return await response.json();
 
-			}
-			//})
+		}
+		//})
 
-		//https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
-		//https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
-		//https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function
+		/*https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+		https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
+		https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function*/
 
 		//==============Connection Start===================//
 
@@ -400,9 +473,13 @@
 				.catch(error => caughtErrors(error))
 		});
 
-		//https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
-		//https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
-		//https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function
+		/*https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+		https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
+		https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function*/
+
+		function caughtErrors(error) {
+			console.log(error.toString());
+		}
 
 
 		function getUserChats(item, index, arr) {
@@ -414,4 +491,3 @@
 	</script>
 </body>
 </html>
-

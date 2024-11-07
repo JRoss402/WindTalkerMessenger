@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using WindTalkerMessenger.Models.DomainModels;
 using WindTalkerMessenger.Models.ExtensionMethods;
 using WindTalkerMessenger.Services;
@@ -30,8 +31,27 @@ namespace WindTalkerMessenger.Controllers
 			return View("Views\\Messaging\\ChatPage.cshtml");
 		}
 
+        [HttpPost]
+        [Route("/GetLoginState/{chatName}")]
+        public bool GetLoginState(string chatName)
+        {
+			string userLoginState;
+			_onlineUsersLists.userLoginState.TryGetValue(chatName, out userLoginState);
+			bool state = true;
 
-		public IActionResult StartChatting()
+			if(userLoginState != null) 
+			{ 
+				if(userLoginState == "Guest")
+				{
+					state = false;
+				}
+			}
+
+            return state;
+
+        }
+
+        public IActionResult StartChatting()
 		{
 			if (_userNameService.IsUserAuthenticated())
 			{

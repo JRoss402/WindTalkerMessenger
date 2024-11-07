@@ -32,17 +32,7 @@ namespace WindTalkerMessenger.Controllers
             _userManager = userManager;
         }
 
-        public bool CheckChatName(string chatName)
-        {
-            var isTaken = _onlineUsersLists.onlineUsers.ContainsKey(chatName);
 
-            if (isTaken == false)
-            {
-                return false; ;
-            }
-
-            return true;
-        }
 
 		[HttpPost]
 		[Route("API/GetReceivedMessages/{chatName}")]

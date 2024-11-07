@@ -12,7 +12,7 @@ namespace WindTalkerMessenger.Services
 
         public ConcurrentDictionary<string,string> authenticatedUsers = new ConcurrentDictionary<string,string>();
 
-
+        public ConcurrentDictionary<string,string> userLoginState = new ConcurrentDictionary<string,string>();
         //Rename these functions and place the verb in front.
        /* public async Task OnlineUsersAdd(string userName,string connectionId)
         {

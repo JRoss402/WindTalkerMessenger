@@ -132,9 +132,8 @@ namespace WindTalkerMessenger.Services
 
 		public bool IsUserGuest(string chatName)
 		{
-			var guest = _userManager.Users.FirstOrDefault(u => u.ChatName == chatName);
-
-			if (guest == null)
+			bool isGuest = _onlineUsersLists.anonUsers.ContainsKey(chatName);
+			if (isGuest)
 			{
 				return true;
 			}

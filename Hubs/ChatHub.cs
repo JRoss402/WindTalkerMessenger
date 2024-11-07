@@ -71,9 +71,9 @@ namespace WindTalkerMessenger.Hubs
 			}
 			else
             {
-                if (_contextServices.IsUserGuest(receiverChatName))
+                if (_contextServices.IsUserGuest(senderChatName))
                 {
-					await Clients.Client(senderConnectionId).SendAsync("GuestGone", receiverChatName);
+					await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName, message);
 				}
 				else
                 {
@@ -104,13 +104,17 @@ namespace WindTalkerMessenger.Hubs
 				var newMessages = await _contextServices.AddQueuedMessages(userName);
 				_onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
 				_onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
+                _onlineUsersLists.userLoginState.TryAdd(userName, "Registered");
+
                 await Clients.Users(connectionId).SendAsync("PrintQueuedMessages", newMessages);
 			}
 			else
             {
                 userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
                 _contextServices.AddNewGuest(userName, connectionId);
+                _onlineUsersLists.anonUsers.TryAdd(userName, connectionId);
                 _onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
+                _onlineUsersLists.userLoginState.TryAdd(userName, "Guest");
             }
             //move to if
 

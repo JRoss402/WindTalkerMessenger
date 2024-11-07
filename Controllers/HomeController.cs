@@ -8,11 +8,31 @@ namespace EnigmaMessengerV1.Controllers
 {
     public class HomeController : Controller
     {
+
+        //Need to differentiate between a guest
+        //and register user. The authorize
+        //of the api controller is messing things
+        //up => Use the resonse.ok to handle the
+        //error?
         private readonly OnlineUsersLists _onlineUsersLists;
 
         public HomeController(OnlineUsersLists onlineUsersLists)
         {
             _onlineUsersLists = onlineUsersLists;
+        }
+
+        [HttpPost]
+        [Route("/CheckChatName/{chatName}")]
+        public bool CheckChatName(string chatName)
+        {
+            var isTaken = _onlineUsersLists.onlineUsers.ContainsKey(chatName);
+
+            if (isTaken == false)
+            {
+                return false; ;
+            }
+
+            return true;
         }
 
 
@@ -38,14 +58,5 @@ namespace EnigmaMessengerV1.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [HttpPost]
-        [Route ("/{chatName}")]
-
-        public JsonResult CheckChatName(string chatName)
-		{
-			var isTaken = _onlineUsersLists.onlineUsers.ContainsKey(chatName);
-
-			return Json(isTaken);
-		}
 	}
 }
