@@ -166,7 +166,7 @@ body {
     padding-bottom: 0.5rem;
 }
 
-#mainLink:hover {
+.mainLink:hover {
     text-decoration: none;
     color: #7ACC00;
 }
@@ -215,7 +215,7 @@ body {
     border: none;
 }
 
-    #logoutButton:hover {
+    .logoutButton:hover {
         color: #7ACC00
     }
 

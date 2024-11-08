@@ -7,6 +7,10 @@
         string GetReceiverEmail(string receiverConnectionId);
         bool IsUserAuthenticated();
 
+        Task KillSwitchAsync(string userId);
 
-	}
+        Task<bool> RegistserCheck(string username);
+
+
+    }
 }

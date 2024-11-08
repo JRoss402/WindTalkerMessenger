@@ -21,7 +21,8 @@ namespace WindTalkerMessenger.Services
 		private readonly OnlineUsersLists _onlineUsersLists;
 		private readonly IHttpContextAccessor _http;
 		private readonly UserManager<ApplicationUser> _userManager;
-		private const string DELETED = "User Account Deleted";
+		private const string USER_DELETED = "User Account Deleted";
+		private const string MSG_DELETED = "User Deleted Messages";
 		private enum Statuses { Sent, Received, Queued }
 
 		public ContextService(ApplicationDbContext context,
@@ -76,32 +77,71 @@ namespace WindTalkerMessenger.Services
 			var userMessages = _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
 														  e.MessageReceiverEmail == identityUserEmail).ToList();
 
-			foreach (var userMessage in userMessages)
+			foreach (Message userMessage in userMessages)
 			{
 				if (userMessage.MessageSenderEmail == identityUserEmail)
 				{
-					userMessage.MessageSenderEmail = DELETED;
-					userMessage.SenderChatName = DELETED;
-					userMessage.UserMessage = DELETED;
+					userMessage.MessageSenderEmail = USER_DELETED;
+					userMessage.SenderChatName = USER_DELETED;
+					userMessage.UserMessage = MSG_DELETED;
 				}
 				else if (userMessage.MessageReceiverEmail == identityUserEmail)
 				{
-					userMessage.MessageReceiverEmail = DELETED;
-					userMessage.ReceiverChatName = DELETED;
+					userMessage.MessageReceiverEmail = USER_DELETED;
+					userMessage.ReceiverChatName = USER_DELETED;
 				}
 
-				IsRowRemovable(userMessage);
+                IsMessageRowRemovable(userMessage);
 
-				_context.Chats.Update(userMessage);
+				 _context.Chats.Update(userMessage);
 			}
 			_context.SaveChanges();
 
-		}
+			DisassociateIdentityUserQueuedMessages(identityUserEmail);
 
-		public void IsRowRemovable(Message message)
+        }
+
+		public void DisassociateIdentityUserQueuedMessages(string identityUserEmail)
 		{
-			if (message.MessageSenderEmail == DELETED &&
-			   message.MessageReceiverEmail == DELETED)
+            var userQueuedMessages = _context.Queues.Where(e => e.MessageSenderEmail == identityUserEmail ||
+                                              e.MessageReceiverEmail == identityUserEmail).ToList();
+
+            foreach (MessageQueue userQueuedMessage in userQueuedMessages)
+            {
+                if (userQueuedMessage.MessageSenderEmail == identityUserEmail)
+                {
+                    userQueuedMessage.MessageSenderEmail = USER_DELETED;
+                    userQueuedMessage.SenderChatName = USER_DELETED;
+                    userQueuedMessage.UserMessage = MSG_DELETED;
+                }
+                else if (userQueuedMessage.MessageReceiverEmail == identityUserEmail)
+                {
+                    userQueuedMessage.MessageReceiverEmail = USER_DELETED;
+                    userQueuedMessage.ReceiverChatName = USER_DELETED;
+                }
+
+                IsQueueRowRemovable(userQueuedMessage);
+
+                _context.Queues.Update(userQueuedMessage);
+            }
+            _context.SaveChanges();
+
+
+        }
+
+		public void IsQueueRowRemovable(MessageQueue queue)
+		{
+            if (queue.MessageSenderEmail == USER_DELETED &&
+                queue.MessageReceiverEmail == USER_DELETED)
+            {
+                _context.Queues.Remove(queue);
+            }
+        }
+
+        public void IsMessageRowRemovable(Message message)
+		{
+			if (message.MessageSenderEmail == USER_DELETED &&
+			   message.MessageReceiverEmail == USER_DELETED)
 			{
 				_context.Chats.Remove(message);
 			}
@@ -144,7 +184,6 @@ namespace WindTalkerMessenger.Services
 
 		}
 
-		//needs to return a list
 		public async Task<List<Message>> AddQueuedMessages(string username)
 		{
 			List<Message> messages = new List<Message>();

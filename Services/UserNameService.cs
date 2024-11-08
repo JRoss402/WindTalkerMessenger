@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Security.Claims;
+using System.Web.Mvc;
+using WindTalkerMessenger.Data.Migrations;
 using WindTalkerMessenger.Models.DataLayer;
 using WindTalkerMessenger.Models.DomainModels;
 
@@ -12,16 +16,22 @@ namespace WindTalkerMessenger.Services
         private readonly OnlineUsersLists _onlineUsersLists;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IContextService _contextService;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public UserNameService(IHttpContextAccessor http, 
                           OnlineUsersLists onlineUsersLists,
                           UserManager<ApplicationUser> userManager,
-                          ApplicationDbContext context)
+                          ApplicationDbContext context,
+                          IContextService contextService,
+                          SignInManager<ApplicationUser> signinmanager)
         {
             _http = http;
             _onlineUsersLists = onlineUsersLists;
             _userManager = userManager;
             _context = context;
+            _contextService = contextService;
+            _signInManager = signinmanager;
         }
 
         public bool IsUserAuthenticated()
@@ -76,5 +86,32 @@ namespace WindTalkerMessenger.Services
             }
             return senderChatName;
         }
+
+        public async Task KillSwitchAsync(string userName)
+        {
+            var user =  await _userManager.FindByEmailAsync(userName);
+            string userEmail = user.ToString();
+            var result = await _userManager.DeleteAsync(user);
+
+            _contextService.DisassociateIdentityUserMessages(userEmail);
+
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException($"Unexpected error occurred deleting user.");
+            }
+            await _signInManager.SignOutAsync();
+
+        }
+
+        public async Task<bool> RegistserCheck(string username)
+        {
+            var regUsers = await _userManager.Users.ToListAsync();
+            var names = regUsers.Select(u => u.ChatName).ToList();
+            if (names.Contains(username)){
+                return true;
+            }
+            return false;
+        }
+
     }
 }

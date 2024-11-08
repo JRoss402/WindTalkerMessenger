@@ -95,7 +95,8 @@
 			flex-direction: column;
 			overflow-y: auto;
 			border-right-color: black;
-			text-align: center
+			text-align: center;
+			border-top-width:0px
 		}
 
 		#chatParagraph {
@@ -129,16 +130,11 @@
 			color: #7ACC00;
 		}
 
-		#sendButton {
-			margin-top: 10px;
-			height: 50px;
-			width: 125px;
-			background-color: black;
-			color: #7ACC00;
-			font-weight: bold;
-			border-left-color: black;
-			margin-left: 0px;
+		.senderColor{
+			color:purple;
 		}
+
+
 
 		#messageContainer {
 			display: inline-flex;
@@ -148,7 +144,28 @@
 			border-style: none;
 		}
 
-		#killswitch {
+		.killswitch {
+			margin-top: 10px;
+			height: 50px;
+			width: 300px;
+			background-color: #2a2a2a;
+			color: #6a6a6a;
+			font-weight: bold;
+			border-left-color: black;
+			margin-left: 0px;
+			font-size: 25px;
+		}
+
+		
+
+		.killswitch:active {
+			color: #7ACC00;
+			background-color: red;
+			}
+
+		
+
+		.enableSwitch {
 			margin-top: 10px;
 			height: 50px;
 			width: 300px;
@@ -158,6 +175,10 @@
 			border-left-color: black;
 			margin-left: 0px;
 			font-size: 25px;
+		}
+		.enableSwitch:active{
+				color: #7ACC00;
+				background-color: red;
 		}
 
 		#warning {
@@ -216,13 +237,26 @@
 					<div id="rightinnerdiv">
 						<p id="chatParagraph">Options</p>
 						<p>Enter a Username below to begin new chat.</p>
+						<!--https://www.geeksforgeeks.org/html-clearing-the-input-field/-->
 						<input type="text"
 							   id="username"
 							   class="username"
-							   placeholder="Username" />
-						<p>To delete your PROFILE and CHAT HISTORY click the "Kill Switch" below.</p>
+							   placeholder="Username"
+							   onfocus="this.value=' '"/>
+						
+					    <p>To delete your PROFILE and CHAT HISTORY click the "Kill Switch" below.</p>
 						<p><span id="warning">WARNING:</span> THIS ACTION IS NOT REVERSABLE!</p>
-						<button id="killswitch">Kill Switch</button>
+						<button class="enableSwitch" 
+								id="enableSwitch" 
+								name="enableSwitch">Enable Kill Switch</button>
+
+						<form asp-controller="Messaging" asp-action="KillSwitch" >
+							<input type="hidden" name="userName" value="@User.Identity.Name" />
+							<button class="killswitch" 
+								    id="killswitch" 
+									type="submit" 
+									disabled>Kill Switch</button>
+						</form>
 					</div>
 				</div>
 
@@ -240,254 +274,300 @@
 						   class="form-control"
 						   placeholder="Write message..." />
 				</div>
-				<button id="sendButton" class="sendButton">Transmit</button>
+				<button class="sendButton" id="sendButton">Transmit</button>
 			</div>
 		</div>
 	</div>
 
 	<script>
-		/*https://vmar76.medium.com/using-async-await-when-chaining-fetch-requests-in-javascript-5b75a75ff8e0*/
-		async function GetMessages(event, name) {
-			$("#leftinnerdiv").empty();
-			if (name == null) {
-				var target = $(event.target);
-				var chatName = target.attr("name-arg");
-				$("#username").val(chatName);
-			} else {
-				var chatName = name;
-			}
+		/*https://stackoverflow.com/questions/46197844/is-it-possible-to-use-a-ternary-operator-in-css*/
 
-
-			const requestName = "../API/GetChatName";
-
-			fetch(requestName, {
-				method: 'POST',
-				headers: {
-					'Accept': 'application/json; charset=utf-8',
-					'Content-Type': 'application/json;charset=UTF-8'
-				}
-			})
-				.then(response => response.json())
-				.then(json => storeChatName(json))
-
-			const storeChatName = (json) => {
-				localStorage.setItem('UserChatName', json.toString());
-
-			}
-			const requestMessages = `../API/GetReceivedMessages/${chatName}`;
-
-			await fetch(requestMessages, {
-				method: 'POST',
-				body: JSON.stringify({ ChatName: chatName }),
-				headers: {
-					'Accept': 'application/json; charset=utf-8',
-					'Content-Type': 'application/json;charset=UTF-8'
-				}
-			})
-				.then(response => response.json())
-				.then(response => response.forEach(getChats))
-
-
-
-			const queuesRequest = `../API/GetSenderQueues/${chatName}`;
-			await fetch(queuesRequest, {
-				method: 'POST',
-				body: JSON.stringify({ ChatName: chatName }),
-				headers: {
-					'Accept': 'application/json; charset=utf-8',
-					'Content-Type': 'application/json;charset=UTF-8'
-				}
-			})
-				/*https://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up*/
-				.then(response => response.json())
-				.then(response => response.forEach(postQueuedChats))
-				.then(response => {
-					setTimeout(() => { scrollBottom(); }, 0);
-				})
-			function scrollBottom() {
-				const chatContainer = document.getElementById("leftinnerdiv");
-				chatContainer.scrollTop = chatContainer.scrollHeight;
-			}
-		}
-
-		function postQueuedChats(item, index, arr) {
-			let chatPostName = $("<div />").text(item.senderChatName).html();
-			let sendName = item.senderChatName;
-			let message = $("<div />").text(item.userMessage).html();
-			let timeStamp = $("<div />").text(item.MessageDate).html();
-			let storedChatName = localStorage.getItem('UserChatName');
-			if (sendName !== storedChatName) {
-				$("#leftinnerdiv").append("<li><strong>" + chatPostName + " (Sent) </strong>: " + message + "</li>");
-			}
-			else {
-				$("#leftinnerdiv").append('<li><strong>You (Sent)</strong>:<span class="messageLoad">' + message + "</span></li>");
-			}
-		};
-
-		function getChats(item, index, arr) {
-			let chatPostName = $("<div />").text(item.senderChatName).html();
-			let sendName = item.senderChatName;
-			let message = $("<div />").text(item.userMessage).html();
-			let timeStamp = $("<div />").text(item.MessageDate).html();
-			let storedChatName = localStorage.getItem('UserChatName');
-			if (sendName !== storedChatName) {
-				$("#leftinnerdiv").append('<li><strong>' + chatPostName + '</strong>: <span class="messageLoad">' + message + "</span></li>");
-
-			}
-			else {
-				$("#leftinnerdiv").append('<li><strong>You (Read)</strong>: <span class="messageLoad">' + message + "</span></li>");
-			}
-		};
-
-
-		//https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-8.0
-		//https://www.roundthecode.com/dotnet-tutorials/add-signalr-hub-aspnet-core-connect-using-javascript
-
-		var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
-		connection.on("ReceiveMessage", function (user, message) {
-			var encodedUser = $("<div />").text(user).html();
-			var encodedMsg = $("<div />").text(message).html();
-			console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
-			$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span> < /li>");
+		$("#enableSwitch").on("click", function () {
+			var isDisabled = $("#killswitch").prop("disabled");
+			$("#killswitch").prop("disabled", !isDisabled)
+				.css({
+					"color": isDisabled ? '#FF0000' : "#6a6a6a",
+					"background-color": isDisabled ? '#7ACC00' : "#2a2a2a"
+				});
 		});
 
-
-		//add the (Queued Message) styling.
-		connection.on("MessageQueued", async function (receiver, message) {
-			var encodedUser = $("<div />").text(receiver).html();
-			console.log(encodedUser, " is offline.Your message has been queued until they return.");
-			let name = localStorage.getItem('UserChatName');
-			const loginState = await GetLoginState(name)
-			if (loginState == true) {
-				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. They will review your message when they return.</li>");
-			} else {
-				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. Due to your guest credentials, your message cannot be delivered. Register or Login to have your message queued for their return.</li>");
-			}
-
-		});
-
-		connection.on("GuestGone", function (user) {
-			var encodedUser = $("<div />").text(user).html();
-
-			console.log(encodedUser, " was a guest and have disconnected.");
-
-			$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone rogue and removed their fingerprint from this site.</li>");
-		});
-
-		connection.on("PrintQueuedMessages", function (messages) {
-			messages.forEach(printMsgs)
-			function printMsgs(item, index, arr) {
-				let chatName = $("<div />").text(item.senderChatName).html();
-				let message = $("<div />").text(item.userMessage).html();
-				$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
-			}
-		});
-		connection.on("ServerDisconnect", function (user) {
-			var encodedUser = $("<div />").text(user).html();
-			console.log("User: ", encodedUser, " disconnected.The server timed out");
-
-			$("#leftinnerdiv").append("<li><strong>Server Response Timed Out. You have been disconnected.</strong></li>");
-		});
-
-		$("#sendButton").click(async function () {
-			let names = [];
-			let nameList = [];
-			var username = "";
-			if (!username) {
-				username = $("#username").val();
-			}
-			var message = $("#message").val();
-			if (username && message) {
-				const loginState = await GetLoginState();
-				console.log(loginState)
-				if (loginState == true) {
-					namesList = await fetchChatNameList();
-					//console.log(namesList);
-					if (namesList.includes(username) == false) {
-						$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + username + '">' + username + "</button>");
+			async function KillSwitch() {
+				let chatName = localStorage.getItem('UserChatName');
+				const request = `/KillSwitch`
+				const response = fetch(request, {
+					method: 'POST',
+					body: JSON.stringify({ ChatName: chatName }),
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
 					}
-					await GetMessages(event, username)
+				}).then(response => {
+					localStorage.removeItem('UserChatName');
+				})
+			}
+
+			async function GetMessages(event, name) {
+				$("#leftinnerdiv").empty();
+				if (name == null) {
+					var target = $(event.target);
+					var chatName = target.attr("name-arg");
+					$("#username").val(chatName);
+				} else {
+					var chatName = name;
 				}
 
-				username = $("#username").val();
-				var encodedMsg = $("<div />").text(message).html();
-				$("#leftinnerdiv").append('<li><strong>You</strong>: <span class="messageLoad"> ' + encodedMsg + "</span></li>");
-				connection.invoke("SendMessage", username, message)
-					.catch(function (err) {
-						return console.error(err.toString());
-					});
-				$("#message").val("").focus();
-			} else if (!username) {
-				alert("Please enter your username!");
-			}
-		})
-		/*https://stackoverflow.com/questions/45018338/javascript-fetch-api-how-to-save-output-to-variable-as-an-object-not-the-prom*/
 
-		async function GetLoginState() {
-			let storedChatName = localStorage.getItem('UserChatName');
-			const request = `/GetLoginState/${storedChatName}`
+				const requestName = "../API/GetChatName";
+
+				fetch(requestName, {
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
+					}
+				})
+					.then(response => response.json())
+					.then(json => storeChatName(json))
+
+				const storeChatName = (json) => {
+					localStorage.setItem('UserChatName', json.toString());
+
+				}
+				const requestMessages = `../API/GetReceivedMessages/${chatName}`;
+
+				await fetch(requestMessages, {
+					method: 'POST',
+					body: JSON.stringify({ ChatName: chatName }),
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
+					}
+				})
+					.then(response => response.json())
+					.then(response => response.forEach(getChats))
+
+
+
+				const queuesRequest = `../API/GetSenderQueues/${chatName}`;
+				await fetch(queuesRequest, {
+					method: 'POST',
+					body: JSON.stringify({ ChatName: chatName }),
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
+					}
+				})
+					/*https://stackoverflow.com/questions/18614301/keep-overflow-div-scrolled-to-bottom-unless-user-scrolls-up*/
+					.then(response => response.json())
+					.then(response => response.forEach(postQueuedChats))
+					.then(response => {
+						setTimeout(() => { scrollBottom(); }, 0);
+					})
+				function scrollBottom() {
+					const chatContainer = document.getElementById("leftinnerdiv");
+					chatContainer.scrollTop = chatContainer.scrollHeight;
+				}
+			}
+
+			function postQueuedChats(item, index, arr) {
+				let chatPostName = $("<div />").text(item.senderChatName).html();
+				let sendName = item.senderChatName;
+				let message = $("<div />").text(item.userMessage).html();
+				let timeStamp = $("<div />").text(item.MessageDate).html();
+				let storedChatName = localStorage.getItem('UserChatName');
+				if (sendName !== storedChatName) {
+					$("#leftinnerdiv").append("<li><strong>" + chatPostName + " (Sent) </strong>: " + message + "</li>");
+				}
+				else {
+					$("#leftinnerdiv").append('<li><strong><span class="senderColor">You (Sent)</span></strong>:<span class="messageLoad">' + message + "</span></li>");
+				}
+			};
+
+			function getChats(item, index, arr) {
+				let chatPostName = $("<div />").text(item.senderChatName).html();
+				let sendName = item.senderChatName;
+				let message = $("<div />").text(item.userMessage).html();
+				let timeStamp = $("<div />").text(item.MessageDate).html();
+				let storedChatName = localStorage.getItem('UserChatName');
+				if (sendName !== storedChatName) {
+					$("#leftinnerdiv").append('<li><strong>' + chatPostName + '</strong>: <span class="messageLoad">' + message + "</span></li>");
+
+				}
+				else {
+					$("#leftinnerdiv").append('<li><strong><span class="senderColor">You (Read)</span></strong>: <span class="messageLoad">' + message + "</span></li>");
+				}
+			};
+			//=================SIGNALR METHODS==================//
+
+			//https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-8.0
+			//https://www.roundthecode.com/dotnet-tutorials/add-signalr-hub-aspnet-core-connect-using-javascript
+
+
+			var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+			connection.on("ReceiveMessage", function (user, message) {
+				var encodedUser = $("<div />").text(user).html();
+				var encodedMsg = $("<div />").text(message).html();
+				console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span> < /li>");
+			});
+
+			connection.on("NoOne", function (user, message) {
+				var encodedUser = $("<div />").text(user).html();
+				var encodedMsg = $("<div />").text(message).html();
+				//$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span> < /li>");
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> is not a registered user nor are they a guest.</li>");
+
+		});
+			
+			//add the (Queued Message) styling.
+			connection.on("MessageQueued", async function (receiver, message) {
+				var encodedUser = $("<div />").text(receiver).html();
+				console.log(encodedUser, " is offline.Your message has been queued until they return.");
+				let name = localStorage.getItem('UserChatName');
+				const loginState = await GetLoginState(name)
+				if (loginState == true) {
+					$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. They will review your message when they return.</li>");
+				} else {
+					$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. Due to your guest credentials, your message cannot be delivered. Register or Login to have your message queued for their return.</li>");
+				}
+
+			});
+
+			connection.on("GuestGone", function (user) {
+				var encodedUser = $("<div />").text(user).html();
+
+				console.log(encodedUser, " was a guest and have disconnected.");
+
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone rogue and removed their fingerprint from this site.</li>");
+			});
+
+			connection.on("PrintQueuedMessages", function (messages) {
+				messages.forEach(printMsgs)
+				function printMsgs(item, index, arr) {
+					let chatName = $("<div />").text(item.senderChatName).html();
+					let message = $("<div />").text(item.userMessage).html();
+					$("#leftinnerdiv").append("<li><strong>" + chatName + "</strong>: " + message + "</li>");
+				}
+			});
+			connection.on("ServerDisconnect", function (user) {
+				var encodedUser = $("<div />").text(user).html();
+				console.log("User: ", encodedUser, " disconnected.The server timed out");
+
+				$("#leftinnerdiv").append("<li><strong>Server Response Timed Out. You have been disconnected.</strong></li>");
+			});
+			//===================SEND BUTTON====================//
+			$("#sendButton").click(async function () {
+				let names = [];
+				let nameList = [];
+				var username = "";
+				if (!username) {
+					username = $("#username").val();
+				}
+				var message = $("#message").val();
+				if (username && message) {
+					const loginState = await GetLoginState();
+					if (loginState == true) {
+						namesList = await fetchChatNameList();
+						let isRegistered = await IsReceiverRegistered(username);
+						console.log(isRegistered);
+					if (namesList.includes(username) == false && isRegistered == true) {
+							$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + username + '">' + username + "</button>");
+						}
+						await GetMessages(event, username)
+					}
+
+					username = $("#username").val();
+					var encodedMsg = $("<div />").text(message).html();
+					$("#leftinnerdiv").append('<li><strong><span class="senderColor">You</span></strong>: <span class="messageLoad"> ' + encodedMsg + "</span></li>");
+					connection.invoke("SendMessage", username, message)
+						.catch(function (err) {
+							return console.error(err.toString());
+						});
+					$("#message").val("").focus();
+				} else if (!username) {
+					alert("Please enter your username!");
+				}
+			})
+			/*https://stackoverflow.com/questions/45018338/javascript-fetch-api-how-to-save-output-to-variable-as-an-object-not-the-prom*/
+
+		async function IsReceiverRegistered(username) {
+			const request = `/IsReceiverRegistered/${username}`
 			const response = await fetch(request, {
 				method: 'POST',
+				body: JSON.stringify({ Username: username }),
 				headers: {
 					'Accept': 'application/json; charset=utf-8',
 					'Content-Type': 'application/json;charset=UTF-8'
 				}
 			});
 			const responseJson = await response.json();
-
 			return responseJson;
 		}
 
-		async function fetchChatNameList() {
-			const request = '../API/GetUserChatList';
-			const response = await fetch(request, {
-				method: 'POST',
-				headers: {
-					'Accept': 'application/json; charset=utf-8',
-					'Content-Type': 'application/json;charset=UTF-8'
-				}
-			}).catch(error => caughtErrors(error))
-			return await response.json();
+			async function GetLoginState() {
+				let storedChatName = localStorage.getItem('UserChatName');
+				const request = `/GetLoginState/${storedChatName}`
+				const response = await fetch(request, {
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
+					}
+				});
+				const responseJson = await response.json();
 
-		}
-		//})
+				return responseJson;
+			}
 
-		/*https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
-		https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
-		https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function*/
+			async function fetchChatNameList() {
+				const request = '../API/GetUserChatList';
+				const response = await fetch(request, {
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
+					}
+				}).catch(error => caughtErrors(error))
+				return await response.json();
 
-		//==============Connection Start===================//
+			}
 
-		connection.start().then(function () {
-			console.log("Connected!");
-			const request = '../API/GetUserChatList';
-			fetch(request, {
-				method: 'POST',
-				headers: {
-					'Accept': 'application/json; charset=utf-8',
-					'Content-Type': 'application/json;charset=UTF-8'
-				}
-			})
-				.then(response => response.json())
-				.then(json => json.forEach(getUserChats))
-				.catch(error => caughtErrors(error))
-		});
+			/*https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+			https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
+			https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function*/
 
-		/*https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
-		https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
-		https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function*/
+			//==============Connection Start===================//
 
-		function caughtErrors(error) {
-			console.log(error.toString());
-		}
+			connection.start().then(function () {
+				console.log("Connected!");
+				const request = '../API/GetUserChatList';
+				fetch(request, {
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json; charset=utf-8',
+						'Content-Type': 'application/json;charset=UTF-8'
+					}
+				})
+					.then(response => response.json())
+					.then(json => json.forEach(getUserChats))
+					.catch(error => caughtErrors(error))
+			});
+
+			/*https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+			https://stackoverflow.com/questions/1276870/how-to-pass-an-event-object-to-a-function-in-javascript
+			https://stackoverflow.com/questions/39144210/pass-a-variable-to-foreach-function*/
+
+			function caughtErrors(error) {
+				console.log(error.toString());
+			}
 
 
-		function getUserChats(item, index, arr) {
-			let name = item;
-			$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + name + '">' + name + "</button>");
+			function getUserChats(item, index, arr) {
+				let name = item;
+				$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + name + '">' + name + "</button>");
 
-		}
-
+			}
+		
 	</script>
 </body>
 </html>

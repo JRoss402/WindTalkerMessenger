@@ -20,7 +20,7 @@
 
 	.container {
 		width: 1350px;
-		height: 500px;
+		height: 520px;
 		background-color: black;
 		margin: auto;
 		color: green;
@@ -76,20 +76,22 @@
 			opacity: 0;
 		}
 	}
+
 </style>
 
 <div class="container">
 	<div class="text-center">
-		<h1>Welcome to the Agent Correspondance Terminal</h1>
-		<h2>Powered by Wind Talker Technology Inc.</h2>
+		<h1>Welcome to Wind Talker</h1>
+		<h2>Taking back privacy.</h2>
 		@if (SignInManager.IsSignedIn(User))
 		{
-			<p>Agent @User.Claims.FirstOrDefault(x => x.Type == "ChatName")?.Value, your credentials have been verified.</p>
+			<p>@User.Claims.FirstOrDefault(x => x.Type == "ChatName")?.Value, your credentials have been verified.</p>
 		}
-		<p>We are happy to welcome you aboard. All transmissions have been secured.</p>
+		<p>We are happy to welcome you aboard.</p>
 
-		<p>If you forget or lose your credentials, contact your main headquarters IMMEDIATELY.</p>
-		<p>Guest passes are available if you cannot contact your headquarters at this time. <span class="cursor"></span></p>
-		<a id="enterButton" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter Secure Chat</a>
+		<p>Guests are allowed to chat if you do not have an account.</p>
+		<p>Please visit the "About" page to learn more!</p>
+
+		<a id="enterButton" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter The Terminal</a>
 	</div>
 </div>

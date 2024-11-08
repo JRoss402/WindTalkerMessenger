@@ -29,8 +29,10 @@ namespace WindTalkerMessenger.Services
 
         bool IsUserGuest(string chatName);
 
+        void IsQueueRowRemovable(MessageQueue queue);
 
-		void IsRowRemovable(Message message);
+
+        void IsMessageRowRemovable(Message message);
         void DisassociateIdentityUserMessages(string identityUserEmail);
         void InsertMessage(Message message);
         void DisassociateGuestUserMessages(string guestChatName);
@@ -38,6 +40,7 @@ namespace WindTalkerMessenger.Services
 
 		void AddNewGuest(string userName, string connectionId);
 
+        void DisassociateIdentityUserQueuedMessages(string identityUserEmail);
 
 
 

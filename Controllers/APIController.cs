@@ -77,17 +77,58 @@ namespace WindTalkerMessenger.Controllers
 			var connectedUserChatName = userInfo.ChatName;
 
 			HashSet<string> userList = new HashSet<string>();
-
             var senders = _context.Chats.Where(u => u.SenderChatName == connectedUserChatName).ToList();
             var receivers = _context.Chats.Where(u => u.ReceiverChatName == connectedUserChatName).ToList();
+            //var chatNames = await _context.Queues.Where(u => u.SenderChatName == connectedUserChatName ||
+            //                                                u.ReceiverChatName == connectedUserChatName).ToListAsync();
+
+            var queuedNames = await GetQueuedChatList(connectedUserChatName);
 
             foreach(var sender in senders)
             {
-                userList.Add(sender.ReceiverChatName.ToString());
+                if (sender.ReceiverChatName != "User Account Deleted" && sender.ReceiverChatName != "Guest Disconnected")
+                {
+                    userList.Add(sender.ReceiverChatName.ToString());
+                }
+
             }
             foreach(var receiver in receivers)
             {
-                userList.Add(receiver.SenderChatName.ToString());
+                if (receiver.SenderChatName != "User Account Deleted" && receiver.SenderChatName != "Guest Disconnected")
+                {
+                    userList.Add(receiver.SenderChatName.ToString());
+
+                }
+            }
+            foreach(string name in queuedNames)
+            {
+              userList.Add(name);
+            }
+
+            return userList;
+        }
+
+        public async Task<List<string>> GetQueuedChatList(string connectedUserChatName)
+        {
+            List<string> userList = new List<string>();
+
+            var senders = _context.Queues.Where(u => u.SenderChatName == connectedUserChatName).ToList();
+            var receivers = _context.Queues.Where(u => u.ReceiverChatName == connectedUserChatName).ToList();
+
+            foreach (var sender in senders)
+            {
+                if(sender.ReceiverChatName != "User Account Deleted" && sender.ReceiverChatName != "Guest Disconnected")
+                {
+                    userList.Add(sender.ReceiverChatName.ToString());
+                }
+            }
+            foreach (var receiver in receivers)
+            {
+                if (receiver.SenderChatName != "User Account Deleted" && receiver.SenderChatName != "Guest Disconnected")
+                {
+                    userList.Add(receiver.SenderChatName.ToString());
+
+                }
             }
 
             return userList;
