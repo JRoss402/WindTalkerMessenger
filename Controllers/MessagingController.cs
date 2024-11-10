@@ -95,7 +95,7 @@ namespace WindTalkerMessenger.Controllers
         [Route("/IsReceiverRegistered/{username}")]
         public async Task<bool> IsReceiverRegistered(string username)
         {
-			var isRegistered = await _userNameService.RegistserCheck(username);
+			var isRegistered = await _userNameService.RegisterCheck(username);
 
 			return isRegistered;
 

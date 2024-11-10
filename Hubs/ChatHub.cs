@@ -1,5 +1,7 @@
 ﻿using WindTalkerMessenger.Services;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Identity;
+using WindTalkerMessenger.Models.DomainModels;
 
 namespace WindTalkerMessenger.Hubs
 {
@@ -10,6 +12,7 @@ namespace WindTalkerMessenger.Hubs
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUserNameService _userNameService;
         private const string chatNameKey = "chatName";
+        private readonly ILogger _logger;
 
         enum Status
         {
@@ -19,12 +22,14 @@ namespace WindTalkerMessenger.Hubs
         public ChatHub(IContextService contextServices, 
                        OnlineUsersLists onlineUsersLists, 
                        IHttpContextAccessor httpContextAccessor,
-                       IUserNameService userNameService)
+                       IUserNameService userNameService,
+                       ILogger<ChatHub> logger)
         {
             _contextServices = contextServices;
             _onlineUsersLists = onlineUsersLists;
             _contextAccessor = httpContextAccessor;
             _userNameService = userNameService;
+            _logger = logger;
         }
 
         public async Task SendMessage(string receiverChatName, string message)
@@ -71,24 +76,46 @@ namespace WindTalkerMessenger.Hubs
 			}
 			else
             {
-                if (_contextServices.IsUserGuest(senderChatName))
+                if(await _userNameService.RegisterCheck(receiverChatName) == true)
                 {
-					await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName, message);
-				}
-				else
-                {
-					_contextServices.CreateQueuedMessageObject(message,
-					                                           senderIdentityEmail,
-					                                           receiverEmail,
-					                                           messageFamilyUID,
-					                                           Status.Queued,
-					                                           senderChatName,
-					                                           receiverChatName);
+                    if (_contextServices.IsUserGuest(senderChatName))
+                    {
+                        await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName, message);
+                    }
+                    else
+                    {
+                        _contextServices.CreateQueuedMessageObject(message,
+                                                                   senderIdentityEmail,
+                                                                   receiverEmail,
+                                                                   messageFamilyUID,
+                                                                   Status.Queued,
+                                                                   senderChatName,
+                                                                   receiverChatName);
 
-					await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName,message);
-				}
-			}
+                        await Clients.Client(senderConnectionId).SendAsync("MessageQueued", receiverChatName, message);
+                    }
+                }
+                else
+                {
+                    await Clients.Client(senderConnectionId).SendAsync("NoOne", receiverChatName, message);
+
+                }
+
+            }
         }
+
+        public void HeartBeatResponse(bool isAlive)
+        {
+            if(isAlive == true)
+            {
+                _logger.LogInformation("The heartbeat came back. Client is alive.");
+            }
+            else
+            {
+                _logger.LogInformation("The hearbeat was either false or didn't return. Client Dead. Clean.");
+            }
+        }
+
 
         public override async Task<Task> OnConnectedAsync()
         {
@@ -121,19 +148,24 @@ namespace WindTalkerMessenger.Hubs
             return base.OnConnectedAsync();
         }
 
+        
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-			//await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
-			string connectionId = Context.ConnectionId.ToString();
-            string userName = Context.User.Identity.Name;
+            string identityUserName = Context.User.Identity.Name;
+            string connectionId = Context.ConnectionId.ToString();            //await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
+            string userName = _userNameService.GetSenderChatName(connectionId);
             //string userName = _userNameService.GetSenderChatName(connectionId);
-            if(userName == null)
+            if (userName == null)
             {
 				userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
 				_contextServices.DisassociateGuestUserMessages(userName);
 				_onlineUsersLists.anonUsers.TryRemove(userName, out _);
 			}
-            _onlineUsersLists.onlineUsers.TryRemove(userName, out _);
+            bool removed = _onlineUsersLists.onlineUsers.TryRemove(userName, out _);
+            bool removedtwo = _onlineUsersLists.authenticatedUsers.TryRemove(userName, out _);
+            bool gone = _onlineUsersLists.userLoginState.TryRemove(userName, out _);
+            
 
             await base.OnDisconnectedAsync(exception);
         }

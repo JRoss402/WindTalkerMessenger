@@ -103,10 +103,10 @@ namespace WindTalkerMessenger.Services
 
         }
 
-        public async Task<bool> RegistserCheck(string username)
+        public async Task<bool> RegisterCheck(string username)
         {
             var regUsers = await _userManager.Users.ToListAsync();
-            var names = regUsers.Select(u => u.ChatName).ToList();
+            var names =  regUsers.Select(u => u.ChatName).ToList();
             if (names.Contains(username)){
                 return true;
             }

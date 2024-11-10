@@ -9,7 +9,7 @@
 
         Task KillSwitchAsync(string userId);
 
-        Task<bool> RegistserCheck(string username);
+        Task<bool> RegisterCheck(string username);
 
 
     }

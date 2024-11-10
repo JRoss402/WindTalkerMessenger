@@ -28,12 +28,14 @@
 			overflow-y: auto;
 			background-color: black;
 			opacity: 95%;
-			border-radius: 15px 0px 0px 15px;
 			color: #2E801B;
-			//border-style: solid;
+			border-style: solid;
 			border-width: 1px;
+			border-top-style:none;
+			border-left-style:none;
 			border-right-style: solid;
 			border-bottom-style: solid;
+			border-top-left-radius: 25px;
 
 		}
 
@@ -81,7 +83,6 @@
 
 		#chatsAside {
 			background-color: black;
-			border-radius: 0px 15px 0px 0px;
 			color: #7ACC00;
 			border-style: solid;
 			border-width: 1px;
@@ -96,12 +97,14 @@
 			overflow-y: auto;
 			border-right-color: black;
 			text-align: center;
-			border-top-width:0px
+			border-top-width:0px;
+			border-top-right-radius: 25px;
 		}
 
 		#chatParagraph {
 			font-size:40px;
 			text-decoration: underline;
+
 		}
 
 		#userHeading {
@@ -116,6 +119,7 @@
 			font-size: 20px;
 			margin-top: 10px;
 			margin-bottom: 20px;
+			margin-left:10px;
 			text-align: center;
 			background-color: black;
 			opacity: 90%;
@@ -241,8 +245,7 @@
 						<input type="text"
 							   id="username"
 							   class="username"
-							   placeholder="Username"
-							   onfocus="this.value=' '"/>
+							   placeholder="Username"/>
 						
 					    <p>To delete your PROFILE and CHAT HISTORY click the "Kill Switch" below.</p>
 						<p><span id="warning">WARNING:</span> THIS ACTION IS NOT REVERSABLE!</p>
@@ -408,7 +411,7 @@
 				var encodedUser = $("<div />").text(user).html();
 				var encodedMsg = $("<div />").text(message).html();
 				console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
-				$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span> < /li>");
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span></li>");
 			});
 
 			connection.on("NoOne", function (user, message) {
@@ -426,12 +429,20 @@
 				let name = localStorage.getItem('UserChatName');
 				const loginState = await GetLoginState(name)
 				if (loginState == true) {
-					$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. They will review your message when they return.</li>");
+					$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> is not online. They will review your message when they return.</li>");
 				} else {
-					$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone dark. Due to your guest credentials, your message cannot be delivered. Register or Login to have your message queued for their return.</li>");
+					$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> is not online. Due to your guest credentials, your message cannot be delivered. Register or Login to have your message queued for their return.</li>");
 				}
-
 			});
+
+		connection.on("heartbeat", async function (isAlive) {
+			console.log("pulse received", isAlive);
+			isAlive = true;
+			connection.invoke("HeartBeatResponse", isAlive)
+				.catch(function (err) {
+					return console.error(err.toString());
+				});
+		});
 
 			connection.on("GuestGone", function (user) {
 				var encodedUser = $("<div />").text(user).html();
