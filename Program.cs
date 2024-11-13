@@ -4,6 +4,7 @@ using WindTalkerMessenger.Hubs;
 using WindTalkerMessenger.Models.DataLayer;
 using Microsoft.AspNetCore.Identity;
 using WindTalkerMessenger.Models.DomainModels;
+using Coravel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,11 +21,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSession();
+builder.Services.AddScheduler();
+builder.Services.AddTransient<ClientHearbeat>();
 builder.Services.AddScoped<IContextService, ContextService>();
 builder.Services.AddSingleton<OnlineUsersLists>();
-//builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IUserNameService, UserNameService>();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<HeartBeat>();
 builder.Services.AddHttpContextAccessor();
 
 
@@ -55,6 +58,13 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chatHub");
+
+app.Services.UseScheduler(schedular =>
+{
+    schedular.Schedule<ClientHearbeat>()
+        .EverySeconds(4);
+});
+
 
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using (var scope = scopeFactory.CreateScope())

@@ -438,7 +438,7 @@
 		connection.on("heartbeat", async function (isAlive) {
 			console.log("pulse received", isAlive);
 			isAlive = true;
-			connection.invoke("HeartBeatResponse", isAlive)
+			connection.invoke("HeartBeatResponseAsync")
 				.catch(function (err) {
 					return console.error(err.toString());
 				});

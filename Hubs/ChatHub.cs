@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Identity;
 using WindTalkerMessenger.Models.DomainModels;
+using WindTalkerMessenger.Models;
 
 namespace WindTalkerMessenger.Hubs
 {
@@ -11,8 +12,10 @@ namespace WindTalkerMessenger.Hubs
         private readonly OnlineUsersLists _onlineUsersLists;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUserNameService _userNameService;
+        private readonly HeartBeat _heartBeat;
         private const string chatNameKey = "chatName";
         private readonly ILogger _logger;
+
 
         enum Status
         {
@@ -23,13 +26,15 @@ namespace WindTalkerMessenger.Hubs
                        OnlineUsersLists onlineUsersLists, 
                        IHttpContextAccessor httpContextAccessor,
                        IUserNameService userNameService,
-                       ILogger<ChatHub> logger)
+                       ILogger<ChatHub> logger,
+                       HeartBeat heartBeat)
         {
             _contextServices = contextServices;
             _onlineUsersLists = onlineUsersLists;
             _contextAccessor = httpContextAccessor;
             _userNameService = userNameService;
             _logger = logger;
+            _heartBeat = heartBeat;
         }
 
         public async Task SendMessage(string receiverChatName, string message)
@@ -104,25 +109,23 @@ namespace WindTalkerMessenger.Hubs
             }
         }
 
-        public void HeartBeatResponse(bool isAlive)
+        public async Task HeartBeatResponseAsync()
         {
-            if(isAlive == true)
-            {
-                _logger.LogInformation("The heartbeat came back. Client is alive.");
-            }
-            else
-            {
-                _logger.LogInformation("The hearbeat was either false or didn't return. Client Dead. Clean.");
-            }
-        }
+            var connectionId = Context.ConnectionId;
+            var userName = _userNameService.GetSenderChatName(connectionId);
 
+            _logger.LogInformation("Pulse Received from " + connectionId + "ChatName: " + userName);
+            await _heartBeat.NodeUpdate(connectionId);
+
+            await _heartBeat.TreeCheck();
+        }
 
         public override async Task<Task> OnConnectedAsync()
         {
             string userName;
             string identityUserName = Context.User.Identity.Name;
             string connectionId = Context.ConnectionId.ToString();
-            
+            await _heartBeat.AddClientNode(connectionId);
 
             if (identityUserName != null)
             {
@@ -153,7 +156,8 @@ namespace WindTalkerMessenger.Hubs
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             string identityUserName = Context.User.Identity.Name;
-            string connectionId = Context.ConnectionId.ToString();            //await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
+            string connectionId = Context.ConnectionId.ToString();            
+            //await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
             string userName = _userNameService.GetSenderChatName(connectionId);
             //string userName = _userNameService.GetSenderChatName(connectionId);
             if (userName == null)
