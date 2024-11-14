@@ -136,6 +136,7 @@
 
 		.senderColor{
 			color:purple;
+			margin-bottom: 3px;
 		}
 
 
@@ -183,6 +184,22 @@
 		.enableSwitch:active{
 				color: #7ACC00;
 				background-color: red;
+		}
+
+		.timestampSender {
+			font-size: 15px;
+			color:purple;
+			margin-bottom:5px;
+		}
+
+		.timestampReceiver{
+			font-size:15px;
+			color: green;
+			margin-bottom: 5px;
+		}
+
+		.timeFontColor{
+			color: #7ACC00;
 		}
 
 		#warning {
@@ -387,17 +404,33 @@
 			};
 
 			function getChats(item, index, arr) {
+				const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+				const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
+				const date = new Date(item.messageDate);
+				let monthNum = date.getMonth() + 1;
+				const monthDate = date.getDate();
+				const hour = date.getHours();
+				const minute = date.getUTCMinutes();
+				
+				let dayNum = date.getDay() + 1;
+				const weekDay = dayNames[dayNum];
+				const monthDay = monthNames[monthNum];
+				const time = + hour + ":" + minute;
+				const dateString = weekDay + " " + monthDay + " " + monthDate + " - ";
+
 				let chatPostName = $("<div />").text(item.senderChatName).html();
 				let sendName = item.senderChatName;
 				let message = $("<div />").text(item.userMessage).html();
-				let timeStamp = $("<div />").text(item.MessageDate).html();
+				let timeStamp = $("<div />").text(dateString).html();
 				let storedChatName = localStorage.getItem('UserChatName');
 				if (sendName !== storedChatName) {
 					$("#leftinnerdiv").append('<li><strong>' + chatPostName + '</strong>: <span class="messageLoad">' + message + "</span></li>");
-
+				$("#leftinnerdiv").append('<li class="timestampReceiver" ><strong>' + timeStamp + '<span class="timeFontColor"> ' + time + '</span></strong></li>');
 				}
 				else {
 					$("#leftinnerdiv").append('<li><strong><span class="senderColor">You (Read)</span></strong>: <span class="messageLoad">' + message + "</span></li>");
+				$("#leftinnerdiv").append('<li class="timestampSender" ><strong>' + timeStamp + '<span class="timeFontColor"> ' + time + '</span></strong></li>');
+
 				}
 			};
 			//=================SIGNALR METHODS==================//
@@ -436,7 +469,7 @@
 			});
 
 		connection.on("heartbeat", async function (isAlive) {
-			console.log("pulse received", isAlive);
+			console.log("pulse received");
 			isAlive = true;
 			connection.invoke("HeartBeatResponseAsync")
 				.catch(function (err) {
