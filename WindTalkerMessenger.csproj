@@ -9,9 +9,13 @@
 
   <ItemGroup>
     <Compile Remove="Images\**" />
+    <Compile Remove="Models\DataLayer\Repositories\**" />
     <Content Remove="Images\**" />
+    <Content Remove="Models\DataLayer\Repositories\**" />
     <EmbeddedResource Remove="Images\**" />
+    <EmbeddedResource Remove="Models\DataLayer\Repositories\**" />
     <None Remove="Images\**" />
+    <None Remove="Models\DataLayer\Repositories\**" />
   </ItemGroup>
 
   <ItemGroup>

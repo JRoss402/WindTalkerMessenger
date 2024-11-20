@@ -11,13 +11,15 @@ namespace WindTalkerMessenger.Services
         private  readonly OnlineUsersLists _onlineUsersLists;
         private  readonly IHttpContextAccessor _contextAccessor;
         private  readonly IUserNameService _userNameService;
-        private  readonly ILogger _logger;
+        private  readonly ILogger<HeartBeat> _logger;
+        private const string chatNameKey = "chatName";
+
 
         public HeartBeat(IContextService contextServices,
                        OnlineUsersLists onlineUsersLists,
                        IHttpContextAccessor httpContextAccessor,
                        IUserNameService userNameService,
-                       ILogger<ChatHub> logger)
+                       ILogger<HeartBeat> logger)
         {
             _contextServices = contextServices;
             _onlineUsersLists = onlineUsersLists;
@@ -45,8 +47,13 @@ namespace WindTalkerMessenger.Services
         public void CleanUpClient(ClientNode node)
         {
             var connectionId = node.NodeName.ToString();
-            string userName = _userNameService.GetSenderChatName(connectionId);
+            string userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
 
+            //Wrong chat name being grabbed
+            if (_onlineUsersLists.anonUsers.TryGetValue(connectionId, out _))
+            {
+                _contextServices.DisassociateGuestUserMessages(userName);
+            }
             _onlineUsersLists.onlineUsers.TryRemove(userName, out _);
             _onlineUsersLists.anonUsers.TryRemove(userName, out _);
             _onlineUsersLists.clientHeartBeatTree.Remove(node);

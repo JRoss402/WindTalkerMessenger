@@ -34,6 +34,13 @@ namespace WindTalkerMessenger.Services
             _signInManager = signinmanager;
         }
 
+        public List<string> GetAllUserNames()
+        {
+            var registeredUserNames =  _userManager.Users.Select(u => u.ChatName).ToList();
+            
+            return registeredUserNames;
+        }
+
         public bool IsUserAuthenticated()
         {
             var auth = _http.HttpContext.User.Identity.IsAuthenticated;

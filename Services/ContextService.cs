@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Eventing.Reader;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web.Mvc;
@@ -23,17 +24,20 @@ namespace WindTalkerMessenger.Services
 		private readonly UserManager<ApplicationUser> _userManager;
 		private const string USER_DELETED = "User Account Deleted";
 		private const string MSG_DELETED = "User Deleted Messages";
-		private enum Statuses { Sent, Received, Queued }
+        private readonly ILogger<ContextService> _logger;
+        private enum Statuses { Sent, Received, Queued }
 
 		public ContextService(ApplicationDbContext context,
 							  OnlineUsersLists onlineUsersLists,
 							  UserManager<ApplicationUser> userManager,
-							  IHttpContextAccessor http)
+							  IHttpContextAccessor http,
+							  ILogger<ContextService> logger)
 		{
 			_context = context;
 			_onlineUsersLists = onlineUsersLists;
 			_userManager = userManager;
 			_http = http;
+			_logger = logger;
 		}
 
 		public void AddNewGuest(string userName,
@@ -150,14 +154,19 @@ namespace WindTalkerMessenger.Services
 		public async Task<List<string>> GetChatFriends(string chatName)
 		{
 			List<string> totalList = new List<string>();
-
-			var currentChatsList = await _context.Chats.Where(u => u.SenderChatName == chatName).ToListAsync();
-			foreach (Message user in currentChatsList)
+			try
 			{
-				if (!totalList.Contains(user.ReceiverChatName))
+				var currentChatsList = await _context.Chats.Where(u => u.SenderChatName == chatName).ToListAsync();
+				foreach (Message user in currentChatsList)
 				{
-					totalList.Add(user.ReceiverChatName);
+					if (!totalList.Contains(user.ReceiverChatName))
+					{
+						totalList.Add(user.ReceiverChatName);
+					}
 				}
+			}catch(Exception ex)
+			{
+				_logger.LogError(ex.ToString());
 			}
 
 			return totalList;
@@ -166,11 +175,20 @@ namespace WindTalkerMessenger.Services
 
 		public async Task<List<Message>> GrabFriendChats(string chatName)
 		{
-			var chats = await _context.Chats.Where(u => u.ReceiverChatName == chatName).ToListAsync();
-			return chats;
-		}
+			List<Message> chats = new List<Message>();
+			try
+			{
+				chats = await _context.Chats.Where(u => u.ReceiverChatName == chatName).ToListAsync();
+            
+			}catch(Exception ex)
+			{
+				_logger.LogError(ex.ToString());
+			}
+            return chats;
 
-		public bool IsUserGuest(string chatName)
+        }
+
+        public bool IsUserGuest(string chatName)
 		{
 			bool isGuest = _onlineUsersLists.anonUsers.ContainsKey(chatName);
 			if (isGuest)
@@ -187,15 +205,24 @@ namespace WindTalkerMessenger.Services
 		public async Task<List<Message>> AddQueuedMessages(string username)
 		{
 			List<Message> messages = new List<Message>();
-			var queues = await _context.Queues.Where(u => u.ReceiverChatName == username).ToListAsync();
-			foreach (MessageQueue queue in queues)
+            List<MessageQueue> queues = new List<MessageQueue>();
+
+            try
+            {
+				queues = await _context.Queues.Where(u => u.ReceiverChatName == username).ToListAsync();
+                foreach (MessageQueue queue in queues)
+                {
+                    queue.MessageStatus = Status.Sent.ToString();
+                    var newMsg = CreateMessageObject(queue);
+                    messages.Add(newMsg);
+                    await _context.Chats.AddAsync(newMsg);
+                    _context.Queues.Remove(queue);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch(Exception ex)
 			{
-				queue.MessageStatus = Status.Sent.ToString();
-				var newMsg = CreateMessageObject(queue);
-				messages.Add(newMsg);
-				await _context.Chats.AddAsync(newMsg);
-				_context.Queues.Remove(queue);
-				await _context.SaveChangesAsync();
+				_logger.LogError(ex.ToString());
 			}
 
 			return messages;

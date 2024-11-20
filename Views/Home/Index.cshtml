@@ -88,10 +88,13 @@
 			<p>@User.Claims.FirstOrDefault(x => x.Type == "ChatName")?.Value, your credentials have been verified.</p>
 		}
 		<p>We are happy to welcome you aboard.</p>
-
+		<p>Your chat history and account information is in your hands.</p>
 		<p>Guests are allowed to chat if you do not have an account.</p>
-		<p>Please visit the "About" page to learn more!</p>
+		<p>Please visit the "About" page to learn more!<span class="cursor"></span></p>
 
 		<a id="enterButton" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter The Terminal</a>
 	</div>
 </div>
+
+<script>
+</script>

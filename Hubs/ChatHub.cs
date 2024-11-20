@@ -14,12 +14,13 @@ namespace WindTalkerMessenger.Hubs
         private readonly IUserNameService _userNameService;
         private readonly HeartBeat _heartBeat;
         private const string chatNameKey = "chatName";
-        private readonly ILogger _logger;
+        private readonly ILogger<ChatHub> _logger;
 
+        
 
         enum Status
         {
-            Sent, Received, Queued
+            Sent, Queued
         }
 
         public ChatHub(IContextService contextServices, 
@@ -45,9 +46,7 @@ namespace WindTalkerMessenger.Hubs
             string senderChatName = _userNameService.GetSenderChatName(senderConnectionId);
             string receiverConnectionId;
 
-            /* Key => Chatname - Value => ConnectionId*/
 
-            //may not need part of this if-else
             if (!_onlineUsersLists.onlineUsers.TryGetValue(receiverChatName, out _))
             {
                 receiverConnectionId = "";
@@ -56,7 +55,9 @@ namespace WindTalkerMessenger.Hubs
             {
 			    _onlineUsersLists.onlineUsers.TryGetValue(receiverChatName, out receiverConnectionId).ToString();
 			}
-			string receiverEmail = _userNameService.GetReceiverEmail(receiverChatName);
+
+
+            string receiverEmail = _userNameService.GetReceiverEmail(receiverChatName);
           
 
             if(receiverEmail == "")
@@ -116,7 +117,6 @@ namespace WindTalkerMessenger.Hubs
 
             _logger.LogInformation("Pulse Received from " + connectionId + "ChatName: " + userName);
             await _heartBeat.NodeUpdate(connectionId);
-
             await _heartBeat.TreeCheck();
         }
 
@@ -125,28 +125,46 @@ namespace WindTalkerMessenger.Hubs
             string userName;
             string identityUserName = Context.User.Identity.Name;
             string connectionId = Context.ConnectionId.ToString();
-            await _heartBeat.AddClientNode(connectionId);
+            try
+            {
+                await _heartBeat.AddClientNode(connectionId);
+            }catch(Exception ex)
+            {
+                _logger.LogError($"Could not add the client node: {ex}");
+            }
 
             if (identityUserName != null)
             {
-			    userName =  _userNameService.GetSenderChatName(connectionId);
-				_onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
-				var newMessages = await _contextServices.AddQueuedMessages(userName);
-				_onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
-				_onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
-                _onlineUsersLists.userLoginState.TryAdd(userName, "Registered");
+                try
+                {
+                    userName = _userNameService.GetSenderChatName(connectionId);
+                    _onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
+                    var newMessages = await _contextServices.AddQueuedMessages(userName);
+                    _onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
+                    _onlineUsersLists.authenticatedUsers.TryAdd(userName, connectionId);
+                    _onlineUsersLists.userLoginState.TryAdd(userName, "Registered");
 
-                await Clients.Users(connectionId).SendAsync("PrintQueuedMessages", newMessages);
+                    await Clients.Users(connectionId).SendAsync("PrintQueuedMessages", newMessages);
+                }catch(Exception ex)
+                {
+                    _logger.LogError($"Could not update User Login States: {ex}");
+                }
 			}
 			else
             {
-                userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
-                _contextServices.AddNewGuest(userName, connectionId);
-                _onlineUsersLists.anonUsers.TryAdd(userName, connectionId);
-                _onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
-                _onlineUsersLists.userLoginState.TryAdd(userName, "Guest");
+                try
+                {
+                    userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);
+                    _contextServices.AddNewGuest(userName, connectionId);
+                    _onlineUsersLists.anonUsers.TryAdd(userName, connectionId);
+                    _onlineUsersLists.onlineUsers.TryAdd(userName, connectionId);
+                    _onlineUsersLists.userLoginState.TryAdd(userName, "Guest");
+                }catch(Exception ex)
+                {
+                    _logger.LogError($"Failed to process guest user: {ex}");
+                }
+
             }
-            //move to if
 
             return base.OnConnectedAsync();
         }
@@ -157,9 +175,8 @@ namespace WindTalkerMessenger.Hubs
         {
             string identityUserName = Context.User.Identity.Name;
             string connectionId = Context.ConnectionId.ToString();            
-            //await Clients.User(Context.ConnectionId).SendAsync("ServerDisconnect");
             string userName = _userNameService.GetSenderChatName(connectionId);
-            //string userName = _userNameService.GetSenderChatName(connectionId);
+
             if (userName == null)
             {
 				userName = _contextAccessor.HttpContext.Session.GetString(chatNameKey);

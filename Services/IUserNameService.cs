@@ -6,6 +6,7 @@
         string GetSenderChatName(string senderConnectionId);
         string GetReceiverEmail(string receiverConnectionId);
         bool IsUserAuthenticated();
+        List<string> GetAllUserNames();
 
         Task KillSwitchAsync(string userId);
 

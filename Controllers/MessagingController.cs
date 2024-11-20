@@ -30,7 +30,7 @@ namespace WindTalkerMessenger.Controllers
 			_userManager = userManager;
 		}
 
-        public IActionResult Guest(string chatName)
+		public IActionResult Guest(string chatName)
 		{
 			
 			_httpAccessor.HttpContext.Session.SetString("chatName", chatName);
@@ -100,6 +100,20 @@ namespace WindTalkerMessenger.Controllers
 			return isRegistered;
 
         }
+
+		[HttpPost]
+        [Route("/CheckChatName/CheckName/{chatName}")]
+        public async Task<bool> CheckChatName(string chatName)
+        {
+			var registeredChatNames = _userNameService.GetAllUserNames();
+
+			if((registeredChatNames.Contains(chatName)) || (_onlineUsersLists.anonUsers.TryGetValue(chatName,out _))) 
+			{
+				return true;
+			}
+
+            return false;
+		}
 
     }
 }

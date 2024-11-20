@@ -11,11 +11,11 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-            <a class="mainLink" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Agent @User.Claims.FirstOrDefault(x => x.Type == "ChatName")?.Value</a>
+            <a class="mainLink" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@User.Claims.FirstOrDefault(x => x.Type == "ChatName")?.Value</a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button type="submit" class="logoutButton">Logout</button>
+                <button type="submit" class="logoutButton" onclick="ClearStorage()">Logout</button>
         </form>
     </li>
 }
@@ -29,3 +29,9 @@ else
     </li>
 }
 </ul>
+
+<script>
+    async function ClearStorage(){
+        sessionStorage.removeItem('UserChatName');
+    }
+</script>

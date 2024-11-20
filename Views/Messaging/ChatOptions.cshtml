@@ -6,45 +6,43 @@
 @model WindTalkerMessenger.Models.ViewModels.ChatOptionsViewModel
 
 
+
+
+<div class="chatPageContainer">
+    <div class="text-center">
+
 @if (!SignInManager.IsSignedIn(User))
 {
-    <p>It appears you are not logged in or you are not registered.</p>
-    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login">Login to start!</a>
-    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a class="enterButton" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            <a class="enterButton" sp-area="Identity" asp-page="/Account/Register">Register</a>
     <p>Or you can pick a guest name and then click "Start Chatting".</p>
     <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
-        <span id="guestError"></span>
-        <input type="text" placeholder="Pick Chat Name" name="chatName" id="chatName" />
-        <button type="submit" class="btn btn-primary" id="guestSend" name="guestSend">Start Chatting</button>
-    </form>
+            <input type="text" placeholder="Pick Chat Name" class="username" name="chatName" id="chatName" />
+                <button type="submit" class="enterButton" id="submitButton" name="guestSend">Start Chatting</button>
+                <div id="guestError"></div>
+            </form>
 }
 else
 {
-    <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
-        <span id="guestError"></span>
-        <input type="text" placeholder="Pick Chat Name" name="chatName" id="chatName" />
-        <button type="submit" class="btn btn-primary" id="guestSend" name="guestSend">Start Chatting</button>
-    </form>
+            <form asp-action="Guest" asp-controller="Messaging" method="post" id="guest_form">
+                <span id="guestError"></span>
+                <input type="text" placeholder="Pick Chat Name" name="chatName" id="chatName" />
+                <button type="submit" class="enterButton" id="submitButton" name="guestSend">Start Chatting</button>
+            </form>
 }
-
+</div>
+</div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 <script>
-    $("#guestOption").click(function () {
-        console.log("Works");
-        $("#chatName").toggleClass("recShow");
-    })
-</script>
-
-<script>
     //https://stackoverflow.com/questions/57328836/post-fetch-net-core
-    $("#guestSend").click((event) => {
+
+    $("#submitButton").click(async function (event) {
         event.preventDefault();
         const chatName = $("#chatName").val();
-        const request = `/CheckChatName/${chatName}`;
-        alert("Clicked")
-        fetch(request, {
+        const request = `/CheckChatName/${chatName}`
+        await fetch("/CheckChatName/" + chatName, {
             method: 'POST',
             body: JSON.stringify({ ChatName: chatName }),
             headers: {
@@ -56,19 +54,19 @@ else
             .then(response => nameCheck(response, chatName))
             .catch(error => caughtErrors(error))
     });
-        
+    function valueCheck(chatName) {
+        if (chatName == "") {
+            $("#guestError").text("Please enter a username.");
+            $("#chatName").focus();
+        }
+
+    }
     function nameCheck(response,chatName){
-        alert("Inside the namecheck fun")
-        console.log(response);
-        console.log(chatName);
-        localStorage.setItem("UserChatName", chatName.toString());
+        sessionStorage.setItem('UserChatName', chatName.toString());
         if (response == true) {
-            alert("Inside response = true");
             $("#guestError").text("That chat name is taken.");
-            console.log("Failed");
         } else {
-            alert("Inside repsonse = false");
-            localStorage.setItem("UserChatName", chatName.toString());
+            sessionStorage.setItem('UserChatName', chatName.toString());
             $("#guest_form").submit();
         }
     }
