@@ -17,12 +17,6 @@
             return this;
         }
 
-        public MessageBuilder WithMessageFamilyUID(string messageFamilyUID)
-        {
-            _message.MessageFamilyUID = messageFamilyUID;
-            return this;
-        }
-
         public MessageBuilder WithMessageDate(DateTime messageDate)
         {
             _message.MessageDate = messageDate;

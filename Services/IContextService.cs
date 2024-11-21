@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WindTalkerMessenger.Models.DomainModels;
+﻿using WindTalkerMessenger.Models.DomainModels;
 
 namespace WindTalkerMessenger.Services
 {
@@ -8,7 +7,6 @@ namespace WindTalkerMessenger.Services
         void CreateMessageObject(string message, 
                                  string senderEmail, 
                                  string receiverEmail, 
-                                 string messageFamilyUID,
                                  Enum status, 
                                  string senderChatName, 
                                  string receiverChatName);
@@ -17,7 +15,6 @@ namespace WindTalkerMessenger.Services
         void CreateQueuedMessageObject(string message, 
                                        string senderEmail, 
                                        string receiverEmail, 
-                                       string messageFamilyUID,
                                        Enum status, 
                                        string senderChatName, 
                                        string receiverChatName);
@@ -27,7 +24,7 @@ namespace WindTalkerMessenger.Services
 
 		Task<List<string>> GetChatFriends(string chatName);
 
-        bool IsUserGuest(string chatName);
+        //bool IsUserGuest(string chatName);
 
         void IsQueueRowRemovable(MessageQueue queue);
 

@@ -2,33 +2,21 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Text.Json;
 using WindTalkerMessenger.Models.DataLayer;
 using WindTalkerMessenger.Models.DomainModels;
-using WindTalkerMessenger.Services;
 
 namespace WindTalkerMessenger.Controllers
 {
     [Authorize]
     public class APIController : Controller
     {
-        private readonly OnlineUsersLists _onlineUsersLists;
-        private readonly IContextService _contextService;
         private readonly ApplicationDbContext _context;
-        private readonly IHttpContextAccessor _http;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public APIController(OnlineUsersLists onlineUsersLists,
-                             IContextService contextService,
-                             ApplicationDbContext context,
-                             IHttpContextAccessor http,
+        public APIController(ApplicationDbContext context,
                              UserManager<ApplicationUser> userManager)
         {
-            _onlineUsersLists = onlineUsersLists;
-            _contextService = contextService;
             _context = context;
-            _http = http;
             _userManager = userManager;
         }
 

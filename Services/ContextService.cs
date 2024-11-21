@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Eventing.Reader;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Web.Mvc;
 using WindTalkerMessenger.Models.DataLayer;
 using WindTalkerMessenger.Models.DomainModels;
 
@@ -188,7 +183,7 @@ namespace WindTalkerMessenger.Services
 
         }
 
-        public bool IsUserGuest(string chatName)
+        /*public bool IsUserGuest(string chatName)
 		{
 			bool isGuest = _onlineUsersLists.anonUsers.ContainsKey(chatName);
 			if (isGuest)
@@ -200,7 +195,7 @@ namespace WindTalkerMessenger.Services
 				return false;
 			}
 
-		}
+		}*/
 
 		public async Task<List<Message>> AddQueuedMessages(string username)
 		{
@@ -253,7 +248,7 @@ namespace WindTalkerMessenger.Services
 			var newMessage = new MessageBuilder()
 								.WithMessageStatus(queue.MessageStatus)
 								.WithMessage(queue.UserMessage)
-								.WithMessageFamilyUID(queue.MessageFamilyUID)
+								//.WithMessageFamilyUID(queue.MessageFamilyUID)
 								.WithMessageDate(DateTime.Now)
 								.WithIsReceived(queue.IsReceived)
 								.WithSenderEmail(queue.MessageSenderEmail)
@@ -267,15 +262,17 @@ namespace WindTalkerMessenger.Services
 		public void CreateMessageObject(string message,
 										string senderEmail,
 										string receiverEmail,
-										string messageFamilyUID,
+										//string messageFamilyUID,
 										Enum status,
 										string senderChatName,
 										string receiverChatName)
 		{
+			string messageFamilyUID = Guid.NewGuid().ToString();
+
 			var newMessage = new MessageBuilder()
 								.WithMessageStatus(status.ToString())
 								.WithMessage(message)
-								.WithMessageFamilyUID(messageFamilyUID)
+								//.WithMessageFamilyUID(messageFamilyUID)
 								.WithMessageDate(DateTime.Now)
 								.WithIsReceived(true)
 								.WithSenderEmail(senderEmail)
@@ -291,16 +288,18 @@ namespace WindTalkerMessenger.Services
 		public void CreateQueuedMessageObject(string message,
 											  string senderEmail,
 											  string receiverEmail,
-											  string messageFamilyUID,
+											  //string messageFamilyUID,
 											  Enum status,
 											  string senderChatName,
 											  string receiverChatName)
 		{
+			string messageFamilyUID = Guid.NewGuid().ToString();
+
 
 			var queuedMessage = new MessageQueueBuilder()
 					.WithMessageStatus(status.ToString())
 					.WithMessage(message)
-					.WithMessageFamilyUID(messageFamilyUID)
+					//.WithMessageFamilyUID(messageFamilyUID)
 					.WithMessageDate(DateTime.Now)
 					.WithIsReceived(true)
 					.WithSenderEmail(senderEmail)
@@ -317,7 +316,7 @@ namespace WindTalkerMessenger.Services
 			var queuedMessage = new MessageQueueBuilder()
 					.WithMessageStatus(msg.MessageStatus)
 					.WithMessage(msg.UserMessage)
-					.WithMessageFamilyUID(msg.MessageFamilyUID)
+					//.WithMessageFamilyUID(msg.MessageFamilyUID)
 					.WithMessageDate(DateTime.Now)
 					.WithIsReceived(msg.IsReceived)
 					.WithSenderEmail(msg.MessageSenderEmail)

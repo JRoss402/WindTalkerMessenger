@@ -5,7 +5,6 @@ namespace WindTalkerMessenger.Models.DomainModels
     public class MessageQueue
     {
         public int MessageQueueId { get; set; }
-        public string? MessageFamilyUID { get; set; }
         public string? MessageStatus { get; set; }
         public string? UserMessage { get; set; }
         public DateTime MessageDate { get; set; } = DateTime.Now;

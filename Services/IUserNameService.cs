@@ -4,13 +4,13 @@
     {
         bool IsUserNameAvailable(string guestName);
         string GetSenderChatName(string senderConnectionId);
-        string GetReceiverEmail(string receiverConnectionId);
+        string GetReceiverIdentityEmail(string receiverConnectionId);
         bool IsUserAuthenticated();
         List<string> GetAllUserNames();
 
         Task KillSwitchAsync(string userId);
 
-        Task<bool> RegisterCheck(string username);
+        Task<bool> IsUserRegistered(string username);
 
 
     }

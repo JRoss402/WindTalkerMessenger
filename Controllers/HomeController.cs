@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WindTalkerMessenger.Services;
-using NuGet.Protocol;
 
 namespace EnigmaMessengerV1.Controllers
 {

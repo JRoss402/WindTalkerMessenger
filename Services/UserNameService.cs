@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Security.Claims;
-using System.Web.Mvc;
-using WindTalkerMessenger.Data.Migrations;
 using WindTalkerMessenger.Models.DataLayer;
-using WindTalkerMessenger.Models.DomainModels;
 
 
 namespace WindTalkerMessenger.Services
@@ -60,22 +56,21 @@ namespace WindTalkerMessenger.Services
             }
             return isAvailable;
         }
-        public string GetReceiverEmail(string username)
-        {
-            
-            var grab = _userManager.Users.FirstOrDefault(u => u.ChatName == username);
-            if (grab != null)
-            {
-                var receiverEmail = grab.Email;
-                return receiverEmail;
-            }
-            else
-            {
-                var receiverEmail = "";
-                return receiverEmail;
-            }
-        }
-        public string GetSenderChatName(string senderConnectionId)
+		public string GetReceiverIdentityEmail(string username)
+		{
+
+			var grab = _userManager.Users.FirstOrDefault(u => u.ChatName == username);
+			if (grab != null)
+			{
+				var receiverEmail = grab.Email;
+				return receiverEmail;
+			}
+			else
+			{
+				return null;
+			}
+		}
+		public string GetSenderChatName(string senderConnectionId)
         {
             var identityEmail =  _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
             var chatNameKey = "";
@@ -110,7 +105,7 @@ namespace WindTalkerMessenger.Services
 
         }
 
-        public async Task<bool> RegisterCheck(string username)
+        public async Task<bool> IsUserRegistered(string username)
         {
             var regUsers = await _userManager.Users.ToListAsync();
             var names =  regUsers.Select(u => u.ChatName).ToList();

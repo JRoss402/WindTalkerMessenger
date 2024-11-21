@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using WindTalkerMessenger.Models.DataLayer;
-using WindTalkerMessenger.Models.DomainModels;
-using WindTalkerMessenger.Models.ExtensionMethods;
 using WindTalkerMessenger.Services;
 
 namespace WindTalkerMessenger.Controllers
@@ -14,18 +10,15 @@ namespace WindTalkerMessenger.Controllers
 	{
 		private readonly OnlineUsersLists _onlineUsersLists;
 		private readonly IHttpContextAccessor _httpAccessor;
-		private readonly IContextService _contextService;
 		private readonly IUserNameService _userNameService;
 		private readonly UserManager<ApplicationUser> _userManager;
 		public MessagingController(OnlineUsersLists onlineUsersLists,
                                    IHttpContextAccessor httpAccessor,
-								   IContextService contextService,
 								   IUserNameService userNameService,
 								   UserManager<ApplicationUser> userManager)
         {
 			_onlineUsersLists = onlineUsersLists;
 			_httpAccessor = httpAccessor;
-			_contextService = contextService;
 			_userNameService = userNameService;
 			_userManager = userManager;
 		}
@@ -95,7 +88,7 @@ namespace WindTalkerMessenger.Controllers
         [Route("/IsReceiverRegistered/{username}")]
         public async Task<bool> IsReceiverRegistered(string username)
         {
-			var isRegistered = await _userNameService.RegisterCheck(username);
+			var isRegistered = await _userNameService.IsUserRegistered(username);
 
 			return isRegistered;
 

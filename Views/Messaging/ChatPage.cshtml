@@ -544,7 +544,6 @@
 
 				const loginState = await GetLoginState();
 				if (loginState == true) {
-					console.log("In the login state method.");
 					namesList = await fetchChatNameList();
 					let isRegistered = await IsReceiverRegistered(username);
 					await GetMessages(event, username)

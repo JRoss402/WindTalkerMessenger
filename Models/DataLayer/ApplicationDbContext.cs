@@ -12,7 +12,6 @@ namespace WindTalkerMessenger.Models.DataLayer
         }
         public DbSet<Message> Chats { get; set; }
         public DbSet<MessageQueue> Queues { get; set; }
-        //public DbSet<Groups> Groups { get; set; }
         public DbSet<Guest> Guests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

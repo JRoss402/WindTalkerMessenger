@@ -15,12 +15,6 @@
             return this;
         }
 
-        public MessageQueueBuilder WithMessageFamilyUID(string messageFamilyUID)
-        {
-            _messageQueue.MessageFamilyUID = messageFamilyUID;
-            return this;
-        }
-
         public MessageQueueBuilder WithMessageDate(DateTime messageDate)
         {
             _messageQueue.MessageDate = messageDate;
