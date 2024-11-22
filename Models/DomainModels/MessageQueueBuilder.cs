@@ -3,49 +3,49 @@
     public class MessageQueueBuilder
     {
         private MessageQueue _messageQueue = new MessageQueue();
-        public MessageQueueBuilder WithMessageStatus(string messageStatus)
+        public MessageQueueBuilder SetMessageStatus(string messageStatus)
         {
             _messageQueue.MessageStatus = messageStatus;
             return this;
         }
 
-        public MessageQueueBuilder WithMessage(string message)
+        public MessageQueueBuilder SetMessage(string message)
         {
             _messageQueue.UserMessage = message;
             return this;
         }
 
-        public MessageQueueBuilder WithMessageDate(DateTime messageDate)
+        public MessageQueueBuilder SetMessageDate(DateTime messageDate)
         {
             _messageQueue.MessageDate = messageDate;
             return this;
         }
 
-        public MessageQueueBuilder WithIsReceived(bool isReceived)
+        public MessageQueueBuilder SetIsReceived(bool isReceived)
         {
             _messageQueue.IsReceived = isReceived;
             return this;
         }
 
-        public MessageQueueBuilder WithSenderEmail(string senderEmail)
+        public MessageQueueBuilder SetSenderEmail(string senderEmail)
         {
             _messageQueue.MessageSenderEmail = senderEmail;
             return this;
         }
 
-        public MessageQueueBuilder WithReceiverEmail(string receiverEmail)
+        public MessageQueueBuilder SetReceiverEmail(string receiverEmail)
         {
             _messageQueue.MessageReceiverEmail = receiverEmail;
             return this;
         }
 
-        public MessageQueueBuilder WithSenderChatName(string senderChatName)
+        public MessageQueueBuilder SetSenderChatName(string senderChatName)
         {
             _messageQueue.SenderChatName = senderChatName;
             return this;
         }
 
-        public MessageQueueBuilder WithReceiverChatName(string receiverChatName)
+        public MessageQueueBuilder SetReceiverChatName(string receiverChatName)
         {
             _messageQueue.ReceiverChatName = receiverChatName;
             return this;

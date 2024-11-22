@@ -14,24 +14,15 @@ namespace WindTalkerMessenger.Services
 
 
 		private readonly ApplicationDbContext _context;
-		private readonly OnlineUsersLists _onlineUsersLists;
-		private readonly IHttpContextAccessor _http;
-		private readonly UserManager<ApplicationUser> _userManager;
 		private const string USER_DELETED = "User Account Deleted";
 		private const string MSG_DELETED = "User Deleted Messages";
         private readonly ILogger<ContextService> _logger;
         private enum Statuses { Sent, Received, Queued }
 
 		public ContextService(ApplicationDbContext context,
-							  OnlineUsersLists onlineUsersLists,
-							  UserManager<ApplicationUser> userManager,
-							  IHttpContextAccessor http,
 							  ILogger<ContextService> logger)
 		{
 			_context = context;
-			_onlineUsersLists = onlineUsersLists;
-			_userManager = userManager;
-			_http = http;
 			_logger = logger;
 		}
 
@@ -43,9 +34,18 @@ namespace WindTalkerMessenger.Services
 			guest.GuestName = userName;
 			guest.GuestConnectionId = connectionId;
 			guest.GuestUID = guestuid;
+			guest.AddedDate = DateTime.Now;
+			try
+			{
+				_context.Guests.Add(guest);
+			    _context.SaveChanges();
 
-			_context.Guests.Add(guest);
-			_context.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+
+				_logger.LogError($"Guest Was Not Added. : {ex}");
+			}
 		}
 
 		public void DisassociateGuestUserMessages(string guestChatName)
@@ -161,7 +161,7 @@ namespace WindTalkerMessenger.Services
 				}
 			}catch(Exception ex)
 			{
-				_logger.LogError(ex.ToString());
+				_logger.LogError($"Error Grabbing Chat Friends List: {ex}");
 			}
 
 			return totalList;
@@ -174,10 +174,10 @@ namespace WindTalkerMessenger.Services
 			try
 			{
 				chats = await _context.Chats.Where(u => u.ReceiverChatName == chatName).ToListAsync();
-            
-			}catch(Exception ex)
+
+			} catch (Exception ex)
 			{
-				_logger.LogError(ex.ToString());
+				_logger.LogError($"Error Getting Chats From Friends: {ex}");
 			}
             return chats;
 
@@ -246,15 +246,14 @@ namespace WindTalkerMessenger.Services
 		public Message CreateMessageObject(MessageQueue queue)
 		{
 			var newMessage = new MessageBuilder()
-								.WithMessageStatus(queue.MessageStatus)
-								.WithMessage(queue.UserMessage)
-								//.WithMessageFamilyUID(queue.MessageFamilyUID)
-								.WithMessageDate(DateTime.Now)
-								.WithIsReceived(queue.IsReceived)
-								.WithSenderEmail(queue.MessageSenderEmail)
-								.WithSenderChatName(queue.SenderChatName)
-								.WithReceiverEmail(queue.MessageReceiverEmail)
-								.WithReceiverChatName(queue.ReceiverChatName)
+								.SetMessageStatus(queue.MessageStatus)
+								.SetMessage(queue.UserMessage)
+								.SetMessageDate(DateTime.Now)
+								.SetIsReceived(queue.IsReceived)
+								.SetSenderEmail(queue.MessageSenderEmail)
+								.SetSenderChatName(queue.SenderChatName)
+								.SetReceiverEmail(queue.MessageReceiverEmail)
+								.SetReceiverChatName(queue.ReceiverChatName)
 								.Build();
 
 			return newMessage;
@@ -262,7 +261,6 @@ namespace WindTalkerMessenger.Services
 		public void CreateMessageObject(string message,
 										string senderEmail,
 										string receiverEmail,
-										//string messageFamilyUID,
 										Enum status,
 										string senderChatName,
 										string receiverChatName)
@@ -270,15 +268,14 @@ namespace WindTalkerMessenger.Services
 			string messageFamilyUID = Guid.NewGuid().ToString();
 
 			var newMessage = new MessageBuilder()
-								.WithMessageStatus(status.ToString())
-								.WithMessage(message)
-								//.WithMessageFamilyUID(messageFamilyUID)
-								.WithMessageDate(DateTime.Now)
-								.WithIsReceived(true)
-								.WithSenderEmail(senderEmail)
-								.WithSenderChatName(senderChatName)
-								.WithReceiverEmail(receiverEmail)
-								.WithReceiverChatName(receiverChatName)
+								.SetMessageStatus(status.ToString())
+								.SetMessage(message)
+								.SetMessageDate(DateTime.Now)
+								.SetIsReceived(true)
+								.SetSenderEmail(senderEmail)
+								.SetSenderChatName(senderChatName)
+								.SetReceiverEmail(receiverEmail)
+								.SetReceiverChatName(receiverChatName)
 								.Build();
 
 			InsertMessage(newMessage);
@@ -288,7 +285,6 @@ namespace WindTalkerMessenger.Services
 		public void CreateQueuedMessageObject(string message,
 											  string senderEmail,
 											  string receiverEmail,
-											  //string messageFamilyUID,
 											  Enum status,
 											  string senderChatName,
 											  string receiverChatName)
@@ -297,15 +293,14 @@ namespace WindTalkerMessenger.Services
 
 
 			var queuedMessage = new MessageQueueBuilder()
-					.WithMessageStatus(status.ToString())
-					.WithMessage(message)
-					//.WithMessageFamilyUID(messageFamilyUID)
-					.WithMessageDate(DateTime.Now)
-					.WithIsReceived(true)
-					.WithSenderEmail(senderEmail)
-					.WithSenderChatName(senderChatName)
-					.WithReceiverEmail(receiverEmail)
-					.WithReceiverChatName(receiverChatName)
+					.SetMessageStatus(status.ToString())
+					.SetMessage(message)
+					.SetMessageDate(DateTime.Now)
+					.SetIsReceived(true)
+					.SetSenderEmail(senderEmail)
+					.SetSenderChatName(senderChatName)
+					.SetReceiverEmail(receiverEmail)
+					.SetReceiverChatName(receiverChatName)
 					.Build();
 
 			InsertQueuedMessage(queuedMessage);
@@ -314,15 +309,14 @@ namespace WindTalkerMessenger.Services
 		public MessageQueue CreateQueuedMessageObject(Message msg)
 		{
 			var queuedMessage = new MessageQueueBuilder()
-					.WithMessageStatus(msg.MessageStatus)
-					.WithMessage(msg.UserMessage)
-					//.WithMessageFamilyUID(msg.MessageFamilyUID)
-					.WithMessageDate(DateTime.Now)
-					.WithIsReceived(msg.IsReceived)
-					.WithSenderEmail(msg.MessageSenderEmail)
-					.WithSenderChatName(msg.SenderChatName)
-					.WithReceiverEmail(msg.MessageReceiverEmail)
-					.WithReceiverChatName(msg.ReceiverChatName)
+					.SetMessageStatus(msg.MessageStatus)
+					.SetMessage(msg.UserMessage)
+					.SetMessageDate(DateTime.Now)
+					.SetIsReceived(msg.IsReceived)
+					.SetSenderEmail(msg.MessageSenderEmail)
+					.SetSenderChatName(msg.SenderChatName)
+					.SetReceiverEmail(msg.MessageReceiverEmail)
+					.SetReceiverChatName(msg.ReceiverChatName)
 					.Build();
 
 			return queuedMessage;

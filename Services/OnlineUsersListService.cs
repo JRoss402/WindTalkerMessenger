@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
-using System.Security.Policy;
+﻿using System.Collections.Concurrent;
 using WindTalkerMessenger.Models;
 
 namespace WindTalkerMessenger.Services
@@ -15,8 +13,6 @@ namespace WindTalkerMessenger.Services
 
         public ConcurrentDictionary<string,string> userLoginState = new ConcurrentDictionary<string,string>();
 
-        public LinkedList<ClientNode> clientHeartBeatTree = new LinkedList<ClientNode>();
-
-
+        public LinkedList<ClientNode> clientHeartBeatCollection = new LinkedList<ClientNode>();
     }
 }

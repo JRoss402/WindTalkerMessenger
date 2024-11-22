@@ -479,12 +479,9 @@
 		connection.on("NoOne", function (user, message) {
 			var encodedUser = $("<div />").text(user).html();
 			var encodedMsg = $("<div />").text(message).html();
-			//$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span> < /li>");
 			$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> is not a registered user nor are they a guest.</li>");
 
 		});
-
-		//add the (Queued Message) styling.
 		connection.on("MessageQueued", async function (receiver, message) {
 			var encodedUser = $("<div />").text(receiver).html();
 			console.log(encodedUser, " is offline.Your message has been queued until they return.");
@@ -499,7 +496,7 @@
 
 		connection.on("heartbeat", async function (isAlive) {
 			console.log("pulse received");
-			connection.invoke("HeartBeatResponseAsync")
+			connection.invoke("HeartBeatResponse")
 				.catch(function (err) {
 					return console.error(err.toString());
 				});
@@ -622,10 +619,10 @@
 
 		//==============Connection Start===================//
 
-		connection.start().then(function () {
+		connection.start().then(async function () {
 			console.log("Connected!");
 			const request = '../API/GetUserChatList';
-			fetch(request, {
+			await fetch(request, {
 				method: 'POST',
 				headers: {
 					'Accept': 'application/json; charset=utf-8',
@@ -635,6 +632,18 @@
 				.then(response => response.json())
 				.then(json => json.forEach(getUserChats))
 				.catch(error => caughtErrors(error))
+
+			const chatName = sessionStorage.getItem('UserChatName');
+			const guestChatNameSend = `/SetGuestChatName/ChatName/${chatName}`;
+			await fetch(guestChatNameSend, {
+				method: 'POST',
+				body: JSON.stringify({ ChatName: chatName }),
+				headers: {
+					'Accept': 'application/json; charset=utf-8',
+					'Content-Type': 'application/json;charset=utf-8'
+				}
+			}).catch(error => caughtErrors(error))
+
 		});
 
 		/*https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function

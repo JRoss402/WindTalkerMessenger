@@ -1,14 +1,12 @@
 ﻿using Coravel.Invocable;
 using Microsoft.AspNetCore.SignalR;
 using WindTalkerMessenger.Hubs;
-using System.Timers;
 using WindTalkerMessenger.Models;
 
 namespace WindTalkerMessenger.Services
 {
     public class ClientHearbeat : IInvocable
     {
-
         //https://jonhilton.net/coravel/
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly ILogger<ClientHearbeat> _logger;
@@ -26,21 +24,17 @@ namespace WindTalkerMessenger.Services
         }
         public async Task Invoke()
         {
-            var tree = _onlineUsers.clientHeartBeatTree.ToList();
+            var nodes = _onlineUsers.clientHeartBeatCollection.ToList();
 
             //https://docs.coravel.net/Scheduler/
             await _hubContext.Clients.All.SendAsync("heartbeat");
-            foreach (ClientNode node in tree)
+            foreach (ClientNode node in nodes)
             {
                 _heartBeat.HeartBeatAdd(node.NodeName.ToString());
 
             }
             _logger.LogInformation("Pulses Sent");
-
-            //return Task.CompletedTask;
-
         }
-
     }
 }
 

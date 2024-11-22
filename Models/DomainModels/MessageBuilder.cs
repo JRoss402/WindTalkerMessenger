@@ -5,49 +5,49 @@
 
         private Message _message = new Message();
 
-        public MessageBuilder WithMessageStatus(string messageStatus)
+        public MessageBuilder SetMessageStatus(string messageStatus)
         {
             _message.MessageStatus = messageStatus;
             return this;
         }
         
-        public MessageBuilder WithMessage(string message)
+        public MessageBuilder SetMessage(string message)
         {
             _message.UserMessage = message;
             return this;
         }
 
-        public MessageBuilder WithMessageDate(DateTime messageDate)
+        public MessageBuilder SetMessageDate(DateTime messageDate)
         {
             _message.MessageDate = messageDate;
             return this;
         }
 
-        public MessageBuilder WithIsReceived(bool isReceived)
+        public MessageBuilder SetIsReceived(bool isReceived)
         {
             _message.IsReceived = isReceived;
             return this;
         }
 
-        public MessageBuilder WithSenderEmail(string  senderEmail)
+        public MessageBuilder SetSenderEmail(string  senderEmail)
         {
             _message.MessageSenderEmail = senderEmail;
             return this;
         }
 
-        public MessageBuilder WithReceiverEmail(string receiverEmail)
+        public MessageBuilder SetReceiverEmail(string receiverEmail)
         {
             _message.MessageReceiverEmail = receiverEmail;
             return this;
         }
 
-        public MessageBuilder WithSenderChatName(string senderChatName)
+        public MessageBuilder SetSenderChatName(string senderChatName)
         {
             _message.SenderChatName = senderChatName;
             return this;
         }
 
-        public MessageBuilder WithReceiverChatName(string receiverChatName)
+        public MessageBuilder SetReceiverChatName(string receiverChatName)
         {
             _message.ReceiverChatName = receiverChatName;
             return this;

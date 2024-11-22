@@ -20,8 +20,6 @@ namespace WindTalkerMessenger.Controllers
             _userManager = userManager;
         }
 
-
-
 		[HttpPost]
 		[Route("API/GetReceivedMessages/{chatName}")]
 		public async Task<List<Message>> GetReceivedMessages(string chatName)
@@ -63,12 +61,9 @@ namespace WindTalkerMessenger.Controllers
         {
 			var userInfo = await _userManager.GetUserAsync(User);
 			var connectedUserChatName = userInfo.ChatName;
-
 			HashSet<string> userList = new HashSet<string>();
-            var senders = _context.Chats.Where(u => u.SenderChatName == connectedUserChatName).ToList();
-            var receivers = _context.Chats.Where(u => u.ReceiverChatName == connectedUserChatName).ToList();
-            //var chatNames = await _context.Queues.Where(u => u.SenderChatName == connectedUserChatName ||
-            //                                                u.ReceiverChatName == connectedUserChatName).ToListAsync();
+            var senders = await _context.Chats.Where(u => u.SenderChatName == connectedUserChatName).ToListAsync();
+            var receivers = await _context.Chats.Where(u => u.ReceiverChatName == connectedUserChatName).ToListAsync();
 
             var queuedNames = await GetQueuedChatList(connectedUserChatName);
 
@@ -100,8 +95,8 @@ namespace WindTalkerMessenger.Controllers
         {
             List<string> userList = new List<string>();
 
-            var senders = _context.Queues.Where(u => u.SenderChatName == connectedUserChatName).ToList();
-            var receivers = _context.Queues.Where(u => u.ReceiverChatName == connectedUserChatName).ToList();
+            var senders = await _context.Queues.Where(u => u.SenderChatName == connectedUserChatName).ToListAsync();
+            var receivers = await _context.Queues.Where(u => u.ReceiverChatName == connectedUserChatName).ToListAsync();
 
             foreach (var sender in senders)
             {

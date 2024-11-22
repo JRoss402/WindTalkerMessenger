@@ -7,12 +7,6 @@ namespace EnigmaMessengerV1.Controllers
 {
     public class HomeController : Controller
     {
-
-        //Need to differentiate between a guest
-        //and register user. The authorize
-        //of the api controller is messing things
-        //up => Use the resonse.ok to handle the
-        //error?
         private readonly OnlineUsersLists _onlineUsersLists;
 
         public HomeController(OnlineUsersLists onlineUsersLists)
@@ -30,10 +24,8 @@ namespace EnigmaMessengerV1.Controllers
             {
                 return false; ;
             }
-
             return true;
         }
-
 
         public IActionResult Index()
         {
@@ -49,7 +41,6 @@ namespace EnigmaMessengerV1.Controllers
 		{
 			return View();
 		}
-
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -7,6 +7,7 @@
         public DateTime? oldTime { get; set; }
         public DateTime? newTime { get; set; }
         public int RightNodeSend { get; set; }
+        public string chatName { get; set; }
 
 
         public TimeSpan TimeSpread()

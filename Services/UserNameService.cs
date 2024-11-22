@@ -14,13 +14,17 @@ namespace WindTalkerMessenger.Services
         private readonly ApplicationDbContext _context;
         private readonly IContextService _contextService;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<UserNameService> _logger;
+		private const string chatNameKey = "chatName";
 
-        public UserNameService(IHttpContextAccessor http, 
+
+		public UserNameService(IHttpContextAccessor http, 
                           OnlineUsersLists onlineUsersLists,
                           UserManager<ApplicationUser> userManager,
                           ApplicationDbContext context,
                           IContextService contextService,
-                          SignInManager<ApplicationUser> signinmanager)
+                          SignInManager<ApplicationUser> signinmanager,
+                          ILogger<UserNameService> logger)
         {
             _http = http;
             _onlineUsersLists = onlineUsersLists;
@@ -28,6 +32,7 @@ namespace WindTalkerMessenger.Services
             _context = context;
             _contextService = contextService;
             _signInManager = signinmanager;
+            _logger = logger;
         }
 
         public List<string> GetAllUserNames()
@@ -72,19 +77,26 @@ namespace WindTalkerMessenger.Services
 		}
 		public string GetSenderChatName(string senderConnectionId)
         {
-            var identityEmail =  _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-            var chatNameKey = "";
-            var senderChatName = "";
-            
-            if (identityEmail == null)
+			var identityEmail = _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+			//var chatNameKey = "";
+			var senderChatName = "";
+			try
             {
-                var grab = _context.Guests.FirstOrDefault(u => u.GuestConnectionId == senderConnectionId);
-                senderChatName = grab.GuestName;
-            }
-            else
+
+
+                if (identityEmail == null)
+                {
+                    //var grab = _context.Guests.First(u => u.GuestConnectionId == senderConnectionId);
+                    senderChatName = _http.HttpContext.Session.GetString(chatNameKey);
+                }
+                else
+                {
+                    var grab = _userManager.Users.FirstOrDefault(e => e.Email == identityEmail);
+                    senderChatName = grab.ChatName;
+                }
+            } catch(Exception ex)
             {
-               var grab = _userManager.Users.FirstOrDefault(e => e.Email == identityEmail);
-                senderChatName = grab.ChatName;
+                _logger.LogError($"Error Getting Chat Name: {ex}");
             }
             return senderChatName;
         }

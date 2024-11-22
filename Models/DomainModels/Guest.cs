@@ -6,5 +6,6 @@
         public string? GuestName { get; set; }
         public string? GuestConnectionId { get; set; }
         public string? GuestUID { get; set; }
+        public DateTime? AddedDate { get; set; } = DateTime.Now;
     }
 }

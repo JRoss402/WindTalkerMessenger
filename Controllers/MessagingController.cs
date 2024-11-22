@@ -12,20 +12,24 @@ namespace WindTalkerMessenger.Controllers
 		private readonly IHttpContextAccessor _httpAccessor;
 		private readonly IUserNameService _userNameService;
 		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly ILogger<MessagingController> _logger;
+		private const string chatNameKey = "chatName";
+
 		public MessagingController(OnlineUsersLists onlineUsersLists,
                                    IHttpContextAccessor httpAccessor,
 								   IUserNameService userNameService,
-								   UserManager<ApplicationUser> userManager)
+								   UserManager<ApplicationUser> userManager,
+								   ILogger<MessagingController> logger)
         {
 			_onlineUsersLists = onlineUsersLists;
 			_httpAccessor = httpAccessor;
 			_userNameService = userNameService;
 			_userManager = userManager;
+			_logger = logger;
 		}
 
 		public IActionResult Guest(string chatName)
 		{
-			
 			_httpAccessor.HttpContext.Session.SetString("chatName", chatName);
 
 			return View("Views\\Messaging\\ChatPage.cshtml");
@@ -46,10 +50,21 @@ namespace WindTalkerMessenger.Controllers
 					state = false;
 				}
 			}
-
             return state;
-
         }
+
+		[HttpPost]
+		[Route("/SetGuestChatName/ChatName/{chatName}")]
+		public void SetGuestChatName(string chatName)
+		{
+			try 
+			{
+				_httpAccessor.HttpContext.Session.SetString(chatNameKey, chatName);
+			}catch(Exception ex)
+			{
+				_logger.LogError($"New Guest Chat Name Could Not Be Set: {ex}");
+			}
+		}
 
 		public async Task<bool> GetReceiverRegistrationState(string receiverChatName)
 		{
@@ -78,7 +93,6 @@ namespace WindTalkerMessenger.Controllers
 		[HttpPost]
         public async Task<IActionResult> KillSwitchAsync(string userName)
 		{
-			//var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			await _userNameService.KillSwitchAsync(userName);
 
 			return Redirect(("~/"));
