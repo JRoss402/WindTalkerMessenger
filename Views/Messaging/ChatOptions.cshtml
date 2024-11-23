@@ -36,9 +36,9 @@ else
 
     $("#submitButton").click(async function (event) {
         event.preventDefault();
-        const chatName = $("#chatName").val();
-        const request = `/CheckChatName/${chatName}`
-        await fetch("/CheckChatName/" + chatName, {
+        const chatName = $("#chatName").val().trim();
+        const request = `/CheckChatName/CheckName/${chatName}`
+        await fetch(request, {
             method: 'POST',
             body: JSON.stringify({ ChatName: chatName }),
             headers: {

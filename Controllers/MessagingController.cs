@@ -9,20 +9,20 @@ namespace WindTalkerMessenger.Controllers
 	public class MessagingController : Controller
 	{
 		private readonly OnlineUsersLists _onlineUsersLists;
-		private readonly IHttpContextAccessor _httpAccessor;
+		private readonly IHttpContextAccessor _http;
 		private readonly IUserNameService _userNameService;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ILogger<MessagingController> _logger;
 		private const string chatNameKey = "chatName";
 
 		public MessagingController(OnlineUsersLists onlineUsersLists,
-                                   IHttpContextAccessor httpAccessor,
+                                   IHttpContextAccessor http,
 								   IUserNameService userNameService,
 								   UserManager<ApplicationUser> userManager,
 								   ILogger<MessagingController> logger)
         {
 			_onlineUsersLists = onlineUsersLists;
-			_httpAccessor = httpAccessor;
+			_http = http;
 			_userNameService = userNameService;
 			_userManager = userManager;
 			_logger = logger;
@@ -30,10 +30,12 @@ namespace WindTalkerMessenger.Controllers
 
 		public IActionResult Guest(string chatName)
 		{
-			_httpAccessor.HttpContext.Session.SetString("chatName", chatName);
+			_http.HttpContext.Session.SetString("chatName", chatName);
 
 			return View("Views\\Messaging\\ChatPage.cshtml");
 		}
+
+
 
         [HttpPost]
         [Route("/GetLoginState/{chatName}")]
@@ -59,7 +61,7 @@ namespace WindTalkerMessenger.Controllers
 		{
 			try 
 			{
-				_httpAccessor.HttpContext.Session.SetString(chatNameKey, chatName);
+				_http.HttpContext.Session.SetString(chatNameKey, chatName);
 			}catch(Exception ex)
 			{
 				_logger.LogError($"New Guest Chat Name Could Not Be Set: {ex}");

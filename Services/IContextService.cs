@@ -30,14 +30,14 @@ namespace WindTalkerMessenger.Services
 
 
         void IsMessageRowRemovable(Message message);
-        void DisassociateIdentityUserMessages(string identityUserEmail);
+        Task DisassociateIdentityUserMessagesAsync(string identityUserEmail);
         void InsertMessage(Message message);
-        void DisassociateGuestUserMessages(string guestChatName);
+        Task DisassociateGuestUserMessagesAsync(string guestChatName);
 
 
 		void AddNewGuest(string userName, string connectionId);
 
-        void DisassociateIdentityUserQueuedMessages(string identityUserEmail);
+        Task DisassociateIdentityUserQueuedMessagesAsync(string identityUserEmail);
 
 
 

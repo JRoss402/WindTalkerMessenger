@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using System.Security.Claims;
 using WindTalkerMessenger.Models.DataLayer;
 
@@ -11,28 +12,29 @@ namespace WindTalkerMessenger.Services
         private readonly IHttpContextAccessor _http;
         private readonly OnlineUsersLists _onlineUsersLists;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApplicationDbContext _context;
         private readonly IContextService _contextService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<UserNameService> _logger;
+		private readonly HeartBeat _heartBeat;
+
 		private const string chatNameKey = "chatName";
 
 
 		public UserNameService(IHttpContextAccessor http, 
                           OnlineUsersLists onlineUsersLists,
                           UserManager<ApplicationUser> userManager,
-                          ApplicationDbContext context,
                           IContextService contextService,
                           SignInManager<ApplicationUser> signinmanager,
-                          ILogger<UserNameService> logger)
+                          ILogger<UserNameService> logger,
+                          HeartBeat heartBeat)
         {
             _http = http;
             _onlineUsersLists = onlineUsersLists;
             _userManager = userManager;
-            _context = context;
             _contextService = contextService;
             _signInManager = signinmanager;
             _logger = logger;
+            _heartBeat = heartBeat;
         }
 
         public List<string> GetAllUserNames()
@@ -61,9 +63,9 @@ namespace WindTalkerMessenger.Services
             }
             return isAvailable;
         }
+
 		public string GetReceiverIdentityEmail(string username)
 		{
-
 			var grab = _userManager.Users.FirstOrDefault(u => u.ChatName == username);
 			if (grab != null)
 			{
@@ -78,15 +80,12 @@ namespace WindTalkerMessenger.Services
 		public string GetSenderChatName(string senderConnectionId)
         {
 			var identityEmail = _http.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-			//var chatNameKey = "";
 			var senderChatName = "";
 			try
             {
 
-
-                if (identityEmail == null)
+				if (identityEmail == null)
                 {
-                    //var grab = _context.Guests.First(u => u.GuestConnectionId == senderConnectionId);
                     senderChatName = _http.HttpContext.Session.GetString(chatNameKey);
                 }
                 else
@@ -107,7 +106,7 @@ namespace WindTalkerMessenger.Services
             string userEmail = user.ToString();
             var result = await _userManager.DeleteAsync(user);
 
-            _contextService.DisassociateIdentityUserMessages(userEmail);
+            _contextService.DisassociateIdentityUserMessagesAsync(userEmail);
 
             if (!result.Succeeded)
             {

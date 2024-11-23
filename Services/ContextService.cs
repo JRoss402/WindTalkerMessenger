@@ -9,15 +9,15 @@ namespace WindTalkerMessenger.Services
 	{
 		enum Status
 		{
-			Sent, Received, Queued
+			Sent, Queued
 		}
 
 
 		private readonly ApplicationDbContext _context;
 		private const string USER_DELETED = "User Account Deleted";
 		private const string MSG_DELETED = "User Deleted Messages";
-        private readonly ILogger<ContextService> _logger;
-        private enum Statuses { Sent, Received, Queued }
+		private readonly ILogger<ContextService> _logger;
+		private enum Statuses { Sent, Received, Queued }
 
 		public ContextService(ApplicationDbContext context,
 							  ILogger<ContextService> logger)
@@ -38,40 +38,41 @@ namespace WindTalkerMessenger.Services
 			try
 			{
 				_context.Guests.Add(guest);
-			    _context.SaveChanges();
+				_context.SaveChanges();
 
 			}
 			catch (Exception ex)
 			{
 
-				_logger.LogError($"Guest Was Not Added. : {ex}");
+				_logger.LogError("Guest Was Not Added: {ex}", ex);
 			}
 		}
 
-		public void DisassociateGuestUserMessages(string guestChatName)
+		public async Task DisassociateGuestUserMessagesAsync(string guestChatName)
 		{
 			var chats = _context.Chats.Where(u => u.SenderChatName == guestChatName ||
 									  u.ReceiverChatName == guestChatName).ToList();
-						  
-			foreach(Message chat in chats)
+
+			foreach (Message chat in chats)
 			{
-				if(chat.SenderChatName == guestChatName)
+				if (chat.SenderChatName == guestChatName)
 				{
 					chat.SenderChatName = "Guest Disconnected";
 					chat.UserMessage = "Guest Disconnected";
 					//IsRowRemovable(chat);
-					
-				}else if(chat.ReceiverChatName == guestChatName)
+
+				}
+				else if (chat.ReceiverChatName == guestChatName)
 				{
 					chat.ReceiverChatName = "Guest Disconnected";
 					//IsRowRemovable(chat);
 
 				}
-				_context.SaveChangesAsync();
+				await _context.SaveChangesAsync();
 			}
 		}
 
-		public void DisassociateIdentityUserMessages(string identityUserEmail)
+		public async Task DisassociateIdentityUserMessagesAsync(string identityUserEmail)
 		{
 			var userMessages = _context.Chats.Where(e => e.MessageSenderEmail == identityUserEmail ||
 														  e.MessageReceiverEmail == identityUserEmail).ToList();
@@ -90,54 +91,53 @@ namespace WindTalkerMessenger.Services
 					userMessage.ReceiverChatName = USER_DELETED;
 				}
 
-                IsMessageRowRemovable(userMessage);
+				IsMessageRowRemovable(userMessage);
 
 				 _context.Chats.Update(userMessage);
 			}
-			_context.SaveChanges();
+			await _context.SaveChangesAsync();
 
-			DisassociateIdentityUserQueuedMessages(identityUserEmail);
+			DisassociateIdentityUserQueuedMessagesAsync(identityUserEmail);
 
-        }
+		}
 
-		public void DisassociateIdentityUserQueuedMessages(string identityUserEmail)
+		public async Task DisassociateIdentityUserQueuedMessagesAsync(string identityUserEmail)
 		{
-            var userQueuedMessages = _context.Queues.Where(e => e.MessageSenderEmail == identityUserEmail ||
-                                              e.MessageReceiverEmail == identityUserEmail).ToList();
+			var userQueuedMessages = await _context.Queues.Where(e => e.MessageSenderEmail == identityUserEmail ||
+											  e.MessageReceiverEmail == identityUserEmail).ToListAsync();
 
-            foreach (MessageQueue userQueuedMessage in userQueuedMessages)
-            {
-                if (userQueuedMessage.MessageSenderEmail == identityUserEmail)
-                {
-                    userQueuedMessage.MessageSenderEmail = USER_DELETED;
-                    userQueuedMessage.SenderChatName = USER_DELETED;
-                    userQueuedMessage.UserMessage = MSG_DELETED;
-                }
-                else if (userQueuedMessage.MessageReceiverEmail == identityUserEmail)
-                {
-                    userQueuedMessage.MessageReceiverEmail = USER_DELETED;
-                    userQueuedMessage.ReceiverChatName = USER_DELETED;
-                }
+			foreach (MessageQueue userQueuedMessage in userQueuedMessages)
+			{
+				if (userQueuedMessage.MessageSenderEmail == identityUserEmail)
+				{
+					userQueuedMessage.MessageSenderEmail = USER_DELETED;
+					userQueuedMessage.SenderChatName = USER_DELETED;
+					userQueuedMessage.UserMessage = MSG_DELETED;
+				}
+				else if (userQueuedMessage.MessageReceiverEmail == identityUserEmail)
+				{
+					userQueuedMessage.MessageReceiverEmail = USER_DELETED;
+					userQueuedMessage.ReceiverChatName = USER_DELETED;
+				}
 
-                IsQueueRowRemovable(userQueuedMessage);
+				IsQueueRowRemovable(userQueuedMessage);
 
-                _context.Queues.Update(userQueuedMessage);
-            }
-            _context.SaveChanges();
+				 _context.Queues.Update(userQueuedMessage);
+			}
+			await _context.SaveChangesAsync();
 
-
-        }
+		}
 
 		public void IsQueueRowRemovable(MessageQueue queue)
 		{
-            if (queue.MessageSenderEmail == USER_DELETED &&
-                queue.MessageReceiverEmail == USER_DELETED)
-            {
-                _context.Queues.Remove(queue);
-            }
-        }
+			if (queue.MessageSenderEmail == USER_DELETED &&
+				queue.MessageReceiverEmail == USER_DELETED)
+			{
+				_context.Queues.Remove(queue);
+			}
+		}
 
-        public void IsMessageRowRemovable(Message message)
+		public void IsMessageRowRemovable(Message message)
 		{
 			if (message.MessageSenderEmail == USER_DELETED &&
 			   message.MessageReceiverEmail == USER_DELETED)
@@ -148,20 +148,21 @@ namespace WindTalkerMessenger.Services
 
 		public async Task<List<string>> GetChatFriends(string chatName)
 		{
-			List<string> totalList = new List<string>();
+			List<string> totalList = new();
 			try
 			{
 				var currentChatsList = await _context.Chats.Where(u => u.SenderChatName == chatName).ToListAsync();
 				foreach (Message user in currentChatsList)
 				{
-					if (!totalList.Contains(user.ReceiverChatName))
+					if (user.ReceiverChatName != null && !totalList.Contains(user.ReceiverChatName))
 					{
 						totalList.Add(user.ReceiverChatName);
 					}
 				}
-			}catch(Exception ex)
+			}
+			catch (Exception ex)
 			{
-				_logger.LogError($"Error Grabbing Chat Friends List: {ex}");
+				_logger.LogError("Error Grabbing Chat Friends List: {ex}",ex);
 			}
 
 			return totalList;
@@ -175,49 +176,36 @@ namespace WindTalkerMessenger.Services
 			{
 				chats = await _context.Chats.Where(u => u.ReceiverChatName == chatName).ToListAsync();
 
-			} catch (Exception ex)
-			{
-				_logger.LogError($"Error Getting Chats From Friends: {ex}");
 			}
-            return chats;
-
-        }
-
-        /*public bool IsUserGuest(string chatName)
-		{
-			bool isGuest = _onlineUsersLists.anonUsers.ContainsKey(chatName);
-			if (isGuest)
+			catch (Exception ex)
 			{
-				return true;
+				_logger.LogError("Error Getting Chats From Friends: {ex}", ex);
 			}
-			else
-			{
-				return false;
-			}
+			return chats;
 
-		}*/
+		}
 
 		public async Task<List<Message>> AddQueuedMessages(string username)
 		{
 			List<Message> messages = new List<Message>();
-            List<MessageQueue> queues = new List<MessageQueue>();
+			List<MessageQueue> queues = new List<MessageQueue>();
 
-            try
-            {
-				queues = await _context.Queues.Where(u => u.ReceiverChatName == username).ToListAsync();
-                foreach (MessageQueue queue in queues)
-                {
-                    queue.MessageStatus = Status.Sent.ToString();
-                    var newMsg = CreateMessageObject(queue);
-                    messages.Add(newMsg);
-                    await _context.Chats.AddAsync(newMsg);
-                    _context.Queues.Remove(queue);
-                    await _context.SaveChangesAsync();
-                }
-            }
-            catch(Exception ex)
+			try
 			{
-				_logger.LogError(ex.ToString());
+				queues = await _context.Queues.Where(u => u.ReceiverChatName == username).ToListAsync();
+				foreach (MessageQueue queue in queues)
+				{
+					queue.MessageStatus = Status.Sent.ToString();
+					var newMsg = CreateMessageObject(queue);
+					messages.Add(newMsg);
+					await _context.Chats.AddAsync(newMsg);
+					_context.Queues.Remove(queue);
+					await _context.SaveChangesAsync();
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError("Error Adding Queued Message: {ex}", ex);
 			}
 
 			return messages;
@@ -308,18 +296,19 @@ namespace WindTalkerMessenger.Services
 
 		public MessageQueue CreateQueuedMessageObject(Message msg)
 		{
-			var queuedMessage = new MessageQueueBuilder()
-					.SetMessageStatus(msg.MessageStatus)
-					.SetMessage(msg.UserMessage)
-					.SetMessageDate(DateTime.Now)
-					.SetIsReceived(msg.IsReceived)
-					.SetSenderEmail(msg.MessageSenderEmail)
-					.SetSenderChatName(msg.SenderChatName)
-					.SetReceiverEmail(msg.MessageReceiverEmail)
-					.SetReceiverChatName(msg.ReceiverChatName)
-					.Build();
+				var queuedMessage = new MessageQueueBuilder()
+						.SetMessageStatus(msg.MessageStatus)
+						.SetMessage(msg.UserMessage)
+						.SetMessageDate(DateTime.Now)
+						.SetIsReceived(msg.IsReceived)
+						.SetSenderEmail(msg.MessageSenderEmail)
+						.SetSenderChatName(msg.SenderChatName)
+						.SetReceiverEmail(msg.MessageReceiverEmail)
+						.SetReceiverChatName(msg.ReceiverChatName)
+						.Build();
 
 			return queuedMessage;
+
 		}
 
 	}

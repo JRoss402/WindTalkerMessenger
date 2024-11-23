@@ -65,6 +65,17 @@ body {
     justify-content: center;
 }
 
+.enterButtonNavIndex {
+    margin-top: 40px;
+    background-color: black;
+    border-color: #7ACC00;
+    border-width: 1px;
+    height: 50px;
+    color: #7ACC00;
+    font-size: 20px;
+    font-weight: bold;
+    width: 300px;
+}
 
 .username {
     height: 50px;
@@ -104,6 +115,22 @@ body {
     opacity: 95%;
     border-color: green;
 
+}
+.passwordInput {
+    height: 50px;
+    font-size: 20px;
+    margin-top: 20px;
+    margin-bottom: 50px;
+    text-align: center;
+    background-color: black;
+    opacity: 95%;
+    color: green;
+    border-color: green;
+    width:400px;
+}
+.pFont {
+    color: #7ACC00;
+    font-weight: bold;
 }
 
 .registerFormGroups {

@@ -7,9 +7,7 @@
         string GetReceiverIdentityEmail(string receiverConnectionId);
         bool IsUserAuthenticated();
         List<string> GetAllUserNames();
-
-        Task KillSwitchAsync(string userId);
-
+		Task KillSwitchAsync(string userId);
         Task<bool> IsUserRegistered(string username);
 
 

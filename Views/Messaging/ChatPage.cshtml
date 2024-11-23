@@ -144,8 +144,6 @@
 			margin-bottom: 3px;
 		}
 
-
-
 		#messageContainer {
 			display: inline-flex;
 		}
@@ -290,16 +288,28 @@
 									Kill Switch
 								</button>
 							</form>
+						}else{
+							<p>Register or Login for the Kill Switch!</p>
 						}
 					</div>
 				</div>
-
-				<div id="chatsAside">
-					<p id="chatParagraph">Chats</p>
-					<!--<input type="text" id="username" class="username" placeholder="Username" />-->
-					<ul id="chatList">
-					</ul>
-				</div>
+				@if (SignInManager.IsSignedIn(User))
+				{
+					<div id="chatsAside">
+						<p id="chatParagraph">Chats</p>
+						<!--<input type="text" id="username" class="username" placeholder="Username" />-->
+						<ul id="chatList">
+						</ul>
+					</div>
+				}else{
+					<div id="chatsAside">
+						<p id="chatParagraph">Chats</p>
+						<p>Register or Login for a Chat List!</p>
+						<p>Because you are just a guest you can only
+						   chat with one person at a time.
+						</p>
+					</div>
+				}
 			</div>
 			<div class="msg-bottom" id="messageContainer">
 				<div class="input-group">
@@ -500,14 +510,6 @@
 				.catch(function (err) {
 					return console.error(err.toString());
 				});
-		});
-
-		connection.on("GuestGone", function (user) {
-			var encodedUser = $("<div />").text(user).html();
-
-			console.log(encodedUser, " was a guest and have disconnected.");
-
-			$("#leftinnerdiv").append("<li><strong>" + encodedUser + "</strong> has gone rogue and removed their fingerprint from this site.</li>");
 		});
 
 		connection.on("PrintQueuedMessages", function (messages) {

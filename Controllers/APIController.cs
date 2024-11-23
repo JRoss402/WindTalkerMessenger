@@ -12,12 +12,16 @@ namespace WindTalkerMessenger.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _http;
+		private const string chatNameKey = "chatName";
 
-        public APIController(ApplicationDbContext context,
-                             UserManager<ApplicationUser> userManager)
+		public APIController(ApplicationDbContext context,
+                             UserManager<ApplicationUser> userManager,
+                             IHttpContextAccessor http)
         {
             _context = context;
             _userManager = userManager;
+            _http = http;
         }
 
 		[HttpPost]
@@ -60,33 +64,35 @@ namespace WindTalkerMessenger.Controllers
 		public async Task<HashSet<string>> GetUserChatList()
         {
 			var userInfo = await _userManager.GetUserAsync(User);
-			var connectedUserChatName = userInfo.ChatName;
+			var connectedUserChatName = userInfo?.ChatName;
+            //var guestName = _http.HttpContext.Session.GetString(chatNameKey);
+            connectedUserChatName ??= "";
 			HashSet<string> userList = new HashSet<string>();
-            var senders = await _context.Chats.Where(u => u.SenderChatName == connectedUserChatName).ToListAsync();
-            var receivers = await _context.Chats.Where(u => u.ReceiverChatName == connectedUserChatName).ToListAsync();
-
-            var queuedNames = await GetQueuedChatList(connectedUserChatName);
-
-            foreach(var sender in senders)
+			if (connectedUserChatName != "")
             {
-                if (sender.ReceiverChatName != "User Account Deleted" && sender.ReceiverChatName != "Guest Disconnected")
-                {
-                    userList.Add(sender.ReceiverChatName.ToString());
-                }
+				var senders = await _context.Chats.Where(u => u.SenderChatName == connectedUserChatName).ToListAsync();
+				var receivers = await _context.Chats.Where(u => u.ReceiverChatName == connectedUserChatName).ToListAsync();
+				var queuedNames = await GetQueuedChatList(connectedUserChatName);
 
-            }
-            foreach(var receiver in receivers)
-            {
-                if (receiver.SenderChatName != "User Account Deleted" && receiver.SenderChatName != "Guest Disconnected")
-                {
-                    userList.Add(receiver.SenderChatName.ToString());
-
-                }
-            }
-            foreach(string name in queuedNames)
-            {
-              userList.Add(name);
-            }
+				foreach (var sender in senders)
+				{
+					if (sender.ReceiverChatName != "User Account Deleted" && sender.ReceiverChatName != "Guest Disconnected")
+					{
+						userList.Add(sender.ReceiverChatName.ToString());
+					}
+				}
+				foreach (var receiver in receivers)
+				{
+					if (receiver.SenderChatName != "User Account Deleted" && receiver.SenderChatName != "Guest Disconnected")
+					{
+						userList.Add(receiver.SenderChatName.ToString());
+					}
+				}
+				foreach (string name in queuedNames)
+				{
+					userList.Add(name);
+				}
+			}
 
             return userList;
         }

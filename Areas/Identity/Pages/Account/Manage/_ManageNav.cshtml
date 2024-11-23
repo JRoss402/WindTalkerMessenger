@@ -3,12 +3,11 @@
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
 
-<div>
+<div class="navContainer">
 <ul class="nav nav-pills flex-column">
     <li class="nav-item"><a class="mainLink" asp-page="./Index">Profile</a></li>
     <li class="nav-item"><a class="mainLink" asp-page="./Email">Email</a></li>
     <li class="nav-item"><a class="mainLink" asp-page="./ChangePassword">Password</a></li>
-    <li class="nav-item"><a class="mainLink" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
     <li class="nav-item"><a class="mainLink" asp-page="./PersonalData">Personal data</a></li>
 </ul>
 </div>
