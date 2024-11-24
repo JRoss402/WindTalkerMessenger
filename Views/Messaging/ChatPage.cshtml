@@ -351,14 +351,14 @@
 
 		async function GetMessages(event, name) {
 			$("#leftinnerdiv").empty();
-			if (name == null) {
-				var target = $(event.target);
-				var chatName = target.attr("name-arg");
-				$("#username").val(chatName);
-			} else {
-				var chatName = name;
-			}
-
+				if (name == null) {
+					var target = $(event.target);
+					var chatName = target.attr("name-arg");
+					$("#username").val(chatName);
+				} else {
+					var chatName = name;
+				}
+			sessionStorage.setItem("CurrentChatName", chatName.toString());
 			const requestName = "../API/GetChatName";
 			fetch(requestName, {
 				method: 'POST',
@@ -474,15 +474,24 @@
 
 
 		var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
-		connection.on("ReceiveMessage", function (user, message) {
+		connection.on("ReceiveMessage", async function (user, message) {
 			const date = new Date();
 			const timeStamp = GetDate(date);
 			const time = GetTime(date);
 			var encodedUser = $("<div />").text(user).html();
 			var encodedMsg = $("<div />").text(message).html();
+			var currentChatUser = sessionStorage.getItem('CurrentChatName')
+			var namesList = await fetchChatNameList();
+			console.log(namesList);
+			const loginState = await GetLoginState();
 			console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
-			$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span></li>");
-			$("#leftinnerdiv").append('<li class="timestampReceiver" ><strong>' + timeStamp + '<span class="timeFontColor"> ' + time + '</span></strong></li>');
+			if (user == currentChatUser) {
+				$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span></li>");
+				$("#leftinnerdiv").append('<li class="timestampReceiver" ><strong>' + timeStamp + '<span class="timeFontColor"> ' + time + '</span></strong></li>');
+			} else if (namesList.includes(user) == false) 
+			{
+			$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + user + '">' + user + "</button>");
+			}
 
 		});
 

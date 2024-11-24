@@ -114,7 +114,7 @@ namespace WindTalkerMessenger.Controllers
         [Route("/CheckChatName/CheckName/{chatName}")]
         public async Task<bool> CheckChatName(string chatName)
         {
-			var registeredChatNames = _userNameService.GetAllUserNames();
+			var registeredChatNames = await _userNameService.GetAllUserNames();
 
 			if((registeredChatNames.Contains(chatName)) || (_onlineUsersLists.anonUsers.TryGetValue(chatName,out _))) 
 			{

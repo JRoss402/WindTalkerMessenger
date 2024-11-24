@@ -37,9 +37,9 @@ namespace WindTalkerMessenger.Services
             _heartBeat = heartBeat;
         }
 
-        public List<string> GetAllUserNames()
+        public async Task<List<string>> GetAllUserNames()
         {
-            var registeredUserNames =  _userManager.Users.Select(u => u.ChatName).ToList();
+            var registeredUserNames = await _userManager.Users.Select(u => u.ChatName).ToListAsync();
             
             return registeredUserNames;
         }
@@ -125,6 +125,31 @@ namespace WindTalkerMessenger.Services
             }
             return false;
         }
+
+        /*public async Task AddNewGuestAsync(string chatName, string connectionId)
+        {
+            chatName = _http.HttpContext.Session.GetString(chatNameKey);
+            //_heartBeat.AddClientNode(connectionId, chatName);
+            _onlineUsersLists.anonUsers.TryAdd(chatName, connectionId);
+            //_onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
+            _onlineUsersLists.userLoginState.TryAdd(chatName, "Guest");
+
+        }
+
+        public async Task AddNewRegisteredUserAsync(string chatName, string connectionId)
+        {
+            //_heartBeat.AddClientNode(connectionId, chatName);
+            _onlineUsersLists.authenticatedUsers.TryAdd(chatName, connectionId);
+            //_onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
+            _onlineUsersLists.userLoginState.TryAdd(chatName, "Registered");
+        }
+
+        public async Task AddNewUser(string chatName, string connectionId)
+        {
+            _heartBeat.AddClientNode(connectionId, chatName);
+            _onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
+
+        }*/
 
     }
 }

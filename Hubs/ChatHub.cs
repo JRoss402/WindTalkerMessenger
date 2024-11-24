@@ -82,7 +82,7 @@ namespace WindTalkerMessenger.Hubs
 			}
 		}
 
-		public void HeartBeatResponse()
+		public async Task HeartBeatResponse()
 		{
 			var connectionId = Context.ConnectionId;
 			var userName = _userNameService.GetSenderChatName(connectionId);
@@ -92,6 +92,7 @@ namespace WindTalkerMessenger.Hubs
 			_heartBeat.NodeUpdate(connectionId);
 			_heartBeat.NodesCheckAsync();
 		}
+
 		public override async Task<Task> OnConnectedAsync()
 		{
 			string connectionId = Context.ConnectionId;
@@ -102,7 +103,6 @@ namespace WindTalkerMessenger.Hubs
 			{
 				try
 				{
-					//_userNameService.AddRegisteredUser(chatName, connectionId);
 					_heartBeat.AddClientNode(connectionId, chatName);
 					_onlineUsersLists.authenticatedUsers.TryAdd(chatName, connectionId);
 					var newMessages = await _contextService.AddQueuedMessages(chatName);
@@ -121,7 +121,6 @@ namespace WindTalkerMessenger.Hubs
 				try
 				{
 					chatName = _http.HttpContext.Session.GetString(chatNameKey);
-					//_userNameService.AddGuestUser(chatName, connectionId);
 					_heartBeat.AddClientNode(connectionId, chatName);
 					_contextService.AddNewGuest(chatName, connectionId);
 					_onlineUsersLists.anonUsers.TryAdd(chatName, connectionId);
@@ -137,7 +136,7 @@ namespace WindTalkerMessenger.Hubs
 			return base.OnConnectedAsync();
 		}
 
-		public override async Task OnDisconnectedAsync(Exception exception)
+		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
 			string connectionId = Context.ConnectionId.ToString();
 			string chatName = _userNameService.GetSenderChatName(connectionId);
