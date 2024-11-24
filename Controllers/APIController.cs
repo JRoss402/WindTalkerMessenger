@@ -7,21 +7,17 @@ using WindTalkerMessenger.Models.DomainModels;
 
 namespace WindTalkerMessenger.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class APIController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IHttpContextAccessor _http;
-		private const string chatNameKey = "chatName";
 
 		public APIController(ApplicationDbContext context,
-                             UserManager<ApplicationUser> userManager,
-                             IHttpContextAccessor http)
+                             UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
-            _http = http;
         }
 
 		[HttpPost]

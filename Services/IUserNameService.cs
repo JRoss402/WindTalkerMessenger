@@ -10,8 +10,5 @@
 		Task KillSwitchAsync(string userId);
         Task<bool> IsUserRegistered(string username);
 
-        //Task AddNewGuestAsync(string chatName, string connectionId);
-        //Task AddNewRegisteredUserAsync(string chatName, string connectionId);
-
     }
 }

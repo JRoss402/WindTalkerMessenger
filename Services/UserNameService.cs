@@ -125,31 +125,5 @@ namespace WindTalkerMessenger.Services
             }
             return false;
         }
-
-        /*public async Task AddNewGuestAsync(string chatName, string connectionId)
-        {
-            chatName = _http.HttpContext.Session.GetString(chatNameKey);
-            //_heartBeat.AddClientNode(connectionId, chatName);
-            _onlineUsersLists.anonUsers.TryAdd(chatName, connectionId);
-            //_onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
-            _onlineUsersLists.userLoginState.TryAdd(chatName, "Guest");
-
-        }
-
-        public async Task AddNewRegisteredUserAsync(string chatName, string connectionId)
-        {
-            //_heartBeat.AddClientNode(connectionId, chatName);
-            _onlineUsersLists.authenticatedUsers.TryAdd(chatName, connectionId);
-            //_onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
-            _onlineUsersLists.userLoginState.TryAdd(chatName, "Registered");
-        }
-
-        public async Task AddNewUser(string chatName, string connectionId)
-        {
-            _heartBeat.AddClientNode(connectionId, chatName);
-            _onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
-
-        }*/
-
     }
 }

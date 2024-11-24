@@ -31,6 +31,7 @@ else
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
+
 <script>
     //https://stackoverflow.com/questions/57328836/post-fetch-net-core
 
@@ -58,11 +59,11 @@ else
 
     }
     function nameCheck(response,chatName){
-        sessionStorage.setItem('UserChatName', chatName.toString());
         if (response == true) {
             $("#guestError").text("That chat name is taken.");
         } else {
-            sessionStorage.setItem('UserChatName', chatName.toString());
+            sessionStorage.setItem('UserChatName', chatName);
+            console.log("set");
             $("#guest_form").submit();
         }
     }

@@ -471,8 +471,7 @@
 
 		//https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-8.0
 		//https://www.roundthecode.com/dotnet-tutorials/add-signalr-hub-aspnet-core-connect-using-javascript
-
-
+		
 		var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 		connection.on("ReceiveMessage", async function (user, message) {
 			const date = new Date();
@@ -482,15 +481,15 @@
 			var encodedMsg = $("<div />").text(message).html();
 			var currentChatUser = sessionStorage.getItem('CurrentChatName')
 			var namesList = await fetchChatNameList();
+			let isRegistered = await IsReceiverRegistered(currentChatUser);
 			console.log(namesList);
 			const loginState = await GetLoginState();
 			console.log("Message received from: ", encodedUser, "Message: ", encodedMsg);
-			if (user == currentChatUser) {
+			if (user == currentChatUser || loginState == false) {
 				$("#leftinnerdiv").append("<li><strong>" + encodedUser + '</strong>:<span class="messageLoad">' + encodedMsg + "</span></li>");
 				$("#leftinnerdiv").append('<li class="timestampReceiver" ><strong>' + timeStamp + '<span class="timeFontColor"> ' + time + '</span></strong></li>');
-			} else if (namesList.includes(user) == false) 
-			{
-			$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + user + '">' + user + "</button>");
+			}else{
+				$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + user + '">' + user + "</button>");
 			}
 
 		});
@@ -555,13 +554,9 @@
 					namesList = await fetchChatNameList();
 					let isRegistered = await IsReceiverRegistered(username);
 					await GetMessages(event, username)
-					console.log(isRegistered);
 					// && isRegistered == true
-					/*if (namesList.includes(username) == false) {
-						$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + username + '">' + username + "</button>");
-					}
-					await GetMessages(event, username)*/
-					if (namesList.includes(username) == false && isRegistered == true) {
+					console.log(isRegistered);
+					if (namesList.includes(username) == false) {
 						$("#chatList").append('<button id="nameButton" class="btn btn-primary" onclick="GetMessages(event)" name-arg="' + username + '">' + username + "</button>");
 					}
 				}
@@ -643,17 +638,6 @@
 				.then(response => response.json())
 				.then(json => json.forEach(getUserChats))
 				.catch(error => caughtErrors(error))
-
-			const chatName = sessionStorage.getItem('UserChatName');
-			const guestChatNameSend = `/SetGuestChatName/ChatName/${chatName}`;
-			await fetch(guestChatNameSend, {
-				method: 'POST',
-				body: JSON.stringify({ ChatName: chatName }),
-				headers: {
-					'Accept': 'application/json; charset=utf-8',
-					'Content-Type': 'application/json;charset=utf-8'
-				}
-			}).catch(error => caughtErrors(error))
 
 		});
 

@@ -19,12 +19,9 @@ namespace WindTalkerMessenger.Services
                                        string senderChatName, 
                                        string receiverChatName);
 
-
         Task<List<Message>> AddQueuedMessages(string username);
 
 		Task<List<string>> GetChatFriends(string chatName);
-
-        //bool IsUserGuest(string chatName);
 
         void IsQueueRowRemovable(MessageQueue queue);
 
@@ -38,9 +35,6 @@ namespace WindTalkerMessenger.Services
 		void AddNewGuest(string userName, string connectionId);
 
         Task DisassociateIdentityUserQueuedMessagesAsync(string identityUserEmail);
-
-
-
 
     }
 }
