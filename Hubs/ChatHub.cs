@@ -90,7 +90,7 @@ namespace WindTalkerMessenger.Hubs
 
 			_logger.LogInformation("Pulse Received from {connectionId} ChatName: {userName}", connectionId, userName);
 			_heartBeat.NodeUpdate(connectionId);
-			_heartBeat.NodesCheckAsync();
+			await _heartBeat.NodesCheckAsync();
 		}
 
 		public override async Task<Task> OnConnectedAsync()
@@ -147,7 +147,7 @@ namespace WindTalkerMessenger.Hubs
 			if (isGuest)
 			{
 				chatName = _http.HttpContext.Session.GetString(chatNameKey);
-				await _contextService.DisassociateGuestUserMessagesAsync(chatName);
+				await _contextService.UpdateGuestMessagesAsync(chatName);
 				_onlineUsersLists.anonUsers.TryRemove(chatName, out _);
 			}
 			_onlineUsersLists.onlineUsers.TryRemove(chatName, out _);

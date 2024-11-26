@@ -55,7 +55,7 @@ namespace WindTalkerMessenger.Services
 				}
 				if (isGuest)
 				{
-					await _contextServices.DisassociateGuestUserMessagesAsync(chatName);
+					await _contextServices.UpdateGuestMessagesAsync(chatName);
 				}
 				_onlineUsersLists.onlineUsers.TryRemove(chatName, out _);
 				_onlineUsersLists.anonUsers.TryRemove(chatName, out _);

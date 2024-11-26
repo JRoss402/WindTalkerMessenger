@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using System.Security.Claims;
 using WindTalkerMessenger.Models.DataLayer;
 
@@ -15,7 +14,6 @@ namespace WindTalkerMessenger.Services
         private readonly IContextService _contextService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<UserNameService> _logger;
-		private readonly HeartBeat _heartBeat;
 
 		private const string chatNameKey = "chatName";
 
@@ -25,8 +23,7 @@ namespace WindTalkerMessenger.Services
                           UserManager<ApplicationUser> userManager,
                           IContextService contextService,
                           SignInManager<ApplicationUser> signinmanager,
-                          ILogger<UserNameService> logger,
-                          HeartBeat heartBeat)
+                          ILogger<UserNameService> logger)
         {
             _http = http;
             _onlineUsersLists = onlineUsersLists;
@@ -34,7 +31,6 @@ namespace WindTalkerMessenger.Services
             _contextService = contextService;
             _signInManager = signinmanager;
             _logger = logger;
-            _heartBeat = heartBeat;
         }
 
         public async Task<List<string>> GetAllUserNames()
@@ -106,7 +102,7 @@ namespace WindTalkerMessenger.Services
             string userEmail = user.ToString();
             var result = await _userManager.DeleteAsync(user);
 
-            _contextService.DisassociateIdentityUserMessagesAsync(userEmail);
+            _contextService.UpdateIdentityMessagesAsync(userEmail);
 
             if (!result.Succeeded)
             {

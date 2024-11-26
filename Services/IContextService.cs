@@ -4,6 +4,9 @@ namespace WindTalkerMessenger.Services
 {
     public interface IContextService
     {
+
+        Task<HashSet<string>> GetChatNames();
+
         void CreateMessageObject(string message, 
                                  string senderEmail, 
                                  string receiverEmail, 
@@ -25,16 +28,14 @@ namespace WindTalkerMessenger.Services
 
         void IsQueueRowRemovable(MessageQueue queue);
 
-
         void IsMessageRowRemovable(Message message);
-        Task DisassociateIdentityUserMessagesAsync(string identityUserEmail);
+        Task UpdateIdentityMessagesAsync(string identityUserEmail);
         void InsertMessage(Message message);
-        Task DisassociateGuestUserMessagesAsync(string guestChatName);
-
+        Task UpdateGuestMessagesAsync(string guestChatName);
 
 		void AddNewGuest(string userName, string connectionId);
 
-        Task DisassociateIdentityUserQueuedMessagesAsync(string identityUserEmail);
+        Task DeleteIdentityQueuedMessagesAsync(string identityUserEmail);
 
     }
 }
