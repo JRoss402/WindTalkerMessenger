@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Connections.Features;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using WindTalkerMessenger.Hubs;
 using WindTalkerMessenger.Models.DataLayer;
 using WindTalkerMessenger.Models.DomainModels;
 
@@ -18,19 +21,51 @@ namespace WindTalkerMessenger.Services
         private readonly ILogger<ContextService> _logger;
         private readonly IHttpContextAccessor _http;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly OnlineUsersLists _onlineUsersLists;
+        private readonly UserNameService _userNameService;
         private enum Statuses { Sent, Queued }
 
         public ContextService(ApplicationDbContext context,
                               ILogger<ContextService> logger,
                               IHttpContextAccessor http,
-                              UserManager<ApplicationUser> userManager)
+                              UserManager<ApplicationUser> userManager,
+                              OnlineUsersLists onlineUsersLists)
         {
             _context = context;
             _logger = logger;
             _http = http;
             _userManager = userManager;
+            _onlineUsersLists = onlineUsersLists;
+
         }
 
+
+        public async Task UpdateRegistredUsersAsync(string connectionId, string chatName)
+        {
+            _onlineUsersLists.authenticatedUsers.TryAdd(chatName, connectionId);
+            _onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
+            _onlineUsersLists.userLoginState.TryAdd(chatName, "Registered");
+        }
+
+        public async Task UpdateGuestUsersAsync(string connectionId, string chatName)
+        {
+            _onlineUsersLists.anonUsers.TryAdd(chatName, connectionId);
+            _onlineUsersLists.onlineUsers.TryAdd(chatName, connectionId);
+            _onlineUsersLists.userLoginState.TryAdd(chatName, "Guest");
+        }
+
+        public async Task RemoveRegisteredUserAsync(string chatName)
+        {
+            _onlineUsersLists.onlineUsers.TryRemove(chatName, out _);
+            _onlineUsersLists.authenticatedUsers.TryRemove(chatName, out _);
+            _onlineUsersLists.userLoginState.TryRemove(chatName, out _);
+        }
+        public async Task RemoveGuestUserAsync(string chatName)
+        {
+            _onlineUsersLists.anonUsers.TryRemove(chatName, out _);
+            _onlineUsersLists.onlineUsers.TryRemove(chatName, out _);
+            _onlineUsersLists.userLoginState.TryRemove(chatName, out _);
+        }
 
         public async Task<HashSet<string>> GetChatNames()
         {

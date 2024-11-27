@@ -4,7 +4,9 @@ namespace WindTalkerMessenger.Services
 {
     public interface IContextService
     {
+        Task UpdateRegistredUsersAsync(string connectionId,string chatName);
 
+        Task UpdateGuestUsersAsync(string connectionId, string chatName);
         Task<HashSet<string>> GetChatNames();
 
         void CreateMessageObject(string message, 
@@ -36,6 +38,9 @@ namespace WindTalkerMessenger.Services
 		void AddNewGuest(string userName, string connectionId);
 
         Task DeleteIdentityQueuedMessagesAsync(string identityUserEmail);
+
+        Task RemoveRegisteredUserAsync(string chatName);
+        Task RemoveGuestUserAsync(string chatName);
 
     }
 }
