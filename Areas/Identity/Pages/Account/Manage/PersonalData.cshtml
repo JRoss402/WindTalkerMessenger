@@ -5,37 +5,10 @@
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
 }
 
-<style>
-    //https://stackoverflow.com/questions/710089/how-do-i-make-an-html-link-look-like-a-button
-    .linkToButton {
-        margin-top: 40px;
-        background-color: black;
-        height: 200px;
-        color: #7ACC00;
-        font-size: 20px;
-        font-weight: bold;
-        width: 300px;
-        padding: 10px 15px 10px 15px;
-        text-decoration: none;
-        border-top: 1px solid #7ACC00;
-        border-right: 1px solid #7ACC00;
-        border-bottom: 1px solid #7ACC00;
-        border-left: 1px solid #7ACC00;
-        position:relative;
-        top:20px;
-        text-align:center;
-
-    }
-
-        .linkToButton:hover {
-        color: #7ACC00;
-        background-color: red;
-    }
-</style>
 
 <h3>@ViewData["Title"]</h3>
 
-<div class="personalDataPage">
+<div class="personalDataContainer">
 <div class="row">
     <div>
         <p class="pFont">Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>

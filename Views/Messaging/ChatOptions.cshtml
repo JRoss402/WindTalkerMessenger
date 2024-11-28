@@ -4,7 +4,7 @@
 @inject UserManager<ApplicationUser> UserManager
 
 
-<div class="chatPageContainer">
+<div class="containerBase">
     <div class="text-center">
 
 @if (!SignInManager.IsSignedIn(User))
@@ -58,7 +58,7 @@ else
         }
 
     }
-    function nameCheck(response,chatName){
+    function nameCheck(response, chatName) {
         if (response == true) {
             $("#guestError").text("That chat name is taken.");
         } else {

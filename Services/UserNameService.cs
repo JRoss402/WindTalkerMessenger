@@ -14,9 +14,7 @@ namespace WindTalkerMessenger.Services
         private readonly IContextService _contextService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<UserNameService> _logger;
-
 		private const string chatNameKey = "chatName";
-
 
 		public UserNameService(IHttpContextAccessor http, 
                           OnlineUsersLists onlineUsersLists,

@@ -22,7 +22,6 @@ namespace WindTalkerMessenger.Services
         private readonly IHttpContextAccessor _http;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly OnlineUsersLists _onlineUsersLists;
-        private readonly UserNameService _userNameService;
         private enum Statuses { Sent, Queued }
 
         public ContextService(ApplicationDbContext context,

@@ -8,81 +8,11 @@
 	ViewData["Title"] = "Home Page";
 }
 
-<!--The link below is the original source code for the blinking cursor-->
-<!--https://dev.to/phuocng/blinking-cursor-35f4-->
-<style>
-	body {
-		background-image: url('../banner.jpg');
-		background-repeat: no-repeat;
-		background-attachment: fixed;
-		background-size: 100% 100%;
-	}
 
-	.container {
-		width: 1350px;
-		height: 520px;
-		background-color: black;
-		margin: auto;
-		color: green;
-		opacity: 95%;
-		border-radius: 25px;
-		font-size: 20px;
-		font-weight: bold;
-	}
-
-	h2 {
-		margin-bottom: 70px;
-	}
-
-	#enterButton {
-		margin-top: 40px;
-		background-color: black;
-		border-color: #7ACC00;
-		border-width: 1px;
-		height: 50px;
-		color: #7ACC00;
-		font-size: 20px;
-		font-weight: bold;
-	}
-
-
-
-	#enterButton:hover {
-		background-color: darkgreen;
-		opacity: 95%;
-	}
-
-	* {
-		box-sizing: border-box;
-	}
-
-	.cursor {
-		background-color: rgb(122 204 0);
-		width: 0.25rem;
-		height: 2rem;
-		display: inline-block;
-		animation: blink 1s infinite;
-		display: inline-block;
-		position: relative;
-		top: 7px;
-	}
-
-	@@keyframes blink {
-		from {
-			opacity: 1;
-		}
-
-		to {
-			opacity: 0;
-		}
-	}
-
-</style>
-
-<div class="container">
+<div class="containerBase">
 	<div class="text-center">
 		<h1>Welcome to Wind Talker</h1>
-		<h2>Taking back privacy.</h2>
+		<h2 class="indexH2">Taking back privacy.</h2>
 		@if (SignInManager.IsSignedIn(User))
 		{
 			<p>@User.Claims.FirstOrDefault(x => x.Type == "ChatName")?.Value, your credentials have been verified.</p>
@@ -92,7 +22,7 @@
 		<p>Guests are allowed to chat if you do not have an account.</p>
 		<p>Please visit the "About" page to learn more!<span class="cursor"></span></p>
 
-		<a id="enterButton" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter The Terminal</a>
+		<a id="enterButtonOverlay" type="button" class="btn btn-primary" asp-action="StartChatting" asp-controller="Messaging">Enter The Terminal</a>
 	</div>
 </div>
 

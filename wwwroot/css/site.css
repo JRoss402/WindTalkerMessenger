@@ -21,89 +21,9 @@ body {
     background-size: 100% 100%;
 }
 
-#leftinnerdiv {
-    list-style: none;
-}
-
-.personalDataPage {
-    position: relative;
-    z-index: 2;
-    margin-left:100px;
-}
 .navItems{
     margin-right:20px
 }
-.navContainer {
-    width: 1350px;
-    height: 600px;
-    background-color: black;
-    margin: auto;
-    color: green;
-    opacity: 95%;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    display: flex;
-    flex-direction: column;
-    padding-top:70px;
-    z-index:1;
-}
-
-.registerContainer {
-    width: 1350px;
-    height: 600px;
-    background-color: black;
-    margin: auto;
-    color: green;
-    opacity: 95%;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.enterButtonNavIndex {
-    margin-top: 40px;
-    background-color: black;
-    border-color: #7ACC00;
-    border-width: 1px;
-    height: 50px;
-    color: #7ACC00;
-    font-size: 20px;
-    font-weight: bold;
-    width: 300px;
-}
-
-.username {
-    height: 50px;
-    font-size: 20px;
-    margin-top: 20px;
-    margin-bottom: 50px;
-    text-align: center;
-    background-color: black;
-    opacity: 95%;
-    color: green;
-    border-color: green;
-}
-
-.registerButton {
-    background-color: black;
-    border-color: #7ACC00;
-    border-width: 1px;
-    height: 50px;
-    color: green;
-    font-size: 20px;
-    font-weight: bold;
-    padding-bottom: 10px
-
-}
-
-    .registerButton:hover {
-        color: #7ACC00
-    }
 
 .registerFormGroups label {
     width: 150px;
@@ -116,6 +36,7 @@ body {
     border-color: green;
 
 }
+
 .passwordInput {
     height: 50px;
     font-size: 20px;
@@ -155,8 +76,8 @@ body {
     }
 
 .formlabel {
-margin-left:425px;
-margin-top:12px
+    margin-left:425px;
+    margin-top:12px
 }
 
 #forgot {
@@ -180,74 +101,161 @@ margin-top:12px
     font-size: 25px;
 }
 
-#menuItems {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-}
 
 .mainLink:hover {
     text-decoration: none;
     color: #7ACC00;
 }
 
-.loginContainer {
-    width: 1350px;
-    height: 600px;
+/********CHAT PAGE STYLING********/
+#chatsAside {
     background-color: black;
-    margin: auto;
-    color: green;
+    color: #7ACC00;
+    border-style: solid;
+    border-width: 1px;
+    border-left-width: 0px;
     opacity: 95%;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    z-index:1;
-    
+    float: right;
+    height: 495px;
+    width: 25%;
+    justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border-right-color: black;
+    text-align: center;
+    border-top-width: 0px;
+    border-top-right-radius: 25px;
+}
+#chatParagraph {
+    font-size: 40px;
+    text-decoration: underline;
 }
 
-.chatPageContainer {
-    width: 1350px;
-    height: 600px;
-    background-color: black;
-    margin: auto;
-    color: green;
-    opacity: 95%;
-    border-radius: 25px;
-    font-size: 20px;
+#userHeading {
+    color: #2E801B;
+    font-size: 60px;
     font-weight: bold;
-    z-index: 1;
+    text-align: center;
 }
-
-.sendButton {
-    margin-top: 10px;
+#message {
     height: 50px;
-    width: 125px;
+    font-size: 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+    text-align: center;
     background-color: black;
-    color: green;
-    font-weight: bold;
-    border-left-color: black;
-    margin-left: 0px;
+    opacity: 90%;
+    color: #7ACC00;
+    border-color: green;
+    width: 1150px;
+    border-right-color: black;
+    width: 1210px;
 }
 
-.logoutButton {
-    text-decoration: none;
-    color: green;
-    font-size: 25px;
-    background-color: #212529;
-    border: none;
-}
-
-    .logoutButton:hover {
-        color: #7ACC00
-    }
-
-.sendButton:hover {
+.messageLoad {
     color: #7ACC00;
 }
+
+.senderColor {
+    color: purple;
+    margin-bottom: 3px;
+}
+.maindiv {
+    border-style: none;
+}
+
+
+
+.timestampSender {
+    font-size: 15px;
+    color: purple;
+    margin-bottom: 5px;
+}
+
+.timestampReceiver {
+    font-size: 15px;
+    color: green;
+    margin-bottom: 5px;
+}
+
+.timeFontColor {
+    color: #7ACC00;
+}
+
+#warning {
+    color: red;
+}
+
+#deletePara {
+    margin-top: -40px;
+}
+
+#maindiv {
+    border: 3px solid black;
+    height: 500px;
+    width: auto;
+    margin: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#chatList {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+#leftinnerdiv {
+    float: left;
+    height: 495px;
+    width: 50%;
+    overflow-y: auto;
+    background-color: black;
+    opacity: 95%;
+    color: #2E801B;
+    border-style: solid;
+    border-width: 1px;
+    border-top-style: none;
+    border-left-style: none;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-top-left-radius: 25px;
+    list-style: none;
+}
+
+.username {
+    height: 50px;
+    font-size: 20px;
+    margin-top: 20px;
+    margin-bottom: 50px;
+    text-align: center;
+    background-color: black;
+    opacity: 95%;
+    color: green;
+    border-color: green;
+}
+
+#rightinnerdiv {
+    float: left;
+    height: 495px;
+    width: 25%;
+    overflow-y: auto;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-width: 1px;
+    justify-content: center;
+    text-align: center;
+}
+
+
+.indexH2 {
+    margin-bottom: 70px;
+}
+
+
+/*The link below is the original source code for the blinking cursor*/
+/*https://dev.to/phuocng/blinking-cursor-35f4*/
 
 .cursor {
     background-color: rgb(122 204 0);
@@ -269,9 +277,168 @@ margin-top:12px
         opacity: 0;
     }
 }
+
 * {
     box-sizing: border-box;
 }
+
+
+#textarea {
+    padding: 25px;
+
+}
+
+
+.abouth2 {
+    margin-bottom: 20px;
+
+}
+
+/*https://www.w3schools.com/howto/howto_css_custom_scrollbar.asp*/
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: black;
+}
+
+::-webkit-scrollbar-thumb {
+    background: green;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #7ACC00;
+    }
+
+/******Buttons*********/
+.enterButtonNavIndex {
+    margin-top: 40px;
+    background-color: black;
+    border-color: #7ACC00;
+    border-width: 1px;
+    height: 50px;
+    color: #7ACC00;
+    font-size: 20px;
+    font-weight: bold;
+    width: 300px;
+}
+
+.registerButton {
+    background-color: black;
+    border-color: #7ACC00;
+    border-width: 1px;
+    height: 50px;
+    color: green;
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px
+}
+
+    .registerButton:hover {
+        color: #7ACC00
+    }
+
+.killswitch {
+    margin-top: 10px;
+    height: 50px;
+    width: 300px;
+    background-color: #2a2a2a;
+    color: #6a6a6a;
+    font-weight: bold;
+    border-left-color: black;
+    margin-left: 0px;
+    font-size: 25px;
+}
+
+    .killswitch:active {
+        color: #7ACC00;
+        background-color: red;
+    }
+
+.enableSwitch {
+    margin-top: 10px;
+    height: 50px;
+    width: 300px;
+    background-color: #7ACC00;
+    color: red;
+    font-weight: bold;
+    border-left-color: black;
+    margin-left: 0px;
+    font-size: 25px;
+}
+
+    .enableSwitch:active {
+        color: #7ACC00;
+        background-color: red;
+    }
+
+.sendButton {
+    margin-top: 10px;
+    height: 50px;
+    width: 125px;
+    background-color: black;
+    color: green;
+    font-weight: bold;
+    border-left-color: black;
+    margin-left: 0px;
+}
+    .sendButton:hover {
+        color: #7ACC00;
+    }
+
+.logoutButton {
+    text-decoration: none;
+    color: green;
+    font-size: 25px;
+    background-color: #212529;
+    border: none;
+}
+
+    .logoutButton:hover {
+        color: #7ACC00
+    }
+
+//https://stackoverflow.com/questions/710089/how-do-i-make-an-html-link-look-like-a-button
+.linkToButton {
+    margin-top: 40px;
+    background-color: black;
+    height: 200px;
+    color: #7ACC00;
+    font-size: 20px;
+    font-weight: bold;
+    width: 300px;
+    padding: 10px 15px 10px 15px;
+    text-decoration: none;
+    border-top: 1px solid #7ACC00;
+    border-right: 1px solid #7ACC00;
+    border-bottom: 1px solid #7ACC00;
+    border-left: 1px solid #7ACC00;
+    position: relative;
+    top: 20px;
+    text-align: center;
+}
+
+.linkToButton:hover {
+    color: #7ACC00;
+    background-color: red;
+}
+
+#nameButton {
+    background-color: black;
+    border-color: green;
+    border-width: 1px;
+    height: 50px;
+    color: #7ACC00;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+    #nameButton:hover {
+        background-color: darkgreen;
+        opacity: 95%;
+    }
 
 .enterButton {
     margin-top: 40px;
@@ -284,17 +451,11 @@ margin-top:12px
     font-weight: bold;
 }
 
-    #enterButton:hover {
-        background-color: darkgreen;
-        opacity: 95%;
-    }
-
-#textarea {
-    padding: 25px;
-
+.enterButton:hover {
+    background-color: darkgreen;
+    opacity: 95%;
 }
-
-#enterButton {
+#enterButtonOverlay {
     margin-top: 40px;
     background-color: black;
     border-color: #7ACC00;
@@ -305,30 +466,53 @@ margin-top:12px
     font-weight: bold;
 }
 
-
-
-    #enterButton:hover {
+    #enterButtonOverlay:hover {
         background-color: darkgreen;
         opacity: 95%;
     }
 
-* {
-    box-sizing: border-box;
+/******Containers******/
+#messageContainer {
+    display: inline-flex;
 }
-.aboutContainer {
+
+
+.personalDataContainer {
+    position: relative;
+    z-index: 2;
+    margin-left: 100px;
+}
+
+.containerBase {
     width: 1350px;
-    height: auto;
+    height: 600px;
     background-color: black;
+    margin: auto;
     color: green;
     opacity: 95%;
     border-radius: 25px;
     font-size: 20px;
     font-weight: bold;
-    position: relative;
-    right: 20px;
 }
 
-.abouth2 {
-    margin-bottom: 20px;
+.aboutContainer {
+    height: auto;
+    position: relative;
+    right: 20px;
+    z-index: 1;
+}
 
+.navContainer {
+    display: flex;
+    flex-direction: column;
+    padding-top: 70px;
+    z-index: 1;
+}
+
+.registerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
 }
