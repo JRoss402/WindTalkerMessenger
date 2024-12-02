@@ -96,11 +96,13 @@ namespace WindTalkerMessenger.Services
 
         public async Task KillSwitchAsync(string userName)
         {
+            string chatName = GetSenderChatName("");
+            await _contextService.RemoveRegisteredUserAsync(chatName);
             var user =  await _userManager.FindByEmailAsync(userName);
             string userEmail = user.ToString();
             var result = await _userManager.DeleteAsync(user);
 
-            _contextService.UpdateIdentityMessagesAsync(userEmail);
+            await _contextService.UpdateIdentityMessagesAsync(userEmail);
 
             if (!result.Succeeded)
             {

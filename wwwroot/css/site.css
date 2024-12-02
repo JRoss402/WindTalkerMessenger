@@ -268,20 +268,6 @@ body {
     top: 7px;
 }
 
-@keyframes blink {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
-}
-
-* {
-    box-sizing: border-box;
-}
-
 
 #textarea {
     padding: 25px;
